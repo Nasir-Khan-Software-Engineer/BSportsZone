@@ -1,0 +1,275 @@
+:root {
+    --bs-primary: #4e73df;
+}
+
+.modal-header rounded {
+    background-color: var(--bs-primary);
+    color: white;
+}
+
+.form-label {
+    font-weight: 500;
+}
+
+.form-control::placeholder {
+    color: #aaa;
+}
+
+.icon-label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.form-section {
+    margin-bottom: 1rem;
+}
+
+
+.product-card {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: center;
+    background: #fff;
+}
+
+.total-box {
+    background: #e8eaf6;
+    padding: 15px;
+    border-radius: 5px;
+}
+
+.btn-pay {
+    min-width: 100px;
+    padding-top: 15px !important;
+    padding-bottom: 15px !important;
+    font-size: 20px !important;
+}
+
+.full-height {
+    height: calc(100vh - 400px);
+    overflow: auto;
+}
+
+.pos-search-item-container {
+    position: absolute;
+    top: 38px;
+    max-height: 250px;
+    overflow: auto;
+    background-color: #eee;
+    width: 100%;
+    z-index: 100;
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-top: 1px !important;
+}
+
+.item-selectable:hover {
+    background-color: #ddd;
+    cursor: pointer;
+}
+
+.item-not-selectable {
+    cursor: none;
+    color: #ccc;
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Old versions of Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently */
+}
+
+.recent-product {
+    cursor: pointer;
+}
+
+.select2-selection--single {
+    height: 38px !important;
+    border: 1px solid var(--bs-border-color) !important;
+}
+
+.select2-selection__arrow {
+    display: none;
+    height: 38px !important;
+}
+
+.select2-selection__rendered {
+    line-height: 38px !important;
+}
+
+/* // category and brand select2 clear icon css  */
+.category-brand-select .select2-selection__clear span{
+    display: none;
+}
+.category-brand-select .select2-container--classic .select2-selection--single{
+    padding-right: 0px !important;
+}
+.category-brand-select .select2-container--classic .select2-selection--single .select2-selection__clear{
+    margin-right: 5px;
+}
+.category-brand-select .select2-container--classic .select2-selection__clear {
+    color: #ff4d4f; 
+    cursor: pointer;
+    height: 100% !important;
+    margin-right: 5px;
+}
+.category-brand-select .select2-container--classic .select2-selection__clear::after {
+    content: "\f00d";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+}
+
+.category-brand-select span.select2-container{
+    border: 1px solid rgb(63, 63, 63) !important;
+    border-radius: 0px !important;
+}
+.category-brand-select span.select2-container .select2-selection__placeholder{
+    color: #4d4d4d;
+}
+
+.adjustment-input {
+    max-height: 30px !important;
+    border-radius: 5px !important;
+}
+
+.adjustment-input-info-icon {
+    color: #5e1d66;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.tooltip-inner {
+    max-width: 400px !important;
+    text-align: left !important;
+}
+
+
+/* Grid view layout (4 per row) */
+#searchProductContainer.grid-view {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+
+/* List view layout (stacked, full width) */
+#searchProductContainer.list-view {
+    display: block;
+}
+
+#searchProductContainer.list-view .list-item {
+    display: block !important;
+    background-color: #ccc !important;
+}
+
+#searchProductContainer.grid-view .grid-item {
+    display: flex !important;
+    border-radius: 5px;
+}
+
+#searchProductContainer.list-view .grid-item {
+    display: none !important;
+}
+
+#searchProductContainer.list-view .list-item {
+    display: flex !important;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    background-color: #fff;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+
+#searchProductContainer.list-view .list-item:hover {
+    background-color: #f8f9fa;
+}
+
+.terminal-header  {
+    height: 45px !important;
+}
+
+.pos-page-font-size{
+    font-size: 16px !important;
+}
+.category-brand-select .selection .select2{
+    font-size: 16px !important;
+    border-radius: 5px !important;
+    /* // not working  */
+}
+
+.assigned-beautician{
+    font-size: 13px;
+    float: right;
+    transition: all 0.3s ease-in-out;
+    cursor: pointer;
+}
+.beautician-change-button{
+    border: 0px;
+    background: transparent;
+}
+
+.selected-service-name:hover .assigned-beautician{
+    font-size: 16px;
+}
+
+.beautician-card {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
+    background-color: #fff;
+    position: relative;
+}
+
+.beautician-card:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.beautician-card.assigned {
+    background-color: #d4edda;
+    border-color: #28a745;
+}
+
+.beautician-card.disabled {
+    opacity: 0.6;
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.beautician-card.disabled .btn-assign-beautician {
+    pointer-events: none;
+}
+
+.beautician-info {
+    margin-bottom: 10px;
+}
+
+.beautician-info p {
+    margin-bottom: 5px;
+}
+
+.btn-assign-beautician {
+    width: 100%;
+}
+
+.beautician-card .beautician-status{
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    font-size: 13px;
+}
+
+.beautician-card.available{
+    cursor: pointer;
+}

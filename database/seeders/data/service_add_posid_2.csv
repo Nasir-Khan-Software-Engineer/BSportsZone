@@ -1,0 +1,271 @@
+brand,unit,category,name,price,code,cname
+16,6,16,Eye Brow,100,1001,Threading
+16,6,16,Upper Lips,100,1002,Threading
+16,6,16,Chin,80,1003,Threading
+16,6,16,Fore Head,100,1004,Threading
+16,6,16,Side Looks,200,1005,Threading
+16,6,16,Full Face,800,1006,Threading
+16,6,21,Face (Normal),1000,1007,Polish
+16,6,21,Coconut Polish (Face),1100,1008,Polish
+16,6,21,Milk Polish (Face),1200,1009,Polish
+16,6,21,Face and Neck (Normal),1800,1010,Polish
+16,6,21,Under Arms,500,1011,Polish
+16,6,17,Ear Piercing (Both),3000,1012,Ear Piercing
+16,6,17,Ear Piercing (1 Ear),1500,1013,Ear Piercing
+16,6,17,Nose Piercing,1800,1014,Ear Piercing
+16,6,22,Straight Cut,300,1015,Haircut
+16,6,22,V Shape,500,1016,Haircut
+16,6,22,U Shape,400,1017,Haircut
+16,6,22,Long Layers,800,1018,Haircut
+16,6,22,Short Layers,800,1019,Haircut
+16,6,22,Bangs Cut,350,1020,Haircut
+16,6,22,Curtain Bangs,400,1021,Haircut
+16,6,22,Bob Cut,1000,1022,Haircut
+16,6,22,Long Bob,1200,1023,Haircut
+16,6,22,Butterfly Cut,1200,1024,Haircut
+16,6,22,Jawline Bob,1000,1025,Haircut
+16,6,22,Italian Bob,1200,1026,Haircut
+16,6,22,Textured Bob,1200,1027,Haircut
+16,6,22,Modern Shag Cut,1450,1028,Haircut
+16,6,22,Long Shag,1500,1029,Haircut
+16,6,22,Feathered Cut,1200,1030,Haircut
+16,6,22,Blank Cut,800,1031,Haircut
+16,6,22,Long Waves,1450,1032,Haircut
+16,6,22,Long Shaggy,800,1033,Haircut
+16,6,22,Short Shaggy,800,1034,Haircut
+16,6,22,Sliced Layers,1150,1035,Haircut
+16,6,22,Long Boho Layers,1400,1036,Haircut
+16,6,22,Long Razor Layers,1400,1037,Haircut
+16,6,22,Long Volume,1200,1038,Haircut
+16,6,22,Short Volume,1200,1039,Haircut
+16,6,22,Mullet Cut,1150,1040,Haircut
+16,6,22,Hime Cut,1200,1041,Haircut
+16,6,22,Hush Cut,1200,1042,Haircut
+16,6,22,Three Layers Step,800,1043,Haircut
+16,6,22,Wolf Cut,1100,1044,Haircut
+16,6,22,Front Layer,900,1045,Haircut
+16,6,22,Long Slide,900,1046,Haircut
+16,6,22,Short Slide,900,1047,Haircut
+16,6,22,Bubble Cut,1050,1048,Haircut
+16,6,22,Embrace Layer,1100,1049,Haircut
+16,6,22,Baby Hair Cut,500,1050,Haircut
+16,6,22,Hair Wash and Conditioning,600,1051,Haircut
+16,6,22,Blow Dry,500,1052,Haircut
+16,6,22,Blow Dry Special,1200,1053,Haircut
+16,6,23,Basic Cleansing,500,1054,Classic Facial
+16,6,23,Herbal Facial,700,1055,Classic Facial
+16,6,23,Hydrating Facial,1200,1056,Classic Facial
+16,6,23,Fruit Facial,1200,1057,Classic Facial
+16,6,23,Detox Facial,1400,1058,Classic Facial
+16,6,23,Acne Control Facial,1400,1059,Classic Facial
+16,6,24,Anti Aging Facial,2200,1060,Premium Facial
+16,6,24,Gold Facial,2000,1061,Premium Facial
+16,6,24,Pearl Facial,2500,1062,Premium Facial
+16,6,24,Matcha Facial,1800,1063,Premium Facial
+16,6,24,Skin Whitening Facial,1800,1064,Premium Facial
+16,6,24,Oxy Facial,2200,1065,Premium Facial
+16,6,24,Vita-C Facial,3500,1066,Premium Facial
+16,6,44,Base Colour,7000,1067,Hair Colour(Depends on Length)
+16,6,44,Base Colour Special,10000,1068,Hair Colour(Depends on Length)
+16,6,44,Base Colour with Highlights,12000,1069,Hair Colour(Depends on Length)
+16,6,44,Base Colour with Highlights Special,18000,1070,Hair Colour(Depends on Length)
+16,6,44,Low Lights,12000,1071,Hair Colour(Depends on Length)
+16,6,44,Low Lights Special,18000,1072,Hair Colour(Depends on Length)
+16,6,44,Baby Lights,15000,1073,Hair Colour(Depends on Length)
+16,6,44,Baby Lights Special,20000,1074,Hair Colour(Depends on Length)
+16,6,44,Balayage,16000,1075,Hair Colour(Depends on Length)
+16,6,44,Balayage Special,22000,1076,Hair Colour(Depends on Length)
+16,6,44,Ombre,14000,1077,Hair Colour(Depends on Length)
+16,6,44,Ombre Special,18000,1078,Hair Colour(Depends on Length)
+16,6,44,Sombre (Soft Ombre),15000,1079,Hair Colour(Depends on Length)
+16,6,44,Sombre (Soft Ombre) Special,22000,1080,Hair Colour(Depends on Length)
+16,6,44,Colour Melt,15000,1081,Hair Colour(Depends on Length)
+16,6,44,Colour Melt Special,22000,1082,Hair Colour(Depends on Length)
+16,6,44,Root Shadow,8000,1083,Hair Colour(Depends on Length)
+16,6,44,Root Shadow Special,15000,1084,Hair Colour(Depends on Length)
+16,6,44,Deep Dye,12000,1085,Hair Colour(Depends on Length)
+16,6,44,Deep Dye Special,18000,1086,Hair Colour(Depends on Length)
+16,6,44,Shadow Stoning,18000,1087,Hair Colour(Depends on Length)
+16,6,44,Shadow Stoning Special,25000,1088,Hair Colour(Depends on Length)
+16,6,44,Under Lights,3000,1089,Hair Colour(Depends on Length)
+16,6,44,Under Lights Special,6000,1090,Hair Colour(Depends on Length)
+16,6,44,Root Touch up,3000,1091,Hair Colour(Depends on Length)
+16,6,44,Root Touch up Special,6000,1092,Hair Colour(Depends on Length)
+16,6,45,Botox Treatment (Long Short),15000,1093,Hair Straightening Treatment
+16,6,45,Botox Treatment (Long Short) Special,22000,1094,Hair Straightening Treatment
+16,6,45,Silk Shine Treatment,10000,1095,Hair Straightening Treatment
+16,6,45,Silk Shine Treatment Special,15000,1096,Hair Straightening Treatment
+16,6,45,Japanese Hair Straightening,15000,1097,Hair Straightening Treatment
+16,6,45,Japanese Hair Straightening Special,20000,1098,Hair Straightening Treatment
+16,6,45,Brazilian Rebonding,7000,1099,Hair Straightening Treatment
+16,6,45,Brazilian Rebonding Special,15000,1100,Hair Straightening Treatment
+16,6,45,Omega Treatment,15000,1101,Hair Straightening Treatment
+16,6,45,Omega Treatment Special,25000,1102,Hair Straightening Treatment
+16,6,45,Frizz Free Fusion,15000,1103,Hair Straightening Treatment
+16,6,45,Frizz Free Fusion Special,25000,1104,Hair Straightening Treatment
+16,6,46,Normal Manicure Pedicure,1200,1105,Manicure-Pedicure
+16,6,46,Manicure (Classic),750,1106,Manicure-Pedicure
+16,6,46,Pedicure (Classic),750,1107,Manicure-Pedicure
+16,6,46,Candy Mani Pedi,2200,1108,Manicure-Pedicure
+16,6,46,Bomb Mani Pedi,2500,1109,Manicure-Pedicure
+16,6,46,Coconut Matcha Mani Pedi,3000,1110,Manicure-Pedicure
+16,6,46,Royal Peeling Mani Pedi,3600,1111,Manicure-Pedicure
+16,6,46,Detox Mani Pedi,1800,1112,Manicure-Pedicure
+16,6,46,Coco Honey Mani Pedi,2200,1113,Manicure-Pedicure
+16,6,46,Foot Peeling,2000,1114,Manicure-Pedicure
+16,6,46,Foot Massage,1200,1115,Manicure-Pedicure
+16,6,46,Jelly Mani Pedi,4000,1116,Manicure-Pedicure
+16,6,46,Crystal Mani Pedi,5000,1117,Manicure-Pedicure
+16,6,46,Signature Spa Mani Pedi,5000,1118,Manicure-Pedicure
+16,6,46,Hot Stone Massage,1500,1119,Manicure-Pedicure
+16,6,46,Fair Polish Hand (Full),1200,1120,Manicure-Pedicure
+16,6,46,Fair Polish Leg (Full),2400,1121,Manicure-Pedicure
+16,6,46,Fair Polish Leg (Half),1200,1122,Manicure-Pedicure
+16,6,47,Waxing (Hand Full),1200,1123,Waxing
+16,6,47,Waxing Leg (Full),1500,1124,Waxing
+16,6,47,Waxing (Hand Half),750,1125,Waxing
+16,6,47,Waxing Leg (Half),750,1126,Waxing
+16,6,47,Waxing Hand+ Leg (Full),2500,1127,Waxing
+16,6,47,Waxing Hand+ Leg (Half),1500,1128,Waxing
+16,6,47,Underarms,1200,1129,Waxing
+16,6,47,Back Full,1200,1130,Waxing
+16,6,47,Shoulder,650,1131,Waxing
+16,6,47,Bikini,3000,1132,Waxing
+16,6,48,Hot Oil Massage,650,1133,Oil Massage (Short/Long)
+16,6,48,Hot Oil Massage Special,1100,1134,Oil Massage (Short/Long)
+16,6,48,Aromatherapy Oil Massage,800,1135,Oil Massage (Short/Long)
+16,6,48,Aromatherapy Oil Massage Special,1500,1136,Oil Massage (Short/Long)
+16,6,48,Mixed Herbal Oil Massage,1000,1137,Oil Massage (Short/Long)
+16,6,48,Mixed Herbal Oil Massage Special,2000,1138,Oil Massage (Short/Long)
+16,6,48,Vitamin E Oil Massage,800,1139,Oil Massage (Short/Long)
+16,6,48,Vitamin E Oil Massage Special,1200,1140,Oil Massage (Short/Long)
+16,6,49,Henna Pack,1200,1141,Hair Treatment (Short/Long)
+16,6,49,Henna Pack Special,1500,1142,Hair Treatment (Short/Long)
+16,6,49,Protein Pack,1200,1143,Hair Treatment (Short/Long)
+16,6,49,Protein Pack Special,1500,1144,Hair Treatment (Short/Long)
+16,6,49,Hydra Care Hair Mask,1200,1145,Hair Treatment (Short/Long)
+16,6,49,Hydra Care Hair Mask Special,1800,1146,Hair Treatment (Short/Long)
+16,6,49,Keratine Infusion Pack,1400,1147,Hair Treatment (Short/Long)
+16,6,49,Keratine Infusion Pack Special,2000,1148,Hair Treatment (Short/Long)
+16,6,49,Deep Repair Mask,1200,1149,Hair Treatment (Short/Long)
+16,6,49,Deep Repair Mask Special,1800,1150,Hair Treatment (Short/Long)
+16,6,49,Hair Detox Pack,1500,1151,Hair Treatment (Short/Long)
+16,6,49,Hair Detox Pack Special,2500,1152,Hair Treatment (Short/Long)
+16,6,49,Silk Protein Pack,1500,1153,Hair Treatment (Short/Long)
+16,6,49,Silk Protein Pack Special,2500,1154,Hair Treatment (Short/Long)
+16,6,49,Volume Boost Hair Pack,1800,1155,Hair Treatment (Short/Long)
+16,6,49,Volume Boost Hair Pack Special,2900,1156,Hair Treatment (Short/Long)
+16,6,49,Colour Guard Pack,1800,1157,Hair Treatment (Short/Long)
+16,6,49,Colour Guard Pack Special,2400,1158,Hair Treatment (Short/Long)
+16,6,49,Silk Renewal Pack,1800,1159,Hair Treatment (Short/Long)
+16,6,49,Silk Renewal Pack Special,2200,1160,Hair Treatment (Short/Long)
+16,6,50,Aqua Silk Revival,1200,1161,Hair Spa
+16,6,50,Aqua Silk Revival Special,1800,1162,Hair Spa
+16,6,50,Vital Roots Spa,1200,1163,Hair Spa
+16,6,50,Vital Roots Spa Special,1800,1164,Hair Spa
+16,6,50,Luxe Leaf Therapy,1800,1165,Hair Spa
+16,6,50,Luxe Leaf Therapy Special,2500,1166,Hair Spa
+16,6,50,Hydrating Hair Spa,1800,1167,Hair Spa
+16,6,50,Hydrating Hair Spa Special,2500,1168,Hair Spa
+16,6,50,Keratine Hair Spa,2000,1169,Hair Spa
+16,6,50,Keratine Hair Spa Special,2500,1170,Hair Spa
+16,6,50,Anti Dandruff Spa,2000,1171,Hair Spa
+16,6,50,Anti Dandruff Spa Special,2500,1172,Hair Spa
+16,6,50,Hair Ampoles Spa,2500,1173,Hair Spa
+16,6,50,Hair Ampoles Spa Special,3200,1174,Hair Spa
+16,6,50,Brazilian Hair Spa,2500,1175,Hair Spa
+16,6,50,Brazilian Hair Spa Special,3200,1176,Hair Spa
+16,6,50,Olaplex Hair Spa,2500,1177,Hair Spa
+16,6,50,Olaplex Hair Spa Special,3500,1178,Hair Spa
+16,6,50,Nano Steam Hair Spa,3000,1179,Hair Spa
+16,6,50,Nano Steam Hair Spa Special,3500,1180,Hair Spa
+16,6,50,Steam & Shine Therapy,3000,1181,Hair Spa
+16,6,50,Steam & Shine Therapy Special,3500,1182,Hair Spa
+16,6,50,Nano Shine Therapy,3000,1183,Hair Spa
+16,6,50,Nano Shine Therapy Special,3500,1184,Hair Spa
+16,6,50,Colour Protection,3500,1185,Hair Spa
+16,6,50,Colour Protection Special,4000,1186,Hair Spa
+16,6,51,Glam Look by (Senior Hand),4000,1187,Party Makeup
+16,6,51,Soft Glam Look by (Inhouse Artist),3000,1188,Party Makeup
+16,6,51,Exclusive Party Look by (Senior Hand),6000,1189,Party Makeup
+16,6,51,Signature Party Look,7000,1190,Party Makeup
+16,6,51,Semi Bridal Look,8000,1191,Party Makeup
+16,6,51,Only Face,2500,1192,Party Makeup
+16,6,52,Bridal Make Up by Senior Hand,12000,1193,Bridal Makeup
+16,6,52,Bridal Makeup by In House Artist,10000,1194,Bridal Makeup
+16,6,52,Exclusive Bridal by Senior hand,15000,1195,Bridal Makeup
+16,6,53,Holud Makeup,8000,1196,Makeup In-House Artist
+16,6,53,Holud Makeup Special,12000,1197,Makeup In-House Artist
+16,6,53,Akdh Makeup,7000,1198,Makeup In-House Artist
+16,6,53,Akdh Makeup Special,10000,1199,Makeup In-House Artist
+16,6,53,Engagement Makeup,8000,1200,Makeup In-House Artist
+16,6,53,Engagement Makeup Special,12000,1201,Makeup In-House Artist
+16,6,53,Reception Make Up,8000,1202,Makeup In-House Artist
+16,6,53,Reception Make Up Special,12000,1203,Makeup In-House Artist
+16,6,54,Hair Extention,1000,1204,Extra Adds On
+16,6,54,Hair Extention Special,1500,1205,Extra Adds On
+16,6,54,Hair Extention Premium,2000,1206,Extra Adds On
+16,6,54,Len's,700,1207,Extra Adds On
+16,6,54,Fake Nail's,400,1208,Extra Adds On
+16,6,54,Artificial Hair Accessories,500,1209,Extra Adds On
+16,6,54,Artificial Hair Accessories Special,1000,1210,Extra Adds On
+16,6,54,Artificial Hair Accessories Premium,1500,1211,Extra Adds On
+16,6,54,Sharee Draping,250,1212,Extra Adds On
+16,6,54,Dupatta Setting,200,1213,Extra Adds On
+16,6,54,Hand Painting,500,1214,Extra Adds On
+16,6,54,Fore Head Painting,200,1215,Extra Adds On
+16,6,55,Hot Oil Massage,3000,1216,Body Spa
+16,6,55,Swedish Massage,4500,1217,Body Spa
+16,6,55,Deep Tissue Massage,4500,1218,Body Spa
+16,6,55,Hot Stone Spa,5000,1219,Body Spa
+16,6,55,Aroma Therapy Spa,6600,1220,Body Spa
+16,6,55,Sugar Bomb Spa,6600,1221,Body Spa
+16,6,55,Hydrating body Wrap,12000,1222,Body Spa
+16,6,55,Back Facial,4000,1223,Body Spa
+16,6,55,Royal Signature Spa,15000,1224,Body Spa
+16,6,55,Silk Body Polish and Wrap,15000,1225,Body Spa
+16,6,55,Warm Paraffin Spa,12000,1226,Body Spa
+16,6,55,Detox Body Spa,12000,1227,Body Spa
+16,6,55,Body Bom Massage,3000,1228,Body Spa
+16,6,55,Soft Glam Bride,18000,1229,Signature by Nowshin MaAm
+16,6,56,Signature Bride,25000,1230,Signature by Nowshin MaAm
+16,6,56,Royal Bride,35000,1231,Signature by Nowshin MaAm
+16,6,56,Holud Bride,18000,1232,Signature by Nowshin MaAm
+16,6,56,Reception Bride,20000,1233,Signature by Nowshin MaAm
+16,6,56,Akdh Bride,15000,1234,Signature by Nowshin MaAm
+16,6,56,Engagement Bride,15000,1235,Signature by Nowshin MaAm
+16,6,56,Mehedi Look,18000,1236,Signature by Nowshin MaAm
+16,6,56,Semi Bridal,12000,1237,Signature by Nowshin MaAm
+16,6,57,Non Bridal (One Side),400,1238,Henna
+16,6,57,Non Bridal (Both Side),800,1239,Henna
+16,6,57,Bridal (Four Part),2000,1240,Henna
+16,6,57,Bridal (Four Part) Special,4000,1241,Henna
+16,6,57,Bridal (Leg),2000,1242,Henna
+16,6,57,Exclusive Bridal (Full),8000,1243,Henna
+16,6,58,Blow Dry (Long Short),800,1244,Hair Do
+16,6,58,Blow Dry (Long Short) Special,1200,1245,Hair Do
+16,6,58,Straight (Long Short),1000,1246,Hair Do
+16,6,58,Straight (Long Short) Special,1500,1247,Hair Do
+16,6,58,Curl's,1000,1248,Hair Do
+16,6,58,Curl's Special,1500,1249,Hair Do
+16,6,58,Soft Curl's,1200,1250,Hair Do
+16,6,58,Beach Waves,1500,1251,Hair Do
+16,6,58,French Braid,1200,1252,Hair Do
+16,6,58,French Braid Special,1800,1253,Hair Do
+16,6,58,Messi Braid,1200,1254,Hair Do
+16,6,58,Messi Side Braid,1200,1255,Hair Do
+16,6,58,Messi Side Braid Special,1800,1256,Hair Do
+16,6,58,Fashion Customize Hair Bun,1200,1257,Hair Do
+16,6,58,Flower Bun,900,1258,Hair Do
+16,6,58,Bride's maids Hair Setting,1200,1259,Hair Do
+16,6,58,Signature Customize Hair do,1500,1260,Hair Do
+16,6,58,Low bun,800,1261,Hair Do
+16,6,58,Low bun Special,1000,1262,Hair Do
+16,6,58,Side Bun,800,1263,Hair Do
+16,6,58,Western Wedding Hair Style,1200,1264,Hair Do
+16,6,58,Curly High bun,1200,1265,Hair Do
+16,6,58,Curly High bun Special,1500,1266,Hair Do
+16,6,58,Floral Hair Braid's,800,1267,Hair Do
+16,6,58,Floral Hair Braid's Special,1000,1268,Hair Do
+16,6,58,Low Updo,1200,1269,Hair Do
+16,6,58,Low Updo Special,1500,1270,Hair Do

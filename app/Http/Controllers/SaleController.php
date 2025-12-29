@@ -1,0 +1,220 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Purchases;
+use Illuminate\Http\Request;
+use Helper;
+use Number;
+
+class SaleController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        return view('sales.sale.index');
+    }
+
+    public function datatable(Request $request){
+        $posid = auth()->user()->posid;
+        $searchCriteria = $request->input('search');
+
+        // here orWhereHas is subquery - we can improve this
+        $query = Purchases::with('customer', 'createdByUser')
+                            ->where('purchases.posid', $posid)
+                            ->where(function($query) use ($searchCriteria){
+                                $query->where('invoice_code', 'like', "%{$searchCriteria}%")
+                                      ->orWhereHas('customer',function($query) use($searchCriteria){
+                                          $query->where('name', 'like', "%{$searchCriteria}%")
+                                                ->orWhere('phone1', 'like', "%{$searchCriteria}%");
+                                      });
+                            });
+
+        $totalRecord = Purchases::where('posid', $posid)->count();
+        $filteredRecord = $query->count();
+
+        $sales = (clone $query)->orderBy('created_at', 'desc')
+                        ->skip($request->input('start'))
+                        ->take($request->input('length'))
+                        ->get();
+        
+        $sales->transform(function($sale){
+            $sale->formattedDate = formatDate($sale->created_at);
+            $sale->formattedTime = formatTime($sale->created_at);
+
+            $sale->total_payable_amount = str_replace('BDT', 'Tk.', Number::currency($sale->total_payable_amount, 'BDT'));
+            $sale->paidAmount = str_replace('BDT', 'Tk.', Number::currency($sale->payments->sum('paid_amount'), 'BDT'));
+            $sale->discount_amount = str_replace('BDT', 'Tk.', Number::currency($sale->discount_amount, 'BDT'));
+            $sale->created_by = $sale->createdByUser ? $sale->createdByUser->name : 'N/A';
+
+            return $sale;
+        });
+
+        $result = [];
+
+        $result["draw"] = $request->input('draw');
+        $result["recordsTotal"] = $totalRecord;
+        $result["recordsFiltered"] = $filteredRecord;
+
+        $result['data'] = $sales->toArray();
+
+        return response()->json($result);
+
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function modal($id)
+    {
+        $posid = auth()->user()->posid;
+
+        try {
+            $sale = Purchases::where('posid', $posid)
+            ->with([
+                'items.product',
+                'items.beautician',
+                'createdByUser',
+                'updatedByUser',
+                'payments',
+                'customer',
+                'loyaltyHistories',
+            ])
+            ->findOrFail($id);
+
+
+            $sale->formattedCreatedDate = formatDateAndTime($sale->created_at);
+            $sale->formattedUpdatedDate = formatDateAndTime($sale->updated_at);
+
+            $sale->payments->each(function ($payment) {
+                $payment->formattedTime = formatTime($payment->created_at);
+                $payment->formattedDate = formatDate($payment->created_at);
+                $payment->receivedBy = $payment->createdByUser->name ?? 'N/A';
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'sale' => $sale,
+                'loyaltyHistories' => $sale->loyaltyHistories,
+                'created_by_user' => $sale->createdByUser,
+                'updated_by_user' => $sale->updatedByUser,
+                'payments' => $sale->payments
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+
+    }
+
+    public function show($id)
+    {
+        $posid = auth()->user()->posid;
+
+        try {
+            $sale = Purchases::where('posid', $posid)
+                ->with([
+                    'items.product',
+                    'items.beautician',
+                    'createdByUser',
+                    'updatedByUser',
+                    'payments.createdByUser',
+                    'customer',
+                    'loyaltyHistories',
+                ])
+                ->findOrFail($id);
+
+            // format dates
+            $sale->formattedCreatedDate = formatDateAndTime($sale->created_at);
+            $sale->formattedUpdatedDate = formatDateAndTime($sale->updated_at);
+
+            // format payments
+            $sale->payments->each(function ($payment) {
+                $payment->formattedTime = formatTime($payment->created_at);
+                $payment->formattedDate = formatDate($payment->created_at);
+                $payment->receivedBy = $payment->createdByUser->name ?? 'N/A';
+            });
+
+            $sale->discountText = number_format($sale->discount_amount, 2) . ' Tk';
+
+            if ($sale->discount_type === 'fixed') {
+                $sale->discountText .= ' (Fixed)';
+            } elseif ($sale->discount_type === 'percentage') {
+                $sale->discountText .= ' (' . ($sale->discount_value ?? 0) . '%)';
+            }
+
+            $sale->adjustmentText = number_format($sale->adjustmentAmt ?? 0, 2) . ' Tk';
+
+            if(!hasAccess('show_phone')){
+                $sale->formatedCustomerPhone = maskPhoneNumber($sale->customer->phone1);
+            }else{
+                $sale->formatedCustomerPhone = $sale->customer->phone1;
+            }
+
+            // return with compact 
+            return view('sales.sale.show', compact('sale'));
+
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Purchases $purchases)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Purchases $purchases)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        try {
+
+            $purchase = Purchases::findOrFail($id);
+
+            $purchase->delete(); // soft delete added on model
+
+            return response()->json([
+                'status'    => 'success',
+                'message'   => 'Sales Deleted Successfully.'
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status'    => 'error',
+                'message'   => 'Something went wrong.',
+            ]);
+        }
+    }
+}

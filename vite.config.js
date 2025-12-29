@@ -1,0 +1,61 @@
+import { defineConfig } from 'vite';
+import laravel from 'laravel-vite-plugin';
+
+export default defineConfig({
+    plugins: [
+        laravel({
+            input: [
+                'resources/css/app.css', 'resources/js/app.js',
+
+                'resources/sass/app.scss',
+                'resources/css/custom-theme/theme-purple.css',
+                'resources/css/custom-multiselect.css',
+                'resources/css/setup/account-setup-style.css',
+                'resources/css/setup/user-setup-style.css',
+                'resources/css/setup/customer-style.css',
+                'resources/css/product/product-style.css',
+                'resources/css/pos/pos-style.css',
+                'resources/css/custom-style.css',
+
+                'resources/js/app.js',
+                'resources/js/common.js',
+                'resources/js/common-chart.js',
+                'resources/js/validator-script.js',
+                'resources/js/datatable_service.js',
+                'resources/js/custom-multiselect.js',
+                'resources/js/setup/account-setup-script.js',
+                'resources/js/setup/user-setup-script.js',
+                'resources/js/product/category-script.js',
+                'resources/js/product/brand-script.js',
+                'resources/js/setup/supplier-script.js',
+                'resources/js/setup/shop-script.js',
+                'resources/js/setup/role-script.js',
+                'resources/js/setup/customer-script.js',
+                'resources/js/utilities/expense-script.js',
+                'resources/js/utilities/expense-category-script.js',
+                'resources/js/product/product-script.js',
+                'resources/js/print-receipt-script.js',
+                'resources/js/pos/pos-script.js',
+                'resources/js/sales/sale-script.js',
+                'resources/js/setup/profile-script.js',
+                'resources/js/product/unit-script.js',
+                'resources/js/report-script.js',
+                'resources/js/reports/sales-report-script.js',
+                'resources/js/reports/expense-report-script.js',
+                'resources/js/reports/discount-adjustment-report-script.js',
+                'resources/js/reports/revenue-report-script.js',
+                'resources/js/reports/net-profit-report-script.js',
+                'resources/js/reports/customer-report-script.js',
+                'resources/js/reports/employee-report-script.js',
+                'resources/js/reports/beautician-report-script.js',
+                'resources/js/reports/sms-history-report-script.js',
+                'resources/js/subscription.js',
+                'resources/js/loyalty/loyalty-script.js',
+                'resources/js/employee/employee-script.js',
+                'resources/js/attendance/attendance-script.js'
+            
+            ],
+            refresh: true,
+        }),
+    ],
+});

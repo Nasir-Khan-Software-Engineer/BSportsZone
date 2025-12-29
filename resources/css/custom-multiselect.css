@@ -1,0 +1,65 @@
+.list-container {
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  height: 300px;
+  /* fixed height for scrollbar */
+  padding: 10px;
+  background: #f9f9f9;
+  overflow-y: auto;
+  /* vertical scrollbar */
+  overflow-x: hidden;
+  /* hide horizontal scroll */
+}
+
+.list-item {
+  padding: 6px 10px;
+  margin: 4px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  background: #fff;
+  border: 1px solid #ddd;
+  transition: all 0.2s ease;
+}
+
+.list-item:hover {
+  background: #f1f1f1;
+}
+
+.list-item.active {
+  background: #5e1d66;
+  color: #fff;
+}
+
+.btn-move {
+  width: 100%;
+  margin: 5px 0;
+}
+
+.search-box {
+  margin-bottom: 8px;
+}
+
+/* Custom scrollbar for WebKit browsers */
+.list-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.list-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 6px;
+}
+
+.list-container::-webkit-scrollbar-thumb {
+  background-color: #aaa;
+  border-radius: 4px;
+}
+
+.list-container::-webkit-scrollbar-thumb:hover {
+  background-color: #777;
+}
+
+/* Scrollbar for Firefox */
+.list-container {
+  scrollbar-width: thin;
+  scrollbar-color: #aaa #f1f1f1;
+}

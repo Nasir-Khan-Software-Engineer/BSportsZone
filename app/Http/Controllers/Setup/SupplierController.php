@@ -4,44 +4,33 @@ namespace App\Http\Controllers\Setup;
 
 use App\Http\Controllers\Controller;
 use App\Models\Supplier;
+use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 class SupplierController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-
-    public function __construct()
-    {
-        abort(404);
-    }
-
     public function index()
     {
-        $suppliers = Supplier::where('POSID', auth()->user()->POSID)->get();
+        $suppliers = Supplier::with('products')
+            ->where('POSID', auth()->user()->POSID)
+            ->get();
 
         foreach($suppliers as $supplier){
             $supplier->formattedDate = formatDate($supplier->created_at);
             $supplier->formattedTime = formatTime($supplier->created_at);
+            $supplier->products_count = $supplier->products->count();
         }
 
-        return view("setup/supplier/index", ['suppliers' => $suppliers]);
+        return view("service/supplier/index", ['suppliers' => $suppliers]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        return view("setup/supplier/create");
+        return view("service/supplier/create");
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
         try{
@@ -56,14 +45,16 @@ class SupplierController extends Controller
             $supplier = new Supplier;
             $supplier->POSID = auth()->user()->POSID;
             $supplier->name = $request->name;
-            $supplier->phone = $request->phone;
+            $supplier->phone_1 = $request->phone;
             $supplier->email = $request->email;
             $supplier->address = $request->address;
-            $supplier->note = $request->note;
+            $supplier->note = $request->note ?? '';
             $supplier->created_by = auth()->user()->id;
 
             $supplier->save();
 
+            $supplier->products_count = 0;
+            $supplier->phone = $supplier->phone_1; // For compatibility with frontend
             $supplier->formattedDate = formatDate($supplier->created_at);
             $supplier->formattedTime = formatTime($supplier->created_at);
 
@@ -91,25 +82,43 @@ class SupplierController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Supplier $supplier)
     {
-        //
+        $POSID = auth()->user()->POSID;
+        
+        // Ensure supplier belongs to current POS
+        if($supplier->POSID != $POSID){
+            abort(404);
+        }
+
+        // Load products for this supplier
+        $products = Product::where('POSID', $POSID)
+            ->where('supplier_id', $supplier->id)
+            ->with(['brand', 'unit', 'categories'])
+            ->get();
+
+        // Prepare ribbon data
+        $supplierRibbonData = [
+            'name' => $supplier->name,
+            'phone' => $supplier->phone_1,
+            'email' => $supplier->email ?? '-',
+            'address' => $supplier->address ?? '-',
+            'city' => $supplier->city ?? '-',
+            'country' => $supplier->country ?? '-',
+        ];
+
+        return view('service/supplier/show', [
+            'supplier' => $supplier,
+            'products' => $products,
+            'supplierRibbonData' => $supplierRibbonData
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
     public function edit(Supplier $supplier)
     {
-        return view('setup/supplier/create',['supplier' => $supplier]);
+        return view('service/supplier/create',['supplier' => $supplier]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Supplier $supplier)
     {
         try{
@@ -122,14 +131,16 @@ class SupplierController extends Controller
             ]);
 
             $supplier->name = $request->name;
-            $supplier->phone = $request->phone;
+            $supplier->phone_1 = $request->phone;
             $supplier->email = $request->email;
             $supplier->address = $request->address;
-            $supplier->note = $request->note;
+            $supplier->note = $request->note ?? '';
             $supplier->updated_by = auth()->user()->id;
 
             $supplier->update();
 
+            $supplier->products_count = $supplier->products()->count();
+            $supplier->phone = $supplier->phone_1; // For compatibility with frontend
             $supplier->formattedDate = formatDate($supplier->created_at);
             $supplier->formattedTime = formatTime($supplier->created_at);
 
@@ -157,19 +168,32 @@ class SupplierController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Supplier $supplier)
     {
         try{
-            if($supplier->POSID == auth()->user()->POSID
-                && $supplier->delete()){
+            if($supplier->POSID != auth()->user()->POSID){
+                return response()->json(
+                    [
+                        'status'=>'error',
+                        'message' => 'Unauthorized access.',
+                    ]
+                );
+            }
 
+            if($supplier->products()->count() > 0){
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => [
+                        'Dependent' => ['This supplier has products associated with it.']
+                    ],
+                ]);
+            }
+
+            if($supplier->delete()){
                 return response()->json(
                     [
                         'status'=>'success',
-                        'message' => 'Brand deleted successfully.',
+                        'message' => 'Supplier deleted successfully.',
                     ]
                 );
             }else{
@@ -181,7 +205,12 @@ class SupplierController extends Controller
                 );
             }
         }catch (Exception $exception){
-            return $exception;
+            return response()->json(
+                [
+                    'status'=>'error',
+                    'message' => 'Something went wrong, please try later.',
+                ]
+            );
         }
     }
 }

@@ -184,6 +184,16 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::delete('/{unit}', 'destroy')->name('unit.destroy')->middleware('permission');
         });
 
+        Route::prefix('supplier')->controller(SupplierController::class)->group(function () {
+            Route::get('/', 'index')->name('supplier.index');
+            Route::get('/create', 'create')->name('supplier.create');
+            Route::post('/store', 'store')->name('supplier.store');
+            Route::get('/{supplier}', 'show')->name('supplier.show');
+            Route::get('/{supplier}/edit', 'edit')->name('supplier.edit');
+            Route::put('/{supplier}', 'update')->name('supplier.update');
+            Route::delete('/{supplier}', 'destroy')->name('supplier.destroy');
+        });
+
         Route::controller(ServiceController::class)->group(function () {
             Route::get('/', 'index')->name('index')->middleware('permission');
             Route::get('/datatable', 'datatable')->name('datatable');

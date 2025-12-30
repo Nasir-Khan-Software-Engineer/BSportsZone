@@ -1,5 +1,5 @@
-WinPos.Supplier = (function (Urls){
-    var createSupplierForm = function (containerId, callback){
+WinPos.Supplier = (function(Urls){
+    var getCreateSupplierForm = function (containerId, callback){
         WinPos.Common.getAjaxCall(Urls.createSupplier, function (response){
             if(typeof response === "string"){
                 $(containerId).html("");
@@ -11,48 +11,67 @@ WinPos.Supplier = (function (Urls){
         });
     }
 
-    var validateSupplier = function (formData, type, callback){
-        let supplierRegex = new RegExp("^[a-zA-Z ]*$");
+    var getUpdateSupplierForm = function (containerId, supplierId, callback){
+        WinPos.Common.getAjaxCall(Urls.editSupplier.replace("supplierid", supplierId), function (response){
+            if(typeof response === "string"){
+                $(containerId).html("");
+                $(containerId).html(response);
+            }else if(typeof response === "object" && typeof response.errors !== "undefined"){  
+                WinPos.Common.showValidationErrors(response.errors);  
+            }
+            callback();
+        });
+    }
 
-        if(!supplierRegex.test(formData.name) || formData.name.length < 3 || formData.name.length > 15){
-            toastr.error("Supplier name is not valid.");
+    var validateSupplier = function (formData, type, callback){
+        let name = $('#createSupplierForm #supplierName').val().trim();
+        let phone = $('#createSupplierForm #supplierPhone').val().trim();
+        let email = $('#createSupplierForm #supplierEmail').val().trim();
+        let address = $('#createSupplierForm #shortAddress').val().trim();
+
+        if(name.length < 1 || name.length > 100){
+            toastr.error("Supplier name must be between 1 to 100 characters");
             $('#createSupplierForm #supplierName').addClass('is-invalid');
             return false;
         }
 
-        if(!supplierRegex.test(formData.address) || formData.name.address < 5 || formData.name.address > 50){
-            toastr.error("Supplier address is not valid.");
-            $('#createSupplierForm #shortAddress').addClass('is-invalid');
-            return false;
-        }
-
-        if(!WinPos.Common.isValidPhoneNumber(formData.phone)){
+        if(!WinPos.Common.isValidPhoneNumber(phone)){
             toastr.error("Phone number is invalid");
             $('#createSupplierForm #supplierPhone').addClass('is-invalid');
             return false;
         }
         
-        if(formData.email != ''){
-            if(!WinPos.Common.isValidEmail(formData.email)){
+        if(email != ''){
+            if(!WinPos.Common.isValidEmail(email)){
                 toastr.error("Email is invalid");
                 $('#createSupplierForm #supplierEmail').addClass('is-invalid');
                 return false;
             }
         }
 
+        if(address.length < 1){
+            toastr.error("Address is required");
+            $('#createSupplierForm #shortAddress').addClass('is-invalid');
+            return false;
+        }
+
         if(type === 'create'){
             save(formData, callback);
         }else {
-            update(formData, formData.supplierId, callback);
+            let id = $('#createSupplierForm #supplierId').val().trim();
+            if(id === "" || id === "0"){
+                toastr.error("Something went wrong. Please try again.");
+                return false;
+            }
+            update(formData, id, callback);
         }
     }
 
     var save = function (formData, callback){
         WinPos.Common.postAjaxCall(Urls.saveSupplier, JSON.stringify(formData), function (response){
-            console.log(response);
             if(response.status === 'success'){
-                let row = WinPos.Datatable.addNewRow(prepareCategoryRow(response.supplier), true);
-                applyCssToNewlyAddedRow(row);
+                let row = WinPos.Datatable.addNewRow(prepareSupplierRow(response.supplier), true);
+                applyCssToNewlyAddedRow(row, response.supplier.id);
                 toastr.success(response.message);
                 callback();
             }else{
@@ -66,11 +85,10 @@ WinPos.Supplier = (function (Urls){
     }
 
     var update = function (formData, supplierId, callback){
-        WinPos.Common.postAjaxCall(Urls.updateSupplier.replace("supplierid", supplierId), JSON.stringify(formData), function (response){
-            console.log(response);
+        WinPos.Common.putAjaxCallPost(Urls.updateSupplier.replace("supplierid", supplierId), JSON.stringify(formData), function (response){
             if(response.status === 'success'){
-                let row = WinPos.Datatable.updateNewRow(prepareCategoryRow(response.supplier), true);
-                applyCssToNewlyAddedRow(row);
+                let row = WinPos.Datatable.updateNewRow(prepareSupplierRow(response.supplier), true);
+                applyCssToNewlyAddedRow(row, response.supplier.id);
                 toastr.success(response.message);
                 callback();
             }else{
@@ -82,61 +100,62 @@ WinPos.Supplier = (function (Urls){
             }
         });
     }
-    
-    var updateSupplierForm = function (containerId, supplierId, callback){
-        WinPos.Common.getAjaxCall(Urls.editSupplier.replace("supplierid", supplierId), function (response){
-            if(typeof response === "string"){
-                $(containerId).html("");
-                $(containerId).html(response);
-            }else if(typeof response === "object" && typeof response.errors !== "undefined"){  
-                WinPos.Common.showValidationErrors(response.errors);  
-            }
-            callback();
-        });
-    }
 
-    var deleteSupplier = function (brandId){
-        WinPos.Common.deleteAjaxCall(Urls.deleteSupplier.replace('supplierid', brandId), function (response){
+    var deleteSupplier = function (supplierId){
+        WinPos.Common.deleteAjaxCallPost(Urls.deleteSupplier.replace('supplierid', supplierId), function (response){
             if(response.status === 'success'){
                 WinPos.Datatable.deleteRow();
                 toastr.success(response.message);
             }else{
-                WinPos.Common.showValidationErrors(response.errors);
+                if(typeof response.errors !== "undefined"){
+                    WinPos.Common.showValidationErrors(response.errors);
+                }else{
+                    WinPos.Common.somethingWrongToast(response);
+                }
             }
         });
     }
-    var prepareCategoryRow = function(data){
-        let address = (data.address.length > 30)? data.address.substring(0, 30) + '...':data.address;
+
+    var prepareSupplierRow = function(data){
+        let address = (data.address && data.address.length > 30) ? data.address.substring(0, 30) + '...' : (data.address || '-');
+        let productsCount = data.products_count || 0;
+        let phone = data.phone_1 || data.phone || '-';
 
         return [
+            data.id,
             data.name,
-            data.phone,
+            phone,
             address,
-            WinPos.Common.dataTableCreatedOnCell(data.formattedTime, data.formattedDate),
-            WinPos.Common.dataTableActionCell(data.id, 'supplier', '')
+            productsCount,
+            WinPos.Common.dataTableActionCell(data.id, 'supplier', 'data-name="'+ data.name +'"', ['edit', 'delete'])
         ];
     }
 
-    var applyCssToNewlyAddedRow = function(row){
+    var applyCssToNewlyAddedRow = function(row, supplierId){
         let columns = $(row).find('td');
 
         columns.each(function(index){
             let col = $(this);
-
-            if(index === 0){
-                col.addClass('text-left');
-            }else if(index === columns.length-1){
-                col.addClass('text-right');
-            }else{
-                col.addClass('text-center');
-            }
+            col.addClass('text-center');
             col.addClass('align-middle');
         });
+
+        // Add view button to the action column
+        if(supplierId) {
+            let actionCell = $(row).find('td').last();
+            let viewButton = $('<a>')
+                .attr('href', Urls.showSupplier.replace('supplierid', supplierId))
+                .addClass('btn btn-sm thm-btn-bg thm-btn-text-color')
+                .attr('data-toggle', 'tooltip')
+                .attr('title', 'View Details')
+                .html('<i class="fa-solid fa-eye"></i>');
+            $(actionCell).prepend(viewButton);
+        }
     }
 
     return {
-        getCreateSupplierForm: createSupplierForm,
-        getUpdateSupplierForm: updateSupplierForm,
+        getCreateSupplierForm: getCreateSupplierForm,
+        getUpdateSupplierForm: getUpdateSupplierForm,
         saveSupplier: validateSupplier,
         deleteSupplier: deleteSupplier,
     }

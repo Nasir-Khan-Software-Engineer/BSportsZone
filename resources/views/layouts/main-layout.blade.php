@@ -186,6 +186,9 @@
                         </a>
                         @endif
 
+                        <a class="collapse-item {{ request()->routeIs('service.supplier.*') ? 'active' : '' }}" href="{{ route('service.supplier.index') }}">
+                            <i class="fa-solid fa-truck"></i> Supplier
+                        </a>
                     </div>
                 </div>
 

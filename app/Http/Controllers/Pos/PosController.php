@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Pos;
 
 use App\Http\Controllers\Controller;
-use App\Models\Purchases;
+use App\Models\Sales;
 use App\Services\AccountSetup\IAccountSetupService;
 use Illuminate\Http\Request;
 use App\Models\Product;
@@ -11,7 +11,7 @@ use App\Models\Customer;
 use App\Services\Category\ICategoryService;
 use App\Services\Brand\IBrandService;
 use App\Services\Pos\IPosService;
-use App\Models\Purchase_items;
+use App\Models\Sales_items;
 use App\Models\Employee;
 use App\Models\EmployeeDesignation;
 use App\Models\Attendance;
@@ -63,9 +63,9 @@ class PosController extends Controller
                 'code',
                 'products.price',
                 'products.image',
-                'products.beautician_id'
+                'products.staff_id'
             )
-            ->with('TodaysBeautician:id,name')
+            ->with('TodaysStaff:id,name')
             ->where('products.posid', $posId)
             ->where('type', 'Service')
             // search by name or code
@@ -140,57 +140,57 @@ class PosController extends Controller
             $discountAmount = ($totalAmount * $request->discount)/100;
         }
 
-        // Purchases table purchase
-        $purchase = new Purchases;
-        $purchase->posid = $posid;
-        $purchase->shop_id = 1;
-        $purchase->invoice_code = (session('accountInfo.invoiceNumberPrefix') ?? 'AU') . '-'.date('YmdHis');
-        $purchase->customerId = ((int) $request->customerId);
-        $purchase->total_amount = $totalAmount;
-        $purchase->discount_type = $request->discountType;
-        $purchase->discount_value = $request->discount;
-        $purchase->discount_amount = $discountAmount;
-        $purchase->total_payable_amount = $request->payment["paidAmount"]; // paid amount and paybale amount same as there is no due and multiple payment option is not enabled.
-        $purchase->payment_date = date('Y-m-d');
-        $purchase->created_by = auth()->user()->id;
-        $purchase->updated_by = auth()->user()->id;
-        $purchase->adjustmentAmt = $request->adjustmentAmt;
-        $purchase->save();
+        // Sales table sales
+        $sales = new Sales;
+        $sales->posid = $posid;
+        $sales->shop_id = 1;
+        $sales->invoice_code = (session('accountInfo.invoiceNumberPrefix') ?? 'AU') . '-'.date('YmdHis');
+        $sales->customerId = ((int) $request->customerId);
+        $sales->total_amount = $totalAmount;
+        $sales->discount_type = $request->discountType;
+        $sales->discount_value = $request->discount;
+        $sales->discount_amount = $discountAmount;
+        $sales->total_payable_amount = $request->payment["paidAmount"]; // paid amount and paybale amount same as there is no due and multiple payment option is not enabled.
+        $sales->payment_date = date('Y-m-d');
+        $sales->created_by = auth()->user()->id;
+        $sales->updated_by = auth()->user()->id;
+        $sales->adjustmentAmt = $request->adjustmentAmt;
+        $sales->save();
 
-        $purchaseItems = [];
+        $salesItems = [];
         $now = now();
         
         foreach($services as $service){
-            $purchaseItemObj = [];
+            $salesItemObj = [];
 
             $qty = array_filter($request->services, function($item) use($service){
                 return (int) $item['id'] == $service->id;
             });
 
             $serviceData = reset($qty);
-            $beauticianId = isset($serviceData['beautician_id']) && !empty($serviceData['beautician_id']) 
-                ? (int)$serviceData['beautician_id'] 
+            $staffId = isset($serviceData['staff_id']) && !empty($serviceData['staff_id']) 
+                ? (int)$serviceData['staff_id'] 
                 : null;
 
-            $purchaseItemObj['posid'] = $posid;
-            $purchaseItemObj['purchase_id'] = $purchase->id;
-            $purchaseItemObj['product_id'] = $service->id;
-            $purchaseItemObj['beautician_id'] = $beauticianId;
-            $purchaseItemObj['product_price'] = $service->price;
-            $purchaseItemObj['selling_price'] = $service->price;
-            $purchaseItemObj['quantity'] = $serviceData['quantity'];
-            $purchaseItemObj['created_at'] = $now;
-            $purchaseItemObj['updated_at'] = $now;
+            $salesItemObj['posid'] = $posid;
+            $salesItemObj['sales_id'] = $sales->id;
+            $salesItemObj['product_id'] = $service->id;
+            $salesItemObj['staff_id'] = $staffId;
+            $salesItemObj['product_price'] = $service->price;
+            $salesItemObj['selling_price'] = $service->price;
+            $salesItemObj['quantity'] = $serviceData['quantity'];
+            $salesItemObj['created_at'] = $now;
+            $salesItemObj['updated_at'] = $now;
 
-            array_push($purchaseItems, $purchaseItemObj);
+            array_push($salesItems, $salesItemObj);
         }
 
-        Purchase_items::insert($purchaseItems);
+        Sales_items::insert($salesItems);
 
         // Send SMS after items are inserted (so quantity can be calculated)
         $smsConfig = session('sms_config');
         if($smsConfig && isset($smsConfig['is_active']) && $smsConfig['is_active']){ 
-            $sms = $this->sendSmsToCustomer($purchase);
+            $sms = $this->sendSmsToCustomer($sales);
         }
 
         // add payment info
@@ -223,7 +223,7 @@ class PosController extends Controller
         try {
             $payment = SalesPayment::create([
                 'posid'          => $posid,
-                'sales_id'       => $purchase->id,
+                'sales_id'       => $sales->id,
                 'payment_method' => $payment_method,
                 'payment_via'    => $payment_via,
                 'paid_amount'    => $request->payment["paidAmount"],
@@ -244,7 +244,7 @@ class PosController extends Controller
                 $storeLoyalty = $this->storeLoyaltyHistory(
                     $posid,
                     $request->loyaltyCardId,
-                    $purchase->id,
+                    $sales->id,
                     $request->discountType,
                     $request->discount,
                     $discountAmount,
@@ -255,7 +255,7 @@ class PosController extends Controller
                 $storeLoyalty = $this->storeLoyaltyHistory(
                     $posid,
                     $request->loyaltyCardId,
-                    $purchase->id,
+                    $sales->id,
                     'Fixed',
                     '0',
                     '0',
@@ -280,7 +280,7 @@ class PosController extends Controller
             $posid = auth()->user()->posid;
 
             // Get the last sale for this customer
-            $lastSale = Purchases::where('posid', $posid)
+            $lastSale = Sales::where('posid', $posid)
                 ->where('customerId', $customerId)
                 ->with([
                     'items.service',
@@ -420,55 +420,55 @@ class PosController extends Controller
         }
     }
 
-    public function getBeauticians(Request $request)
+    public function getStaffs(Request $request)
     {
         try {
             $posId = auth()->user()->posid;
             $today = Carbon::today()->format('Y-m-d');
 
-            // Get beautician designation
-            $beauticianDesignation = EmployeeDesignation::where('posid', $posId)
-                ->where('name', 'Beautician')
+            // Get staff designation
+            $staffDesignation = EmployeeDesignation::where('posid', $posId)
+                ->where('name', 'Staff')
                 ->first();
 
-            if (!$beauticianDesignation) {
+            if (!$staffDesignation) {
                 return response()->json([
                     'status' => 'success',
-                    'beauticians' => []
+                    'staffs' => []
                 ]);
             }
 
-            // Get all beauticians
-            $beauticians = Employee::where('posid', $posId)
-                ->where('designation_id', $beauticianDesignation->id)
+            // Get all staffs
+            $staffs = Employee::where('posid', $posId)
+                ->where('designation_id', $staffDesignation->id)
                 ->where('status', 'Active')
                 ->orderBy('name')
                 ->get();
 
-            // Get today's attendance for beauticians
+            // Get today's attendance for staffs
             $todayAttendances = Attendance::where('posid', $posId)
                 ->where('attendance_date', $today)
-                ->whereIn('employee_id', $beauticians->pluck('id'))
+                ->whereIn('employee_id', $staffs->pluck('id'))
                 ->get()
                 ->keyBy('employee_id');
 
-            // Get today's service count for each beautician
-            $todayServiceCounts = Purchase_items::where('posid', $posId)
+            // Get today's service count for each staff
+            $todayServiceCounts = Sales_items::where('posid', $posId)
                 ->whereDate('created_at', $today)
-                ->whereNotNull('beautician_id')
-                ->selectRaw('beautician_id, COUNT(*) as service_count')
-                ->groupBy('beautician_id')
+                ->whereNotNull('staff_id')
+                ->selectRaw('staff_id, COUNT(*) as service_count')
+                ->groupBy('staff_id')
                 ->get()
-                ->keyBy('beautician_id');
+                ->keyBy('staff_id');
 
-            $beauticiansData = $beauticians->map(function($beautician) use ($todayAttendances, $todayServiceCounts) {
-                $attendance = $todayAttendances->get($beautician->id);
+            $staffsData = $staffs->map(function($staff) use ($todayAttendances, $todayServiceCounts) {
+                $attendance = $todayAttendances->get($staff->id);
                 $isPresent = $attendance && $attendance->status === 'Present';
-                $todayServiceCount = $todayServiceCounts->get($beautician->id)->service_count ?? 0;
+                $todayServiceCount = $todayServiceCounts->get($staff->id)->service_count ?? 0;
 
                 return [
-                    'id' => $beautician->id,
-                    'name' => $beautician->name,
+                    'id' => $staff->id,
+                    'name' => $staff->name,
                     'is_present' => $isPresent,
                     'today_service_count' => $todayServiceCount
                 ];
@@ -476,7 +476,7 @@ class PosController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'beauticians' => $beauticiansData
+                'staffs' => $staffsData
             ]);
         } catch (Exception $e) {
             return response()->json([

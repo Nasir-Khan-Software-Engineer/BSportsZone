@@ -29,9 +29,9 @@ class SalesPayment extends Model
         'updated_by',
     ];
 
-    public function purchase()
+    public function sales()
     {
-        return $this->belongsTo(Purchases::class, 'sales_id', 'id')
+        return $this->belongsTo(Sales::class, 'sales_id', 'id')
                     ->where('posid', $this->posid);
     }
     

@@ -55,22 +55,22 @@
                         <form id="LoyaltySettingsForm">
                             <div class="form-row">
                                 <div class="form-group col-12 col-lg-6">
-                                    <label for="minimum_purchase_amount">Minimum Purchase Amount (৳)<span class="text-danger required-star">*</span> <i class="fas fa-info-circle" data-toggle="tooltip"
+                                    <label for="minimum_sales_amount">Minimum Sales Amount (৳)<span class="text-danger required-star">*</span> <i class="fas fa-info-circle" data-toggle="tooltip"
                                             data-placement="top" title="The minimum amount a customer must spend to qualify for loyalty benefits"></i></label>
-                                    <input required type="number" step="0.01" class="form-control rounded" name="minimum_purchase_amount" id="minimum_purchase_amount"
-                                        value="{{ $accountInfo->loyaltySettings->minimum_purchase_amount ?? '' }}" placeholder="Minimum Purchase Amount">
+                                    <input required type="number" step="0.01" class="form-control rounded" name="minimum_sales_amount" id="minimum_sales_amount"
+                                        value="{{ $accountInfo->loyaltySettings->minimum_sales_amount ?? '' }}" placeholder="Minimum Sales Amount">
                                 </div>
 
                                 <div class="form-group col-12 col-lg-6">
-                                    <label for="minimum_purchase_amount_applies_for">Applys For <span class="text-danger required-star">*</span> <i class="fas fa-info-circle" data-toggle="tooltip"
+                                    <label for="minimum_sales_amount_applies_for">Applys For <span class="text-danger required-star">*</span> <i class="fas fa-info-circle" data-toggle="tooltip"
                                             data-placement="top" title="The minimum amount a customer must spend to qualify for loyalty benefits applies for"></i></label>
 
-                                    <select required class="form-control rounded" name="minimum_purchase_amount_applies_for" id="minimum_purchase_amount_applies_for">
-                                        <option value="Single" {{ $accountInfo->loyaltySettings?->minimum_purchase_amount_applies_for === 'Single' ? 'selected' : '' }}>
+                                    <select required class="form-control rounded" name="minimum_sales_amount_applies_for" id="minimum_sales_amount_applies_for">
+                                        <option value="Single" {{ $accountInfo->loyaltySettings?->minimum_sales_amount_applies_for === 'Single' ? 'selected' : '' }}>
                                             Single Transaction
                                         </option>
                                         <option value="All"
-                                            {{ $accountInfo->loyaltySettings?->minimum_purchase_amount_applies_for === 'All' || $accountInfo->loyaltySettings?->minimum_purchase_amount_applies_for === null ? 'selected' : '' }}>
+                                            {{ $accountInfo->loyaltySettings?->minimum_sales_amount_applies_for === 'All' || $accountInfo->loyaltySettings?->minimum_sales_amount_applies_for === null ? 'selected' : '' }}>
                                             All Transactions
                                         </option>
                                     </select>

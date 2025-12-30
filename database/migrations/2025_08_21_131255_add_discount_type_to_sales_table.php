@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
+        Schema::table('sales', function (Blueprint $table) {
             $table->string('discount_type')->nullable()->after('total_amount'); 
             $table->decimal('discount_value', 15, 2)->nullable()->after('discount_type');
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
+        Schema::table('sales', function (Blueprint $table) {
             $table->dropColumn(['discount_type', 'discount_value']);
         });
     }

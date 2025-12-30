@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('posid')->references('POSID')->on('accountinfos')->onDelete('cascade');
 
             $table->foreignId('card_id')->constrained('loyalty_cards')->onDelete('cascade');
-            $table->foreignId('sales_id')->constrained('purchases')->onDelete('cascade');
+            $table->foreignId('sales_id')->constrained('sales')->onDelete('cascade');
 
             $table->enum('discount_type', ['Percentage', 'Fixed', 'None']);
             $table->decimal('discount_value', 10, 2);

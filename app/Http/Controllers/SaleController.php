@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Purchases;
+use App\Models\Sales;
 use Illuminate\Http\Request;
 use Helper;
 use Number;
@@ -22,8 +22,8 @@ class SaleController extends Controller
         $searchCriteria = $request->input('search');
 
         // here orWhereHas is subquery - we can improve this
-        $query = Purchases::with('customer', 'createdByUser')
-                            ->where('purchases.posid', $posid)
+        $query = Sales::with('customer', 'createdByUser')
+                            ->where('sales.posid', $posid)
                             ->where(function($query) use ($searchCriteria){
                                 $query->where('invoice_code', 'like', "%{$searchCriteria}%")
                                       ->orWhereHas('customer',function($query) use($searchCriteria){
@@ -32,7 +32,7 @@ class SaleController extends Controller
                                       });
                             });
 
-        $totalRecord = Purchases::where('posid', $posid)->count();
+        $totalRecord = Sales::where('posid', $posid)->count();
         $filteredRecord = $query->count();
 
         $sales = (clone $query)->orderBy('created_at', 'desc')
@@ -88,10 +88,10 @@ class SaleController extends Controller
         $posid = auth()->user()->posid;
 
         try {
-            $sale = Purchases::where('posid', $posid)
+            $sale = Sales::where('posid', $posid)
             ->with([
                 'items.service',
-                'items.beautician',
+                'items.staff',
                 'createdByUser',
                 'updatedByUser',
                 'payments',
@@ -132,10 +132,10 @@ class SaleController extends Controller
         $posid = auth()->user()->posid;
 
         try {
-            $sale = Purchases::where('posid', $posid)
+            $sale = Sales::where('posid', $posid)
                 ->with([
                     'items.service',
-                    'items.beautician',
+                    'items.staff',
                     'createdByUser',
                     'updatedByUser',
                     'payments.createdByUser',
@@ -182,7 +182,7 @@ class SaleController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Purchases $purchases)
+    public function edit(Sales $sales)
     {
         //
     }
@@ -190,7 +190,7 @@ class SaleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Purchases $purchases)
+    public function update(Request $request, Sales $sales)
     {
         //
     }
@@ -202,9 +202,9 @@ class SaleController extends Controller
     {
         try {
 
-            $purchase = Purchases::findOrFail($id);
+            $sales = Sales::findOrFail($id);
 
-            $purchase->delete(); // soft delete added on model
+            $sales->delete(); // soft delete added on model
 
             return response()->json([
                 'status'    => 'success',

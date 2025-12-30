@@ -47,7 +47,7 @@ export default defineConfig({
                 'resources/js/reports/net-profit-report-script.js',
                 'resources/js/reports/customer-report-script.js',
                 'resources/js/reports/employee-report-script.js',
-                'resources/js/reports/beautician-report-script.js',
+                'resources/js/reports/staff-report-script.js',
                 'resources/js/reports/sms-history-report-script.js',
                 'resources/js/subscription.js',
                 'resources/js/loyalty/loyalty-script.js',

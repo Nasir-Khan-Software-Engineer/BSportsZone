@@ -24,7 +24,7 @@ use App\Http\Controllers\Reports\RevenueReportController;
 use App\Http\Controllers\Reports\NetProfitReportController;
 use App\Http\Controllers\Reports\CustomerReportController;
 use App\Http\Controllers\Report\EmployeeReportController;
-use App\Http\Controllers\Report\BeauticianReportController;
+use App\Http\Controllers\Report\StaffReportController;
 use App\Http\Controllers\Report\SmsHistoryReportController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\LoyaltyCardController;
@@ -145,9 +145,9 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::get('/employee/details/data', [EmployeeReportController::class, 'getEmployeeReportData'])->name('employee.details.data');
         Route::get('/employee/details/download', [EmployeeReportController::class, 'downloadEmployeeReport'])->name('employee.details.download')->middleware('permission');
         
-        Route::get('/beautician/details', [BeauticianReportController::class, 'beauticianReportView'])->name('beautician.details')->middleware('permission');
-        Route::get('/beautician/details/data', [BeauticianReportController::class, 'getBeauticianReportData'])->name('beautician.details.data');
-        Route::get('/beautician/details/download', [BeauticianReportController::class, 'downloadBeauticianReport'])->name('beautician.details.download')->middleware('permission');
+        Route::get('/staff/details', [StaffReportController::class, 'staffReportView'])->name('staff.details')->middleware('permission');
+        Route::get('/staff/details/data', [StaffReportController::class, 'getStaffReportData'])->name('staff.details.data');
+        Route::get('/staff/details/download', [StaffReportController::class, 'downloadStaffReport'])->name('staff.details.download')->middleware('permission');
         
         Route::get('/sms/history', [SmsHistoryReportController::class, 'smsHistoryView'])->name('sms.history')->middleware('permission');
         Route::get('/sms/history/data', [SmsHistoryReportController::class, 'getSmsHistoryData'])->name('sms.history.data');
@@ -252,7 +252,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::get('/', 'index')->name('index')->middleware('permission');
             Route::get('/account', 'getAccountInfo')->name('account.get');
             Route::get('/search/service', 'searchService')->name('search.service');
-            Route::get('/beauticians', 'getBeauticians')->name('beauticians');
+            Route::get('/staffs', 'getStaffs')->name('staffs');
             Route::post('/sales/save', 'saveSales')->name('sales.save');
             Route::get('/customer/last-sales/{customerId}', 'getCustomerLastSales')->name('customer.lastSales');
         });

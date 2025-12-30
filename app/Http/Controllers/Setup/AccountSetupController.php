@@ -240,12 +240,12 @@ class AccountSetupController extends Controller
 
             // 1. Validate the request
             $validated = $request->validate([
-                'minimum_purchase_amount' => 'required|numeric|min:0',
+                'minimum_sales_amount' => 'required|numeric|min:0',
                 'validity_period_months' => 'required|integer|min:1',
                 'max_visits' => 'required|integer|min:1',
                 'max_visits_per_day' => 'required|integer|min:1|lte:max_visits',
                 'rules_text' => 'nullable|string',
-                'minimum_purchase_amount_applies_for' => 'required|in:Single,All'
+                'minimum_sales_amount_applies_for' => 'required|in:Single,All'
             ]);
 
             // 2. Get posid and logged-in user id

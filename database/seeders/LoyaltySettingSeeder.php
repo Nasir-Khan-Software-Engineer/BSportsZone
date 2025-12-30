@@ -12,7 +12,7 @@ class LoyaltySettingSeeder extends Seeder
         $data = [
             [
                 'posid' => 1,
-                'minimum_purchase_amount' => 10000,
+                'minimum_sales_amount' => 10000,
                 'validity_period_months' => 12,
                 'max_visits' => 10,
                 'max_visits_per_day' => 1,
@@ -20,7 +20,7 @@ class LoyaltySettingSeeder extends Seeder
             ],
             [
                 'posid' => 2,
-                'minimum_purchase_amount' => 10000,
+                'minimum_sales_amount' => 10000,
                 'validity_period_months' => 12,
                 'max_visits' => 8,
                 'max_visits_per_day' => 1,
@@ -28,11 +28,11 @@ class LoyaltySettingSeeder extends Seeder
             ],
             [
                 'posid' => 3,
-                'minimum_purchase_amount' => 10000,
+                'minimum_sales_amount' => 10000,
                 'validity_period_months' => 6,
                 'max_visits' => 6,
                 'max_visits_per_day' => 1,
-                'rules_text' => 'Get rewarded on every purchase you make.',
+                'rules_text' => 'Get rewarded on every sales you make.',
             ],
         ];
 

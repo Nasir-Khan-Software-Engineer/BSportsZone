@@ -143,14 +143,14 @@ class CheckSessionMiddleware
             if ($loyaltySettings) {
                 session([
                     'loyaltySettings' => [
-                        'minimum_purchase_amount' => $loyaltySettings->minimum_purchase_amount,
+                        'minimum_sales_amount' => $loyaltySettings->minimum_sales_amount,
                         'validity_period_months' => $loyaltySettings->validity_period_months,
                         'max_visits' => $loyaltySettings->max_visits,
                         'max_visits_per_day' => $loyaltySettings->max_visits_per_day,
                         'rules_text' => $loyaltySettings->rules_text,
                         'status' => $loyaltySettings->status,
-                        'minimum_purchase_amount_applies_for' => "All",
-                        'minimum_purchase_amount_applies_for' => $loyaltySettings->minimum_purchase_amount_applies_for
+                        'minimum_sales_amount_applies_for' => "All",
+                        'minimum_sales_amount_applies_for' => $loyaltySettings->minimum_sales_amount_applies_for
                     ]
                 ]);
             }

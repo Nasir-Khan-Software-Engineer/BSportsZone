@@ -13,12 +13,12 @@ class LoyaltySetting extends Model
 
     protected $fillable = [
         'posid',
-        'minimum_purchase_amount',
+        'minimum_sales_amount',
         'validity_period_months',
         'max_visits',
         'max_visits_per_day',
         'rules_text',
-        'minimum_purchase_amount_applies_for'
+        'minimum_sales_amount_applies_for'
     ];
 
 

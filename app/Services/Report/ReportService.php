@@ -1,7 +1,7 @@
 <?php
 namespace App\Services\Report;
 
-use App\Models\Purchases;
+use App\Models\Sales;
 use App\Models\Expense;
 use Carbon\Carbon;
 use Number;
@@ -14,8 +14,8 @@ class ReportService implements IReportService{
 
     public function getSalesDetailsReportData($posId, $from, $to, $start, $length, $type= 'view'){
         
-        $query = Purchases::where('posid', $posId);
-        $totalRecord = Purchases::where('posid', $posId)->count();
+        $query = Sales::where('posid', $posId);
+        $totalRecord = Sales::where('posid', $posId)->count();
 
 
         if ($from) {
@@ -122,7 +122,7 @@ class ReportService implements IReportService{
 
     public function getDiscountAdjustmentReportData($posId, $from, $to, $start, $length, $type= 'view'){
         
-        $query = Purchases::where('posid', $posId);
+        $query = Sales::where('posid', $posId);
 
         if ($from) {
             $query->whereDate('created_at', '>=', $from);
@@ -131,21 +131,21 @@ class ReportService implements IReportService{
             $query->whereDate('created_at', '<=', $to);
         }
 
-        // Get all purchases in the date range
-        $purchases = $query->get();
+        // Get all Sales in the date range
+        $sales = $query->get();
 
         // Group by date and calculate totals
-        $groupedData = $purchases->groupBy(function($purchase) {
-            return $purchase->created_at->format('Y-m-d');
-        })->map(function($dayPurchases, $date) {
-            $totalDiscount = $dayPurchases->sum('discount_amount');
-            $positiveAdjustment = $dayPurchases->where('adjustmentAmt', '>', 0)->sum('adjustmentAmt');
-            $negativeAdjustment = abs($dayPurchases->where('adjustmentAmt', '<', 0)->sum('adjustmentAmt'));
+        $groupedData = $sales->groupBy(function($sales) {
+            return $sales->created_at->format('Y-m-d');
+        })->map(function($daySales, $date) {
+            $totalDiscount = $daySales->sum('discount_amount');
+            $positiveAdjustment = $daySales->where('adjustmentAmt', '>', 0)->sum('adjustmentAmt');
+            $negativeAdjustment = abs($daySales->where('adjustmentAmt', '<', 0)->sum('adjustmentAmt'));
             $netAdjustment = $positiveAdjustment - $negativeAdjustment;
 
             return [
                 'date' => $date,
-                'formattedDate' => formatDate($dayPurchases->first()->created_at),
+                'formattedDate' => formatDate($daySales->first()->created_at),
                 'totalDiscountAmount' => $totalDiscount,
                 'totalPositiveAdjustment' => $positiveAdjustment,
                 'totalNegativeAdjustment' => $negativeAdjustment,
@@ -169,10 +169,10 @@ class ReportService implements IReportService{
         });
 
         // Calculate totals
-        $totalDiscount = str_replace('BDT', 'Tk.', Number::currency($purchases->sum('discount_amount'), 'BDT'));
-        $totalPositiveAdjustment = str_replace('BDT', 'Tk.', Number::currency($purchases->where('adjustmentAmt', '>', 0)->sum('adjustmentAmt'), 'BDT'));
-        $totalNegativeAdjustment = str_replace('BDT', 'Tk.', Number::currency(abs($purchases->where('adjustmentAmt', '<', 0)->sum('adjustmentAmt')), 'BDT'));
-        $totalNetAdjustment = str_replace('BDT', 'Tk.', Number::currency($purchases->sum('adjustmentAmt'), 'BDT'));
+        $totalDiscount = str_replace('BDT', 'Tk.', Number::currency($sales->sum('discount_amount'), 'BDT'));
+        $totalPositiveAdjustment = str_replace('BDT', 'Tk.', Number::currency($sales->where('adjustmentAmt', '>', 0)->sum('adjustmentAmt'), 'BDT'));
+        $totalNegativeAdjustment = str_replace('BDT', 'Tk.', Number::currency(abs($sales->where('adjustmentAmt', '<', 0)->sum('adjustmentAmt')), 'BDT'));
+        $totalNetAdjustment = str_replace('BDT', 'Tk.', Number::currency($sales->sum('adjustmentAmt'), 'BDT'));
 
         $summaryData = null;
 
@@ -200,7 +200,7 @@ class ReportService implements IReportService{
 
     public function getRevenueReportData($posId, $from, $to, $start, $length, $type= 'view'){
         
-        $query = Purchases::where('posid', $posId);
+        $query = Sales::where('posid', $posId);
 
         if ($from) {
             $query->whereDate('created_at', '>=', $from);
@@ -211,24 +211,24 @@ class ReportService implements IReportService{
 
         $query->with(['items.service', 'payments']);
 
-        // Get all purchases in the date range
-        $purchases = $query->get();
+        // Get all Sales in the date range
+        $sales = $query->get();
 
         // Calculate total revenue from paid amounts
-        $totalRevenue = $purchases->pluck('payments')->flatten()->sum('paid_amount');
+        $totalRevenue = $sales->pluck('payments')->flatten()->sum('paid_amount');
         
         // Calculate number of sales
-        $numberOfSales = $purchases->count();
+        $numberOfSales = $sales->count();
         
         // Calculate average sale value
         $averageSaleValue = $numberOfSales > 0 ? $totalRevenue / $numberOfSales : 0;
 
-        // Group purchase items by service to calculate service/service revenue
+        // Group sales items by service to calculate service/service revenue
         // Revenue per item = selling_price * quantity
         $serviceRevenueData = [];
         
-        foreach ($purchases as $purchase) {
-            foreach ($purchase->items as $item) {
+        foreach ($sales as $sales) {
+            foreach ($sales->items as $item) {
                 $serviceId = $item->product_id;
                 
                 // Calculate revenue for this item: selling_price * quantity
@@ -303,17 +303,17 @@ class ReportService implements IReportService{
 
     public function getNetProfitReportData($posId, $from, $to, $start = 0, $length = 9, $type = 'view'){
         
-        // Get purchases with payments grouped by date
-        $purchasesQuery = Purchases::where('posid', $posId);
+        // Get Sales with payments grouped by date
+        $SalesQuery = Sales::where('posid', $posId);
         
         if ($from) {
-            $purchasesQuery->whereDate('created_at', '>=', $from);
+            $SalesQuery->whereDate('created_at', '>=', $from);
         }
         if ($to) {
-            $purchasesQuery->whereDate('created_at', '<=', $to);
+            $SalesQuery->whereDate('created_at', '<=', $to);
         }
 
-        $purchases = $purchasesQuery->with('payments')->get();
+        $sales = $SalesQuery->with('payments')->get();
 
         // Get expenses grouped by date
         $expensesQuery = Expense::where('posid', $posId);
@@ -327,9 +327,9 @@ class ReportService implements IReportService{
 
         $expenses = $expensesQuery->get();
 
-        // Group purchases by date
-        $purchasesByDate = $purchases->groupBy(function($purchase) {
-            $date = $purchase->created_at;
+        // Group Sales by date
+        $SalesByDate = $sales->groupBy(function($sales) {
+            $date = $sales->created_at;
             // Ensure we have a Carbon instance
             if (!($date instanceof Carbon)) {
                 $date = Carbon::parse($date);
@@ -348,22 +348,22 @@ class ReportService implements IReportService{
         });
 
         // Get all unique dates
-        $allDates = $purchasesByDate->keys()->merge($expensesByDate->keys())->unique()->sort()->values();
+        $allDates = $SalesByDate->keys()->merge($expensesByDate->keys())->unique()->sort()->values();
 
         // Build daily data
-        $dailyData = $allDates->map(function($date) use ($purchasesByDate, $expensesByDate) {
-            $dayPurchases = $purchasesByDate->get($date, collect());
+        $dailyData = $allDates->map(function($date) use ($SalesByDate, $expensesByDate) {
+            $daySales = $SalesByDate->get($date, collect());
             $dayExpenses = $expensesByDate->get($date, collect());
 
-            $dayRevenue = $dayPurchases->pluck('payments')->flatten()->sum('paid_amount');
+            $dayRevenue = $daySales->pluck('payments')->flatten()->sum('paid_amount');
             $dayExpense = $dayExpenses->sum('amount');
             $dayNetProfit = $dayRevenue - $dayExpense;
             $dayProfitMargin = $dayRevenue > 0 ? ($dayNetProfit / $dayRevenue) * 100 : 0;
 
             // Format date
             $dateObj = null;
-            if ($dayPurchases->isNotEmpty()) {
-                $dateObj = $dayPurchases->first()->created_at;
+            if ($daySales->isNotEmpty()) {
+                $dateObj = $daySales->first()->created_at;
             } elseif ($dayExpenses->isNotEmpty()) {
                 $dateObj = Carbon::parse($dayExpenses->first()->expenseDate);
             } else {
@@ -444,31 +444,31 @@ class ReportService implements IReportService{
 
         // Process each customer
         $customerData = $customers->map(function($customer) use ($threeMonthsAgo) {
-            // Get ALL purchases for this customer (lifetime, not filtered by date range)
-            $allPurchases = \App\Models\Purchases::where('customerId', $customer->id)
+            // Get ALL Sales for this customer (lifetime, not filtered by date range)
+            $allSales = \App\Models\Sales::where('customerId', $customer->id)
                 ->where('posid', $customer->posid)
                 ->with(['items', 'payments'])
                 ->get();
             
-            // Get purchases in last 3 months (from today, not from date range)
-            $recentPurchases = $allPurchases->filter(function($purchase) use ($threeMonthsAgo) {
-                if (!$purchase->created_at) {
+            // Get Sales in last 3 months (from today, not from date range)
+            $recentSales = $allSales->filter(function($sales) use ($threeMonthsAgo) {
+                if (!$sales->created_at) {
                     return false;
                 }
-                $purchaseDate = $purchase->created_at instanceof Carbon ? $purchase->created_at : Carbon::parse($purchase->created_at);
-                return $purchaseDate >= $threeMonthsAgo;
+                $salesDate = $sales->created_at instanceof Carbon ? $sales->created_at : Carbon::parse($sales->created_at);
+                return $salesDate >= $threeMonthsAgo;
             });
 
-            // Calculate metrics (from all purchases)
-            $totalSales = $allPurchases->count();
-            $totalQuantity = $allPurchases->pluck('items')->flatten()->sum('quantity');
-            $totalSpending = $allPurchases->pluck('payments')->flatten()->sum('paid_amount');
-            $totalDiscountAmount = $allPurchases->sum('discount_amount');
-            $totalAdjustmentAmount = $allPurchases->sum('adjustmentAmt');
+            // Calculate metrics (from all Sales)
+            $totalSales = $allSales->count();
+            $totalQuantity = $allSales->pluck('items')->flatten()->sum('quantity');
+            $totalSpending = $allSales->pluck('payments')->flatten()->sum('paid_amount');
+            $totalDiscountAmount = $allSales->sum('discount_amount');
+            $totalAdjustmentAmount = $allSales->sum('adjustmentAmt');
             
             // Get last visited date
-            $lastPurchase = $allPurchases->sortByDesc('created_at')->first();
-            $lastVisitedDate = $lastPurchase ? $lastPurchase->created_at : null;
+            $lastSales = $allSales->sortByDesc('created_at')->first();
+            $lastVisitedDate = $lastSales ? $lastSales->created_at : null;
 
             // Determine customer type based on updated definitions
             // New Customer: Exactly one service in lifetime, and that service was within the last 3 months
@@ -477,13 +477,13 @@ class ReportService implements IReportService{
             // Old Customer: At least one service in lifetime, but none within the last 3 months
             // Inactive Customer: No services ever in lifetime
             
-            $totalSales = $allPurchases->count();
-            $recentSalesCount = $recentPurchases->count();
+            $totalSales = $allSales->count();
+            $recentSalesCount = $recentSales->count();
             
             if ($totalSales == 0) {
                 $type = 'Inactive Customer';
             } elseif ($recentSalesCount == 0) {
-                // No recent purchases
+                // No recent Sales
                 if ($totalSales == 1) {
                     $type = 'Old Customer';
                 } else {

@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('loyalty_settings', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('posid')->unique();
-            $table->decimal('minimum_purchase_amount', 10, 2);
-            $table->enum('minimum_purchase_amount_applies_for', ['Single', 'All'])
+            $table->decimal('minimum_sales_amount', 10, 2);
+            $table->enum('minimum_sales_amount_applies_for', ['Single', 'All'])
               ->default('Single');
             $table->integer('validity_period_months');
             $table->integer('max_visits');
@@ -49,7 +49,7 @@ return new class extends Migration
         // DROP COLUMN `status`;
 
         // ALTER TABLE loyalty_settings
-        // ADD COLUMN minimum_purchase_amount_applies_for ENUM('Single', 'All') NOT NULL DEFAULT 'Single'
-        // AFTER minimum_purchase_amount;
+        // ADD COLUMN minimum_sales_amount_applies_for ENUM('Single', 'All') NOT NULL DEFAULT 'Single'
+        // AFTER minimum_sales_amount;
     }
 };

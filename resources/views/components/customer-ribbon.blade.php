@@ -25,11 +25,11 @@
                 <p class="mb-1"><strong>Valid Until:</strong> {{ $customer['cardStatus']['valid_until'] ?? '-' }}</p>
             @else
                 <p class="mb-1"><strong>Loyalty:</strong> {{ $customer['status'] }}</p>
-                @if($customer['settings']['minimum_purchase_amount_applies_for'] == 'Single')
-                    <p class="mb-1"><strong>Max Sales:</strong> {{ $customer['currentTotalSpent'] }} Tk / {{ $customer['settings']['minimum_purchase_amount'] }} Tk</p>
+                @if($customer['settings']['minimum_sales_amount_applies_for'] == 'Single')
+                    <p class="mb-1"><strong>Max Sales:</strong> {{ $customer['currentTotalSpent'] }} Tk / {{ $customer['settings']['minimum_sales_amount'] }} Tk</p>
                     <p class="mb-1"><strong>New Card:</strong> @if($customer['isEligibleForNewCard']) Eligible For New Card @else Not Eligible For New Card @endif</p>
                 @else
-                    <p class="mb-1"><strong>Total Spent:</strong> {{ $customer['currentTotalSpent'] ?? '-' }} Tk / {{ $customer['settings']['minimum_purchase_amount'] }} Tk</p>
+                    <p class="mb-1"><strong>Total Spent:</strong> {{ $customer['currentTotalSpent'] ?? '-' }} Tk / {{ $customer['settings']['minimum_sales_amount'] }} Tk</p>
                     <p class="mb-1"><strong>New Card:</strong> @if($customer['isEligibleForNewCard']) Eligible For New Card @else Not Eligible For New Card @endif </p>
                 @endif
             @endif

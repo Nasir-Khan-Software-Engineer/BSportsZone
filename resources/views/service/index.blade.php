@@ -43,7 +43,7 @@ $imagePath = "/images/{$posid}/services/";
                         <th class="text-center align-middle" style="width: 10%;" scope="col">Image</th>
                         <th class="text-center align-middle" style="width: 25%;" scope="col">Name</th>
                         <th class="text-center align-middle" style="width: 10%;" scope="col">Price</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Beautician</th>
+                        <th class="text-center align-middle" style="width: 10%;" scope="col">Staff</th>
                         <th class="text-center align-middle" style="width: 10%;" scope="col">Created At</th>
                         <th class="text-center align-middle" style="width: 10%;" scope="col">Created By</th>
                         <th class="text-center align-middle" style="width: 10%;" scope="col">Action</th>

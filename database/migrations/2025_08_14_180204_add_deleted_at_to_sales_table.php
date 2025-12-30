@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('purchase_items', function (Blueprint $table) {
-            $table->bigInteger('posid')->after('purchase_id')->default(1);
+        Schema::table('sales', function (Blueprint $table) {
+            $table->softDeletes();
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('purchase_items', function (Blueprint $table) {
-            $table->dropColumn('posid');
+        Schema::table('sales', function (Blueprint $table) {
+             $table->dropSoftDeletes();
         });
     }
 };

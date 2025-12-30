@@ -25,7 +25,7 @@ class Product extends Model
 
     public function sales_items()
     {
-        return $this->hasMany(Purchase_items::class, 'product_id');
+        return $this->hasMany(Sales_items::class, 'product_id');
     }
     
     public function creator()
@@ -38,14 +38,14 @@ class Product extends Model
         return $this->belongsTo(User::class, 'updated_by');
     }
 
-    public function beautician()
+    public function staff()
     {
-        return $this->belongsTo(Employee::class, 'beautician_id');
+        return $this->belongsTo(Employee::class, 'staff_id');
     }
 
-    public function TodaysBeautician()
+    public function TodaysStaff()
     {
-        return $this->belongsTo(Employee::class, 'beautician_id')
+        return $this->belongsTo(Employee::class, 'staff_id')
             ->activeAndPresentToday();
     }
 }

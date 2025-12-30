@@ -1,4 +1,4 @@
-WinPos.Report.beautician = (function(Urls) {
+WinPos.Report.staff = (function(Urls) {
     var datatableConfig = function(){
         return {
             serverSide: true,
@@ -18,7 +18,7 @@ WinPos.Report.beautician = (function(Urls) {
                     return json.data || [];
                 }
             },
-            order: [[0, 'asc']], // Sort by beautician name ascending
+            order: [[0, 'asc']], // Sort by staff name ascending
             columns: [
                 {
                     data: null,
@@ -135,5 +135,5 @@ WinPos.Report.beautician = (function(Urls) {
     return {        
         datatableConfiguration: datatableConfig
     };
-})(beauticianReportUrls);
+})(staffReportUrls);
 

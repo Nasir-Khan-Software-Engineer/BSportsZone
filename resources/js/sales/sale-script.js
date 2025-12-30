@@ -41,13 +41,13 @@ WinPos.sale = (function (Urls){
                     let name = item.service ? item.service.name : '';
                     let qty = item.quantity ?? 0;
                     let price = item.selling_price ?? 0;
-                    let beauticianName = item.beautician ? item.beautician.name : 'None';
+                    let staffName = item.staff ? item.staff.name : 'None';
 
                     let row = `
                         <tr>
                             <td>${code}</td>
                             <td>${name}</td>
-                            <td class="text-center">${beauticianName}</td>
+                            <td class="text-center">${staffName}</td>
                             <td class="text-center">${qty}</td>
                             <td class="text-right">${parseFloat(price).toFixed(2)} Tk.</td>
                         </tr>
@@ -151,7 +151,7 @@ WinPos.sale = (function (Urls){
                 price: parseFloat(item.service.price),
                 quantity: parseInt(item.quantity),
                 discount: parseFloat(item.service.discount_value||0),
-                beautician_name: item.beautician ? item.beautician.name : null
+                staff_name: item.staff ? item.staff.name : null
             };
         });
 

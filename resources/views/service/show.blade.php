@@ -48,7 +48,7 @@
                         <p class="mb-1"><strong>Brand:</strong> {{ $service->brand->name ?? '-' }}</p>
                         <p class="mb-1"><strong>Unit:</strong> {{ $service->unit->name ?? '-' }}</p>
                         <p class="mb-1"><strong>Categories:</strong> {{ $service->categories->pluck('name')->join(', ') ?: '-' }}</p>
-                        <p class="mb-1"><strong>Default Beautician:</strong> {{ $service->beautician->name ?? '-' }}</p>
+                        <p class="mb-1"><strong>Default Staff:</strong> {{ $service->staff->name ?? '-' }}</p>
                     </div>
 
                     <!-- Section 4: Sales Info -->

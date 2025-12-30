@@ -24,11 +24,11 @@ WinPos.Service = (function (Urls){
                 
                 $("#editPrice").val(service.price);
                 
-                // Set beautician
-                if(service.beautician_id){
-                    markSingleSelectBoxItem('editBeautician', service.beautician_id);
+                // Set staff
+                if(service.staff_id){
+                    markSingleSelectBoxItem('editStaff', service.staff_id);
                 }else{
-                    $("#editBeautician").val('');
+                    $("#editStaff").val('');
                 }
                 
                 // Disable price field if service has sales
@@ -184,7 +184,7 @@ WinPos.Service = (function (Urls){
                     searchable: false,
                     className: 'text-center align-middle',
                     render: function(data, type, row){
-                        return row.beautician ? row.beautician.name : '-';
+                        return row.staff ? row.staff.name : '-';
                     }
                 },
                 {
@@ -263,7 +263,7 @@ WinPos.Service = (function (Urls){
                 $("#price").val(service.price);
                 $("#details").val(service.description || '');
                 
-                // Note: beautician is not copied when copying a service
+                // Note: staff is not copied when copying a service
 
                 // Mark categories
                 markMultipleSelectBoxItem('category_id', categories);

@@ -44,9 +44,9 @@
                                                 <input step=".01" type="number" class="form-control rounded" name="price" id="price" placeholder="Service Price">
                                             </div>
                                             <div class="col-lg-3 form-group">
-                                                <label for="beautician_id">Default Beautician</label>
-                                                <select class="form-control rounded" name="beautician_id" id="beautician_id">
-                                                    <option value="">Select Beautician</option>
+                                                <label for="staff_id">Default Staff</label>
+                                                <select class="form-control rounded" name="staff_id" id="staff_id">
+                                                    <option value="">Select Staff</option>
                                                     @foreach ($employees as $employee)
                                                         <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                                                     @endforeach

@@ -207,22 +207,22 @@
     /* // not working  */
 }
 
-.assigned-beautician{
+.assigned-staff{
     font-size: 13px;
     float: right;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
 }
-.beautician-change-button{
+.staff-change-button{
     border: 0px;
     background: transparent;
 }
 
-.selected-service-name:hover .assigned-beautician{
+.selected-service-name:hover .assigned-staff{
     font-size: 16px;
 }
 
-.beautician-card {
+.staff-card {
     border: 2px solid #ddd;
     border-radius: 8px;
     padding: 15px;
@@ -232,44 +232,44 @@
     position: relative;
 }
 
-.beautician-card:hover {
+.staff-card:hover {
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-.beautician-card.assigned {
+.staff-card.assigned {
     background-color: #d4edda;
     border-color: #28a745;
 }
 
-.beautician-card.disabled {
+.staff-card.disabled {
     opacity: 0.6;
     background-color: #f8f9fa;
     cursor: not-allowed;
 }
 
-.beautician-card.disabled .btn-assign-beautician {
+.staff-card.disabled .btn-assign-staff {
     pointer-events: none;
 }
 
-.beautician-info {
+.staff-info {
     margin-bottom: 10px;
 }
 
-.beautician-info p {
+.staff-info p {
     margin-bottom: 5px;
 }
 
-.btn-assign-beautician {
+.btn-assign-staff {
     width: 100%;
 }
 
-.beautician-card .beautician-status{
+.staff-card .staff-status{
     position: absolute;
     top: 5px;
     right: 5px;
     font-size: 13px;
 }
 
-.beautician-card.available{
+.staff-card.available{
     cursor: pointer;
 }

@@ -10,14 +10,14 @@
          <!-- Section 2: Loyalty Card -->
          <div class="mr-4">
              <input type="hidden" id="hiddenTerminalCustomerCardId">
-             <div id="terminalCustomerLoyaltyInfo" data-minimum-purchase-amount="{{ session('loyaltySettings.minimum_purchase_amount') }}"
-                 data-minimum-purchase-amount-sales="{{ session('loyaltySettings.minimum_purchase_amount_applies_for') }}" data-max-visit="{{ session('loyaltySettings.max_visits') }}">
+             <div id="terminalCustomerLoyaltyInfo" data-minimum-sales-amount="{{ session('loyaltySettings.minimum_sales_amount') }}"
+                 data-minimum-sales-amount-sales="{{ session('loyaltySettings.minimum_sales_amount_applies_for') }}" data-max-visit="{{ session('loyaltySettings.max_visits') }}">
                  <p class="mb-1 d-none terminal-customer-loyalty-info all-status-info"><strong title="Loyalty Status of Customer">Loyalty:</strong> <span id="terminalCustomerLoyaltyShow">No
                          Card</span></p>
 
                  <p class="mb-1 d-none terminal-customer-loyalty-info loyal-status-info limitted-status-info completed-status-info expired-status-info"><strong
                          title="Total Visit of Customer under loyalty">Visits:</strong> <span id="terminalCustomerVisitShow">0</span></p>
-                 @if(session('loyaltySettings.minimum_purchase_amount_applies_for') == 'Single')
+                 @if(session('loyaltySettings.minimum_sales_amount_applies_for') == 'Single')
                  <p class="mb-1 d-none terminal-customer-loyalty-info new-customer-info single-condition"><strong title="Current maximum sales amount">Max Sales:</strong> <span
                          id="terminalCustomerMaxSalesShow">0</span></p>
                  @else
@@ -31,7 +31,7 @@
                          Card:</strong>
                      <span id="terminalCustomerNextCardShow"><span>Not Eligible</span>
                          <i data-toggle="tooltip" data-placement="top"
-                             title="New card requires a {{ session('loyaltySettings.minimum_purchase_amount') }} BDT minimum purchase in {{ session('loyaltySettings.minimum_purchase_amount_applies_for') }} visit."
+                             title="New card requires a {{ session('loyaltySettings.minimum_sales_amount') }} BDT minimum sales in {{ session('loyaltySettings.minimum_sales_amount_applies_for') }} visit."
                              class="fas fa-info-circle">
                          </i>
                      </span>

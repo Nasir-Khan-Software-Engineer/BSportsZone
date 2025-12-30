@@ -8,7 +8,7 @@
         <div class="card-header d-flex justify-content-between align-items-center">
 
             <div class="d-flex gap-2 align-items-center">
-                <h3>Beautician Performance Report</h3>
+                <h3>Staff Performance Report</h3>
             </div>
 
             <div class="d-flex align-items-center justify-content-between">
@@ -57,14 +57,14 @@
 
         </div>
         <div class="card-body p-1">
-            <!-- Beautician Report Table -->
+            <!-- Staff Report Table -->
             <div class="row">
                 <div class="col-12">
                     <div id="detailReportDiv">
                         <table class="table table-bordered" id="reportTable">
                             <thead>
                                 <tr>
-                                    <th class="text-left align-middle" style="width: 12%;" scope="col">Beautician Name</th>
+                                    <th class="text-left align-middle" style="width: 12%;" scope="col">Staff Name</th>
                                     <th class="text-left align-middle" style="width: 8%;" scope="col">Phone</th>
                                     <th class="text-right align-middle" style="width: 8%;" scope="col">
                                         Total Working Days
@@ -100,11 +100,11 @@
 
 @endsection
 @section('script')
-@vite(['resources/js/report-script.js', 'resources/js/reports/beautician-report-script.js'])
+@vite(['resources/js/report-script.js', 'resources/js/reports/staff-report-script.js'])
 <script>
-let beauticianReportUrls = {
-    'datatable': "{{route('reports.beautician.details.data')}}",
-    'download': "{{route('reports.beautician.details.download')}}"
+let staffReportUrls = {
+    'datatable': "{{route('reports.staff.details.data')}}",
+    'download': "{{route('reports.staff.details.download')}}"
 };
 
 $(document).ready(function() {
@@ -138,7 +138,7 @@ $(document).ready(function() {
         });
     }
 
-    WinPos.Datatable.initDataTable("#reportTable", WinPos.Report.beautician.datatableConfiguration());
+    WinPos.Datatable.initDataTable("#reportTable", WinPos.Report.staff.datatableConfiguration());
 
     $('#filterReport').on('click', function() {
         WinPos.Datatable.getDataTable().ajax.reload(false, true);
@@ -146,13 +146,13 @@ $(document).ready(function() {
 
     $('#downloadPdf').on('click', function() {
         var params = getFilterParams();
-        window.location = beauticianReportUrls.download + '?format=pdf&from_date=' + params.from_date +
+        window.location = staffReportUrls.download + '?format=pdf&from_date=' + params.from_date +
             '&to_date=' + params.to_date;
     });
 
     $('#downloadExcel').on('click', function() {
         var params = getFilterParams();
-        window.location = beauticianReportUrls.download + '?format=excel&from_date=' + params.from_date +
+        window.location = staffReportUrls.download + '?format=excel&from_date=' + params.from_date +
             '&to_date=' + params.to_date;
     });
 });

@@ -87,7 +87,7 @@
                             <tr>
                                 <th>Service Code</th>
                                 <th>Service Name</th>
-                                <th class="text-center">Beautician</th>
+                                <th class="text-center">Staff</th>
                                 <th class="text-center">QTY</th>
                                 <th class="text-end">Price</th>
                             </tr>
@@ -97,7 +97,7 @@
                             <tr>
                                 <td>{{ $item->service->code }}</td>
                                 <td>{{ $item->service->name }}</td>
-                                <td class="text-center">{{ $item->beautician->name ?? 'None' }}</td>
+                                <td class="text-center">{{ $item->staff->name ?? 'None' }}</td>
                                 <td class="text-center">{{ $item->quantity }}</td>
                                 <td class="text-end">{{ number_format($item->selling_price,2) }} Tk</td>
                             </tr>

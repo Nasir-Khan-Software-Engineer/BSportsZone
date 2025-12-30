@@ -42,7 +42,7 @@
         <p><strong>Returning Customer:</strong> A customer who has taken multiple services in their lifetime.</p>
         <p><strong>Old Customer:</strong> A customer who has taken at least one service in their lifetime but has not taken any services within the last three months.</p>
         <p><strong>Inactive Customer:</strong> A customer who has not taken any services in their lifetime.</p>
-        <p style="margin-top: 5px; font-size: 9px; color: #666;"><em>Note: Customer type is determined based on lifetime purchases, not filtered by date range.</em></p>
+        <p style="margin-top: 5px; font-size: 9px; color: #666;"><em>Note: Customer type is determined based on lifetime Sales, not filtered by date range.</em></p>
     </div>
     
     <table>

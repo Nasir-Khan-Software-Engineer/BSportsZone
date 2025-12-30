@@ -12,7 +12,7 @@ class EmployeeDesignationSeeder extends Seeder
     {
         // Common designations for all POS
         $designations = [
-            'Beautician',
+            'Staff',
             'Receptionist',
             'Manager',
             'Accountant',

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->foreignId('customerId')->constrained(table: 'customers', indexName: 'FK_purchases_customer')->onUpdate('cascade')->onDelete('cascade');
+        Schema::table('sales', function (Blueprint $table) {
+            $table->foreignId('customerId')->constrained(table: 'customers', indexName: 'FK_Sales_customer')->onUpdate('cascade')->onDelete('cascade');
             //
         });
     }
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
+        Schema::table('sales', function (Blueprint $table) {
             //
         });
     }

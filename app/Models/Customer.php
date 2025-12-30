@@ -15,9 +15,9 @@ class Customer extends Model
         'created_at', 'updated_at', 'deleted_at'
     ];
 
-    public function purchases()
+    public function Sales()
     {
-        return $this->hasMany(Purchases::class,'customerId');
+        return $this->hasMany(Sales::class,'customerId');
     }
 
     public function creator()

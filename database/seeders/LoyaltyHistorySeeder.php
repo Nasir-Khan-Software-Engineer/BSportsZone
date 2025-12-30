@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\LoyaltyHistory;
 use App\Models\LoyaltyCard;
-use App\Models\Purchases;
+use App\Models\Sales;
 use Carbon\Carbon;
 
 class LoyaltyHistorySeeder extends Seeder
@@ -22,7 +22,7 @@ class LoyaltyHistorySeeder extends Seeder
         foreach ($cards as $index => $card) {
             $customer_id = $card->customer_id;
             $historyCount = $index === 0 ? 5 : 10;
-            $sales = Purchases::where('posid', $card->posid)->where('customerId', $customer_id)->take($historyCount)->get();
+            $sales = Sales::where('posid', $card->posid)->where('customerId', $customer_id)->take($historyCount)->get();
 
             foreach ($sales as $sale) {
                 LoyaltyHistory::create([

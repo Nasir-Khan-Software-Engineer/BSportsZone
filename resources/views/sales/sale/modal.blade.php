@@ -75,7 +75,7 @@
                                 <tr>
                                     <th style="width: 20%;">Service Code</th>
                                     <th>Service Name</th>
-                                    <th style="width: 15%;" class="text-center">Beautician</th>
+                                    <th style="width: 15%;" class="text-center">Staff</th>
                                     <th style="width: 15%;" class="text-center">QTY</th>
                                     <th style="width: 15%;" class="text-right">Price</th>
                                 </tr>

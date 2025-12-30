@@ -5,21 +5,21 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-class Purchase_items extends Model
+class Sales_items extends Model
 {
     use HasFactory;
     use SoftDeletes;
     
     protected $dates = ['deleted_at', 'created_at', 'updated_at'];
 
-    public function purchase()
+    public function sales()
     {
-        return $this->belongsTo(Purchases::class, 'purchase_id');
+        return $this->belongsTo(Sales::class, 'sales_id');
     }
 
     public function items()
     {
-        return $this->hasMany(Purchase_items::class, 'purchase_id');
+        return $this->hasMany(Sales_items::class, 'sales_id');
     }
 
     public function service()
@@ -27,8 +27,8 @@ class Purchase_items extends Model
         return $this->belongsTo(Product::class, 'product_id')->where('type', 'Service');
     }
 
-    public function beautician()
+    public function staff()
     {
-        return $this->belongsTo(Employee::class, 'beautician_id');
+        return $this->belongsTo(Employee::class, 'staff_id');
     }
 }

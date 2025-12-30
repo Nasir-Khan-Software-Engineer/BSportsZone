@@ -34,7 +34,7 @@ class LoyaltyHistory extends Model
 
     public function sale()
     {
-        return $this->belongsTo(Purchases::class, 'sales_id');
+        return $this->belongsTo(Sales::class, 'sales_id');
     }
 
     // Link to creator

@@ -62,7 +62,7 @@ class CustomerReport implements FromArray, WithHeadings, WithEvents
         $headings[] = ['Returning Customer:', 'A customer who has taken multiple services in their lifetime.'];
         $headings[] = ['Old Customer:', 'A customer who has taken at least one service in their lifetime but has not taken any services within the last three months.'];
         $headings[] = ['Inactive Customer:', 'A customer who has not taken any services in their lifetime.'];
-        $headings[] = ['Note:', 'Customer type is determined based on lifetime purchases, not filtered by date range.'];
+        $headings[] = ['Note:', 'Customer type is determined based on lifetime Sales, not filtered by date range.'];
         $headings[] = [];
         $headings[] = ['Customer ID', 'Customer Name', 'Phone', 'Total Sales', 'Total Quantity', 'Total Spending', 'Total Discount Amount', 'Total Adjustment Amount', 'Last Visited Date', 'Type'];
 

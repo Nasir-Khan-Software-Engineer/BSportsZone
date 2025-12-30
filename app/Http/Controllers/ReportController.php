@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Purchases;
+use App\Models\Sales;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Number;
@@ -24,7 +24,7 @@ class ReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $query = Purchases::where('posid', auth()->user()->posid);
+        $query = Sales::where('posid', auth()->user()->posid);
         $totalRecord = $query->count();
 
         if ($from) {
@@ -75,7 +75,7 @@ class ReportController extends Controller
         $from = $request->input('from_date', Carbon::now()->format('Y-m-d'));
         $to = $request->input('to_date', Carbon::now()->format('Y-m-d'));
 
-        $query = Purchases::where('posid', auth()->user()->posid);
+        $query = Sales::where('posid', auth()->user()->posid);
         $totalRecord = $query->count();
 
         if ($from) {

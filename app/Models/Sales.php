@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Purchases extends Model
+class Sales extends Model
 {
     use HasFactory;
     use SoftDeletes;
@@ -15,7 +15,7 @@ class Purchases extends Model
 
     public function items()
     {
-        return $this->hasMany(Purchase_items::class, 'purchase_id');
+        return $this->hasMany(Sales_items::class, 'sales_id');
     }
 
     public function createdByUser()
@@ -40,22 +40,22 @@ class Purchases extends Model
     
     protected static function booted()
     {
-        static::deleting(function ($purchase) {
-            if ($purchase->isForceDeleting()) {
+        static::deleting(function ($sales) {
+            if ($sales->isForceDeleting()) {
                 // Permanently delete related records
-                $purchase->items()->forceDelete();
-                $purchase->payments()->forceDelete();
+                $sales->items()->forceDelete();
+                $sales->payments()->forceDelete();
             } else {
                 // Soft delete related records
-                $purchase->items()->delete();
-                $purchase->payments()->delete();
+                $sales->items()->delete();
+                $sales->payments()->delete();
             }
         });
 
-        static::restoring(function ($purchase) {
+        static::restoring(function ($sales) {
             // Restore related records
-            $purchase->items()->withTrashed()->restore();
-            $purchase->payments()->withTrashed()->restore();
+            $sales->items()->withTrashed()->restore();
+            $sales->payments()->withTrashed()->restore();
         });
     }
 

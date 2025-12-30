@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Reports;
 
 use Illuminate\Http\Request;
-use App\Models\Purchases;
+use App\Models\Sales;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;

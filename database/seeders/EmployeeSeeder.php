@@ -30,7 +30,7 @@ class EmployeeSeeder extends Seeder
         
         foreach ($designations as $designation) {
             // Determine number of employees to create
-            $count = strtolower($designation->name) === 'beautician' ? 15 : 2;
+            $count = strtolower($designation->name) === 'staff' ? 15 : 2;
             
             for ($i = 1; $i <= $count; $i++) {
                 // Generate date of birth (between 18 and 60 years ago)

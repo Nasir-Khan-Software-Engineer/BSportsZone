@@ -1,10 +1,10 @@
 <!-- Discount Modal -->
-<div class="modal fade" id="purchaseDiscountModal" tabindex="-1" aria-labelledby="purchaseDiscountModalLabel" aria-hidden="true">
+<div class="modal fade" id="salesDiscountModal" tabindex="-1" aria-labelledby="salesDiscountModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content rounded">
 
             <div class="modal-header rounded">
-                <h5 class="modal-title" id="purchaseDiscountModalLabel">Discount</h5>
+                <h5 class="modal-title" id="salesDiscountModalLabel">Discount</h5>
                 <button type="button" class="btn-close close-modal" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 

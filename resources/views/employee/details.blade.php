@@ -69,7 +69,7 @@
 
             <!-- Attendance Metrics -->
             <div class="row mb-3">
-                <div class="{{ $isBeautician ? 'col-lg-2 col-md-3' : 'col-md-3' }}">
+                <div class="{{ $isStaff ? 'col-lg-2 col-md-3' : 'col-md-3' }}">
                     <div class="card attendance-metric-card metric-present mb-2">
                         <div class="card-body">
                             <h6 class="text-muted mb-1">Total Present</h6>
@@ -78,7 +78,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="{{ $isBeautician ? 'col-lg-2 col-md-3' : 'col-md-3' }}">
+                <div class="{{ $isStaff ? 'col-lg-2 col-md-3' : 'col-md-3' }}">
                     <div class="card attendance-metric-card metric-absent mb-2">
                         <div class="card-body">
                             <h6 class="text-muted mb-1">Total Absent</h6>
@@ -87,7 +87,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="{{ $isBeautician ? 'col-lg-2 col-md-3' : 'col-md-3' }}">
+                <div class="{{ $isStaff ? 'col-lg-2 col-md-3' : 'col-md-3' }}">
                     <div class="card attendance-metric-card metric-leave mb-2">
                         <div class="card-body">
                             <h6 class="text-muted mb-1">Total Leave</h6>
@@ -96,7 +96,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="{{ $isBeautician ? 'col-lg-3 col-md-3' : 'col-md-3' }}">
+                <div class="{{ $isStaff ? 'col-lg-3 col-md-3' : 'col-md-3' }}">
                     <div class="card attendance-metric-card metric-leave mb-2">
                         <div class="card-body">
                             <h6 class="text-muted mb-1">Total Reviews</h6>
@@ -105,13 +105,13 @@
                         </div>
                     </div>
                 </div>
-                @if($isBeautician && $beauticianServiceMetrics)
+                @if($isStaff && $staffServiceMetrics)
                 <div class="col-lg-3 col-md-3">
                     <div class="card attendance-metric-card metric-service mb-2">
                         <div class="card-body">
                             <h6 class="text-muted mb-1">Today's Services</h6>
-                            <h3 class="mb-0 text-primary">{{ $beauticianServiceMetrics['today_services'] }}</h3>
-                            <small class="text-muted">Total: {{ $beauticianServiceMetrics['total_services'] }} | Average: {{ $beauticianServiceMetrics['average_services_per_day'] }}/day</small>
+                            <h3 class="mb-0 text-primary">{{ $staffServiceMetrics['today_services'] }}</h3>
+                            <small class="text-muted">Total: {{ $staffServiceMetrics['total_services'] }} | Average: {{ $staffServiceMetrics['average_services_per_day'] }}/day</small>
                         </div>
                     </div>
                 </div>

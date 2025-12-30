@@ -3,7 +3,7 @@
 namespace App\Services\Service;
 
 use App\Models\Product;
-use App\Models\Purchase_items;
+use App\Models\Sales_items;
 use DB;
 
 class ServiceService implements IServiceService {
@@ -20,10 +20,10 @@ class ServiceService implements IServiceService {
                 'products.code',
                 'products.price',
                 'products.image',
-                'products.beautician_id'
+                'products.staff_id'
             )
             ->with([
-                'TodaysBeautician:id,name'
+                'TodaysStaff:id,name'
             ])
             ->where('type', 'Service')
             ->whereIn('products.id', $serviceIds)
@@ -33,7 +33,7 @@ class ServiceService implements IServiceService {
 
 
     public function getTopSellingServiceIds($posId){
-        $serviceGroupBy = Purchase_items::select('product_id as id', DB::raw('COUNT(product_id) as qty'))
+        $serviceGroupBy = Sales_items::select('product_id as id', DB::raw('COUNT(product_id) as qty'))
         ->where('posid', $posId)
         ->groupBy('product_id')
         ->orderByDesc('qty')
@@ -52,10 +52,10 @@ class ServiceService implements IServiceService {
                 'products.code',
                 'products.price',
                 'products.image',
-                'products.beautician_id'
+                'products.staff_id'
             )
             ->with([
-                'TodaysBeautician:id,name'
+                'TodaysStaff:id,name'
             ])
             ->where('type', 'Service')
             ->where('products.posid', $posId)

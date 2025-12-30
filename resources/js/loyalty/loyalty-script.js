@@ -57,12 +57,12 @@ WinPos.Loyalty = (function (Urls) {
                         let remainingNote = "";
                         let eligibleText = "";
                         //debugger;
-                        if (settings.minimum_purchase_amount_applies_for == 'Single') {
+                        if (settings.minimum_sales_amount_applies_for == 'Single') {
                             if (response.loyaltyInfo.isEligibleForNewCard) {
                                 remainingNote = "This customer has maximum spent " + response.loyaltyInfo.currentTotalSpent + "Tk. in a single visit.";
                                 eligibleText = "Eligible";
                             } else {
-                                remainingNote = "New card requires a " + settings.minimum_purchase_amount + " BDT minimum purchase in a SINGLE visit.";
+                                remainingNote = "New card requires a " + settings.minimum_sales_amount + " BDT minimum sales in a SINGLE visit.";
                                 remainingNote += " This customer has maximum spent " + response.loyaltyInfo.currentTotalSpent + "Tk. in a single visit.";
                                 eligibleText = "Not Eligible";
                             }
@@ -72,7 +72,7 @@ WinPos.Loyalty = (function (Urls) {
                                 remainingNote = "This customer has already spent " + response.loyaltyInfo.currentTotalSpent + "Tk. in all visit.";
                                 eligibleText = "Eligible";
                             } else {
-                                remainingNote = "New card requires a " + settings.minimum_purchase_amount + " BDT minimum purchase in ALL visit.";
+                                remainingNote = "New card requires a " + settings.minimum_sales_amount + " BDT minimum sales in ALL visit.";
                                 remainingNote += " This customer has already spent " + response.loyaltyInfo.currentTotalSpent + "Tk. in all visit.";
                                 remainingNote += " She has to spend " + response.loyaltyInfo.needForNextCard + "Tk. more to get a new card.";
                                 eligibleText = "Not Eligible";
@@ -107,7 +107,7 @@ WinPos.Loyalty = (function (Urls) {
                         }
                         else {
                             // No Card
-                            setNoCardCustomerLoyaltyInfo(response.loyaltyInfo.status, settings.minimum_purchase_amount_applies_for, response.loyaltyInfo.currentTotalSpent, eligibleText, remainingNote);
+                            setNoCardCustomerLoyaltyInfo(response.loyaltyInfo.status, settings.minimum_sales_amount_applies_for, response.loyaltyInfo.currentTotalSpent, eligibleText, remainingNote);
 
                             $('#posLoyaltyHistoryModalBtn').prop('disabled', true);
                             $('#loyaltyVerificationModal').modal('hide');
@@ -184,14 +184,14 @@ WinPos.Loyalty = (function (Urls) {
 
     }
 
-    var setNoCardCustomerLoyaltyInfo = function (status, settingMinimumPurchaseAmountSales, currentTotalSpent, eligibleText, eligibleTooltipText) {
+    var setNoCardCustomerLoyaltyInfo = function (status, settingMinimumSalesAmountSales, currentTotalSpent, eligibleText, eligibleTooltipText) {
         $(".terminal-customer-loyalty-info").addClass('d-none');
         $(".new-customer-info").removeClass('d-none');
         $(".all-status-info").removeClass('d-none');
 
         $("#terminalCustomerLoyaltyShow").html(status);
 
-        if (settingMinimumPurchaseAmountSales == 'Single') {
+        if (settingMinimumSalesAmountSales == 'Single') {
             $("#terminalCustomerMaxSalesShow").html(currentTotalSpent + ' Tk');
         } else {
             $("#terminalCustomerTotalSpentShow").html(currentTotalSpent + ' Tk');
@@ -210,19 +210,19 @@ WinPos.Loyalty = (function (Urls) {
         $(".new-customer-info").removeClass('d-none');
         $(".all-status-info").removeClass('d-none');
 
-        let minimumPurchaseAmount = $("#terminalCustomerLoyaltyInfo").data('minimum-purchase-amount');
-        let minimumPurchaseAmountSales = $("#terminalCustomerLoyaltyInfo").data('minimum-purchase-amount-sales');
+        let minimumSalesAmount = $("#terminalCustomerLoyaltyInfo").data('minimum-sales-amount');
+        let minimumSalesAmountSales = $("#terminalCustomerLoyaltyInfo").data('minimum-sales-amount-sales');
 
         $("#terminalCustomerLoyaltyShow").html('No Card');
 
-        if (minimumPurchaseAmountSales == 'Single') {
+        if (minimumSalesAmountSales == 'Single') {
             $("#terminalCustomerMaxSalesShow").html('0 Tk');
         } else {
             $("#terminalCustomerTotalSpentShow").html('0 Tk');
         }
 
         $("#terminalCustomerNextCardShow span").html('Not Eligible');
-        $("#terminalCustomerNextCardShow i").attr('title', `New card requires a ${minimumPurchaseAmount} BDT minimum purchase in ${minimumPurchaseAmountSales} visit.`);
+        $("#terminalCustomerNextCardShow i").attr('title', `New card requires a ${minimumSalesAmount} BDT minimum sales in ${minimumSalesAmountSales} visit.`);
     }
 
     var getCardHistory = function (cardId) {

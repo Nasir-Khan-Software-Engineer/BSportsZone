@@ -20,7 +20,7 @@ return new class extends Migration
             $table->decimal('price', $precision = 8, $scale = 2)->default(0);
             $table->decimal('discount', $precision = 8, $scale = 2)->default(0);
             $table->decimal('tax', $precision = 8, $scale = 2)->default(0);
-            $table->enum('reference_type', ['PURCHASE', 'SALE', 'MANUAL_ADJUSTMENT']);
+            $table->enum('reference_type', ['SALES', 'SALE', 'MANUAL_ADJUSTMENT']);
             $table->bigInteger('reference_id')->nullable();
             $table->foreignId('created_by')->constrained(table: 'users', indexName: 'product_stock_user')->onUpdate('cascade')->onDelete('cascade');
             $table->timestamps();

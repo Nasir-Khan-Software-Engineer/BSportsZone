@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Beautician Performance Report PDF</title>
+    <title>Staff Performance Report PDF</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 11px; }
         table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
@@ -18,7 +18,7 @@
 </head>
 <body>
     <h2 class="text-center" style="margin: 0px;">{{ $companyName }}</h2>
-    <h4 class="text-center" style="margin: 0px;">Beautician Performance Report</h4>
+    <h4 class="text-center" style="margin: 0px;">Staff Performance Report</h4>
 
     <div style="margin-bottom: 10px;">
         <strong>POSID:</strong> {{ $posid }}
@@ -39,7 +39,7 @@
     <table>
         <thead>
             <tr>
-                <th class="text-center">Beautician Name</th>
+                <th class="text-center">Staff Name</th>
                 <th class="text-center">Phone</th>
                 <th class="text-right">Total Working Days</th>
                 <th class="text-right">Present</th>
@@ -54,7 +54,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach($beauticianData as $item)
+            @foreach($staffData as $item)
             <tr>
                 <td class="text-left">
                     {{ isset($item['employee_name']) && strlen($item['employee_name']) > 20 

@@ -8,7 +8,7 @@ class CustomerService implements ICustomerService{
     public function index(){
         $posid = auth()->user()->posid;
         $customers = Customer::where('posid', $posid)
-                            ->with('purchases', 'creator')
+                            ->with('sales', 'creator')
                             ->orderBy('id', 'DESC')
                             ->get();
 
@@ -25,7 +25,7 @@ class CustomerService implements ICustomerService{
 
     public function show($id){
         $posid = auth()->user()->posid;
-        $customer = Customer::with('purchases', 'creator', 'updater')
+        $customer = Customer::with('sales', 'creator', 'updater')
                 ->where('posid', $posid)
                 ->where('id', $id)
                 ->firstOrFail();
@@ -63,7 +63,7 @@ class CustomerService implements ICustomerService{
         $customer->formattedDate = formatDate($customer->created_at);
         $customer->formattedTime = formatTime($customer->created_at);
         $customer->createdBy = auth()->user()->name;
-        $customer->purchasesCount = 0;
+        $customer->SalesCount = 0;
 
         return $customer;
     }
@@ -101,7 +101,7 @@ class CustomerService implements ICustomerService{
 
         $customer->formattedDate = formatDate($customer->created_at);
         $customer->formattedTime = formatTime($customer->created_at);
-        $customer->purchasesCount = $customer->purchases()->count();
+        $customer->SalesCount = $customer->sales()->count();
         $customer->createdBy = $customer->creator->name;
 
         return $customer;

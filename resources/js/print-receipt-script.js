@@ -112,7 +112,7 @@ WinPos.PrintReceipt.algoTypes.footer = {
         dom.push('<br>');
 
         dom.push('<p>***THANK YOU. COME AGAIN***</p><span class="nl"></span>');
-        //dom.push('<p>Exchange and return only with invoice, within 15 days from the date of purchase (T&C apply)</p>');
+        //dom.push('<p>Exchange and return only with invoice, within 15 days from the date of sales (T&C apply)</p>');
         dom.push('<br>');
         dom.push('<p>Powered By: ParlourPOS</p>');
         dom.push('<p>www.ParlourPOS.com</p>');
@@ -171,7 +171,7 @@ WinPos.PrintReceipt.algoTypes.salesDetails = {
 
         data.cartInfo.items.forEach(function(item){
             let shortServiceName = (item.name.length > 20 ? (item.name).slice(0,20) : item.name);
-            let beauticianName = item.beautician_name || 'None';
+            let staffName = item.staff_name || 'None';
 
             dom.push('<tr>');
                 dom.push('<td style="text-align: left;">' + shortServiceName + '</td>');
@@ -179,9 +179,9 @@ WinPos.PrintReceipt.algoTypes.salesDetails = {
                 dom.push('<td style="width: 50px; text-align: right;">'+ (item.price) +'</td>');
                 dom.push('<td style="width: 50px; text-align: right;">'+ ((item.price) * item.quantity) +'</td>');
             dom.push('</tr>');
-            if (beauticianName !== 'None') {
+            if (staffName !== 'None') {
                 dom.push('<tr>');
-                    dom.push('<td colspan="4" style="text-align: left; font-size: 10px; padding-left: 10px;">Beautician: ' + beauticianName + '</td>');
+                    dom.push('<td colspan="4" style="text-align: left; font-size: 10px; padding-left: 10px;">Staff: ' + staffName + '</td>');
                 dom.push('</tr>');
             }
         });

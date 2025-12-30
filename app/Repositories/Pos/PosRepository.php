@@ -4,7 +4,7 @@ namespace App\Repositories\Pos;
 
 use App\Models\Product;
 use App\Repositories\Pos\IPosRepository;
-use App\Models\Purchase_items;
+use App\Models\Sales_items;
 use DB;
 
 class PosRepository implements IPosRepository {
@@ -15,9 +15,9 @@ class PosRepository implements IPosRepository {
     }
 
     public function getTopSellingServices($posId){
-        //$result = DB::raw('select productid, count(productid) as qty from purchases_items where posid = $posid group by productid order by qty desc limit 10')->get();
+        //$result = DB::raw('select productid, count(productid) as qty from Sales_items where posid = $posid group by productid order by qty desc limit 10')->get();
 
-        $serviceGroupBy = Purchase_items::select('product_id as id', DB::raw('COUNT(product_id) as qty'))
+        $serviceGroupBy = Sales_items::select('product_id as id', DB::raw('COUNT(product_id) as qty'))
         ->where('posid', $posId)
         ->groupBy('product_id')
         ->orderByDesc('qty')

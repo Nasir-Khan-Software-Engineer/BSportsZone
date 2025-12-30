@@ -360,7 +360,7 @@ WinPos.Customer = (function (Urls){
                 searchable: false,
                 className: 'text-center align-middle',
                 render: function(data, type, row){
-                    return row.purchases_count || 0;
+                    return row.Sales_count || 0;
                 }
             },
             {

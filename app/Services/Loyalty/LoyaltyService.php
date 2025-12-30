@@ -12,11 +12,11 @@ class LoyaltyService implements ILoyaltyService{
 
     public function getCustomerLoayltyStatus($posId, $customerId)
     {
-        $customer = Customer::with(['loyaltyCards.histories','purchases'])->where('posid', $posId)->find($customerId);
+        $customer = Customer::with(['loyaltyCards.histories','sales'])->where('posid', $posId)->find($customerId);
 
         $settings = session('loyaltySettings');
-        $minPurchase = $settings['minimum_purchase_amount'];
-        $minPurchaseAmountAppliesFor = $settings['minimum_purchase_amount_applies_for'];
+        $minSales = $settings['minimum_sales_amount'];
+        $minSalesAmountAppliesFor = $settings['minimum_sales_amount_applies_for'];
 
         $latestCard = $customer->loyaltyCards->sortByDesc('created_at')->first();
         $isEligibleForNewCard = false;
@@ -54,8 +54,8 @@ class LoyaltyService implements ILoyaltyService{
             'isEligibleForNewCard' => $isEligibleForNewCard,
             'currentTotalSpent' => $currentTotalSpent,
             'needForNextCard' => $needForNextCard,
-            'minPurchase' => $minPurchase,
-            'minPurchaseAmountAppliesFor' => $minPurchaseAmountAppliesFor,
+            'minSales' => $minSales,
+            'minSalesAmountAppliesFor' => $minSalesAmountAppliesFor,
             'visitCount' => $visitCount,
             'totalDiscount' => $totalDiscount,
             'cardStatus' => $cardStatusData,
@@ -145,8 +145,8 @@ class LoyaltyService implements ILoyaltyService{
         $history = LoyaltyHistory::with(['sale'])
             ->where('card_id', $cardId)
             ->where('loyalty_histories.posid', $posId)
-            ->join('purchases', 'loyalty_histories.sales_id', '=', 'purchases.id')
-            ->orderBy('purchases.created_at', 'asc')
+            ->join('sales', 'loyalty_histories.sales_id', '=', 'Sales.id')
+            ->orderBy('Sales.created_at', 'asc')
             ->select('loyalty_histories.*')
             ->get();
 
@@ -212,8 +212,8 @@ class LoyaltyService implements ILoyaltyService{
     private function getNextCardEligibility($customer, $latestCard = null)
     {
         $settings = session('loyaltySettings');
-        $minPurchase = $settings['minimum_purchase_amount'];
-        $minPurchaseAmountAppliesFor = $settings['minimum_purchase_amount_applies_for'];
+        $minSales = $settings['minimum_sales_amount'];
+        $minSalesAmountAppliesFor = $settings['minimum_sales_amount_applies_for'];
         $isEligibleForNewCard = false;
         $currentTotalSpent = 0;
         $needForNextCard = 0;
@@ -225,10 +225,10 @@ class LoyaltyService implements ILoyaltyService{
             $comparedDate = $latestCard->created_at;
         }
 
-        if($minPurchaseAmountAppliesFor == "All"){
-            // case 1: if all sales sum is minimum purchase amount
-            $currentTotalSpent = $customer->purchases->where('created_at', '>=', $comparedDate)->sum('total_amount');
-            $needForNextCard = $minPurchase - $currentTotalSpent;
+        if($minSalesAmountAppliesFor == "All"){
+            // case 1: if all sales sum is minimum sales amount
+            $currentTotalSpent = $customer->sales->where('created_at', '>=', $comparedDate)->sum('total_amount');
+            $needForNextCard = $minSales - $currentTotalSpent;
 
             if ($needForNextCard <= 0) {
                 $isEligibleForNewCard = true;
@@ -237,19 +237,19 @@ class LoyaltyService implements ILoyaltyService{
             }
             
         }
-        else if($minPurchaseAmountAppliesFor == "Single"){
-            // case 2: if one single sale is minimum purchase amount
+        else if($minSalesAmountAppliesFor == "Single"){
+            // case 2: if one single sale is minimum sales amount
 
             // sales having the max total amount
-            $maxSalesAmount = $customer->purchases->where('created_at', '>=', $comparedDate)->max('total_amount');
+            $maxSalesAmount = $customer->sales->where('created_at', '>=', $comparedDate)->max('total_amount');
             $currentTotalSpent = $maxSalesAmount ?? 0;
-            $needForNextCard = $minPurchase - $currentTotalSpent;
+            $needForNextCard = $minSales - $currentTotalSpent;
 
             if ($needForNextCard <= 0) {
                 $isEligibleForNewCard = true;
             }else{
                 $isEligibleForNewCard = false;
-                $needForNextCard = $minPurchase;
+                $needForNextCard = $minSales;
             }
         }else{
             $isEligibleForNewCard = false;

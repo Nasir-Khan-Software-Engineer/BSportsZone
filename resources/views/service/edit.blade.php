@@ -45,9 +45,9 @@
                                                 <input step=".01" type="number" class="form-control rounded" name="price" id="editPrice" placeholder="Service Price" min="0">
                                             </div>
                                             <div class="col-4 form-group">
-                                                <label for="editBeautician">Default Beautician</label>
-                                                <select class="form-control rounded" name="beautician_id" id="editBeautician">
-                                                    <option value="">Select Beautician</option>
+                                                <label for="editStaff">Default Staff</label>
+                                                <select class="form-control rounded" name="staff_id" id="editStaff">
+                                                    <option value="">Select Staff</option>
                                                     @foreach ($employees as $employee)
                                                         <option value="{{ $employee->id }}">{{ $employee->name }}</option>
                                                     @endforeach

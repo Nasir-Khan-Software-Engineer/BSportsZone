@@ -35,7 +35,7 @@ class CustomerController extends Controller
         // Base query
         if(isFeatureEnabled('ENABLED_LOYALTY')){
             $query = Customer::where('posid', $posid)
-                    ->withCount('purchases')
+                    ->withCount('sales')
                     ->when($search, function($q) use ($search) {
                         $q->where(function($sub) use ($search) {
                             $sub->where('name', 'like', "%{$search}%")
@@ -45,7 +45,7 @@ class CustomerController extends Controller
             });
         }else{
             $query = Customer::where('posid', $posid)
-                    ->withCount('purchases')
+                    ->withCount('sales')
                     ->when($search, function($q) use ($search) {
                         $q->where(function($sub) use ($search) {
                             $sub->where('name', 'like', "%{$search}%")
@@ -68,7 +68,7 @@ class CustomerController extends Controller
                 0 => 'id',
                 1 => 'name',
                 2 => 'phone1',
-                3 => 'purchases_count',
+                3 => 'Sales_count',
                 5 => 'type'
             ];
         }else{
@@ -76,7 +76,7 @@ class CustomerController extends Controller
                 0 => 'id',
                 1 => 'name',
                 2 => 'phone1',
-                3 => 'purchases_count'
+                3 => 'Sales_count'
             ];
         }
 
@@ -157,22 +157,22 @@ class CustomerController extends Controller
     public function details($id){
         $customer = $this->customerService->show($id);
 
-        // Format date and time for each purchase
-        if ($customer->purchases->count()) {
-            $customer->purchases->transform(function ($purchase) {
-                $purchase->formattedDateTime = formatDateAndTime($purchase->created_at);
-                return $purchase;
+        // Format date and time for each sales
+        if ($customer->sales->count()) {
+            $customer->sales->transform(function ($sales) {
+                $sales->formattedDateTime = formatDateAndTime($sales->created_at);
+                return $sales;
             });
         }
 
         // Get service summary data - aggregate services by service name
         $serviceSummary = [];
-        if ($customer->purchases->count()) {
+        if ($customer->sales->count()) {
             $serviceData = [];
             
-            // Collect all service items from all purchases
-            foreach ($customer->purchases as $purchase) {
-                foreach ($purchase->items as $item) {
+            // Collect all service items from all sales
+            foreach ($customer->sales as $sales) {
+                foreach ($sales->items as $item) {
                     if ($item->service) {
                         $serviceName = $item->service->name;
                         if (!isset($serviceData[$serviceName])) {
@@ -196,12 +196,12 @@ class CustomerController extends Controller
             'name' => $customer->name,
             'phone' => $customer->phone1,
             'age_group' => $customer->age_group,
-            'total_sales' => $customer->purchases->count(),
-            'total_service' => $customer->purchases->sum(function($purchase) {
-                return $purchase->items->count();
+            'total_sales' => $customer->sales->count(),
+            'total_service' => $customer->sales->sum(function($sales) {
+                return $sales->items->count();
             }),
-            'total_paid' => $customer->purchases->sum(function($purchase) {
-                return $purchase->payments->sum('paid_amount');
+            'total_paid' => $customer->sales->sum(function($sales) {
+                return $sales->payments->sum('paid_amount');
             }),
         ];
 
@@ -360,7 +360,7 @@ class CustomerController extends Controller
     {
         $search = $request->term;
 
-        $customers = Customer::with('purchases')->where('posid', auth()->user()->posid)
+        $customers = Customer::with('sales')->where('posid', auth()->user()->posid)
             ->where('phone1', 'like', "%{$search}%")
             ->select('id', 'name', 'phone1', 'age_group')
             ->limit(5)
@@ -368,11 +368,11 @@ class CustomerController extends Controller
         // we need to select total sales and last sale date
 
         foreach ($customers as $customer) {
-            $customer->totalSales = $customer->purchases()->count();
+            $customer->totalSales = $customer->sales()->count();
 
-            $lastPurchase = $customer->purchases()->latest()->first();
-            $customer->lastVisit = $lastPurchase 
-                ? formatDateAndTime($lastPurchase->created_at) 
+            $lastSales = $customer->sales()->latest()->first();
+            $customer->lastVisit = $lastSales 
+                ? formatDateAndTime($lastSales->created_at) 
                 : "-"; // or 'Never' if you want a string
         }
 
@@ -381,7 +381,7 @@ class CustomerController extends Controller
     }
 
     public function destroy(Customer $customer){
-        if($customer->purchases()->count() > 0){
+        if($customer->sales()->count() > 0){
             return response()->json([
                 'status' => 'error',
                 'errors' => [

@@ -9,7 +9,7 @@
 @include('pos.card-payment-modal')
 @include('pos.wallet-payment-modal')
 @include('pos.discount-modal')
-@include('pos.beautician-assign-modal')
+@include('pos.staff-assign-modal')
 @include('components.customer-info-modal')
 @include('pos.last-sales-history-modal')
 
@@ -137,7 +137,7 @@
                             <span>Discount: <span id="discountText"></span></span>
                             <div>
                                 <span id="overall-discount">0.00</span>
-                                <span><i class="fa fa-solid fa-edit card-modal" role="button" data-bs-target="#purchaseDiscountModal"></i></span>
+                                <span><i class="fa fa-solid fa-edit card-modal" role="button" data-bs-target="#salesDiscountModal"></i></span>
                             </div>
                         </div>
 
@@ -258,7 +258,7 @@ $js[] = 'resources/js/loyalty/loyalty-script.js';
 
 <script>
 let posUrls = {
-    'getBeauticians': "{{ route('pos.beauticians') }}",
+    'getStaffs': "{{ route('pos.staffs') }}",
     'searchService': "{{ route('pos.search.service') }}",
     'saveSales': "{{ route('pos.sales.save')}}",
     'searchCustomer': "{{ route('pos.customer.search')}}",
@@ -589,7 +589,7 @@ $(document).ready(function() {
 
     if (WinPos.Common.isFeatureEnabled('ENABLED_LOYALTY')) {
         // show loyalty rules info in discount modal
-        $('#purchaseDiscountModal').on('show.bs.modal', function() {
+        $('#salesDiscountModal').on('show.bs.modal', function() {
             const isVerified = WinPos.Pos.cartObj.loyaltyCard.verifyCard === true;
             if (!isVerified) {
                 $('#discountModelLoyaltyRulesInfo').hide();
@@ -655,13 +655,13 @@ $(document).on('click', '#posLastSalesHistoryModalBtn', function() {
 function renderCart(cart) {
     const dom = [];
     cart.items.forEach((item) => {
-        const beauticianName = item.beautician_name || '---------';
-        const beauticianDisplay = '<span class="text-muted assigned-beautician" data-toggle="tooltip" data-placement="top" title="Click to Change" data-item-id="' + item.id + '" style="cursor: pointer;"> <i class="fa-solid fa-hand-holding-heart"></i> Beautician: ' +
-            beauticianName + ' <button class="beautician-change-button"><i class="fa-solid fa-pen-to-square"></i></button></span>';
+        const staffName = item.staff_name || '---------';
+        const staffDisplay = '<span class="text-muted assigned-staff" data-toggle="tooltip" data-placement="top" title="Click to Change" data-item-id="' + item.id + '" style="cursor: pointer;"> <i class="fa-solid fa-hand-holding-heart"></i> Staff: ' +
+            staffName + ' <button class="staff-change-button"><i class="fa-solid fa-pen-to-square"></i></button></span>';
         
         dom.push('<tr>');
         dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + 
-                ' <br> ' + beauticianDisplay + '</td>');
+                ' <br> ' + staffDisplay + '</td>');
         dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '"></td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + item.price.toFixed(2) + ' Tk.</td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + ((item.price) * item.quantity).toFixed(2) + ' Tk.</td>');
@@ -806,14 +806,14 @@ $(document).on('click', '#posLoyaltyRulesModalBtn', function() {
     $('#loyaltyRulesModal').modal('show');
 });
 
-// Beautician assignment handlers
+// Staff assignment handlers
 let currentCartItemId = null;
 
-$(document).on('click', '.assigned-beautician, .beautician-change-button', function(e) {
+$(document).on('click', '.assigned-staff, .staff-change-button', function(e) {
     e.preventDefault();
     e.stopPropagation();
     
-    const itemId = $(this).closest('.assigned-beautician').data('item-id') || $(this).closest('tr').find('.assigned-beautician').data('item-id');
+    const itemId = $(this).closest('.assigned-staff').data('item-id') || $(this).closest('tr').find('.assigned-staff').data('item-id');
     if (!itemId) return;
     
     currentCartItemId = itemId;
@@ -821,34 +821,34 @@ $(document).on('click', '.assigned-beautician, .beautician-change-button', funct
     
     if (!cartItem) return;
     
-    $('#beauticianModalServiceName').text(cartItem.code + ' - ' + cartItem.name);
+    $('#staffModalServiceName').text(cartItem.code + ' - ' + cartItem.name);
     
-    // Load beauticians
-    WinPos.Common.getAjaxCall(posUrls.getBeauticians, function(response) {
+    // Load staffs
+    WinPos.Common.getAjaxCall(posUrls.getStaffs, function(response) {
         if (response.status === 'success') {
-            WinPos.Pos.renderBeauticianCards(response.beauticians, cartItem.beautician_id);
-            $('#beauticianAssignModal').modal('show');
+            WinPos.Pos.renderStaffCards(response.staffs, cartItem.staff_id);
+            $('#staffAssignModal').modal('show');
         }
     });
 });
 
 
-$(document).on('click', '.beautician-card', function() {
+$(document).on('click', '.staff-card', function() {
 
     if ($(this).hasClass('disabled')) return;
 
-    const beauticianId = $(this).data('beautician-id');
-    const beauticianName = $(this).data('beautician-name');
+    const staffId = $(this).data('staff-id');
+    const staffName = $(this).data('staff-name');
     
     if (!currentCartItemId) return;
 
-    let isAssigned = WinPos.Pos.cart.updateBeautician(currentCartItemId, beauticianId, beauticianName);
+    let isAssigned = WinPos.Pos.cart.updateStaff(currentCartItemId, staffId, staffName);
     if(isAssigned) {
-        $('#beauticianAssignModal').modal('hide');
+        $('#staffAssignModal').modal('hide');
         currentCartItemId = null;
-        toastr.success('Beautician '+ beauticianName +' assigned successfully.', 'Success');
+        toastr.success('Staff '+ staffName +' assigned successfully.', 'Success');
     }else{
-        toastr.error('Failed to assign beautician.', 'Error');
+        toastr.error('Failed to assign staff.', 'Error');
     }
 });
 </script>

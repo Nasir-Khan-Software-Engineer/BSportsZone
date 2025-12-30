@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchases', function (Blueprint $table) {
+        Schema::create('sales', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('posid');
-            $table->foreignId('shop_id')->constrained(table: 'shops', indexName: 'fk_purchase_shop')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('shop_id')->constrained(table: 'shops', indexName: 'fk_sales_shop')->onUpdate('cascade')->onDelete('cascade');
             $table->string('invoice_code');
 
             $table->decimal('total_amount', $precision = 8, $scale = 2)->default(0);
@@ -23,8 +23,8 @@ return new class extends Migration
 
 
             $table->dateTimeTz('payment_date')->useCurrent();
-            $table->foreignId('created_by')->constrained(table: 'users', indexName: 'fk_purchase_user_create')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('updated_by')->constrained(table: 'users', indexName: 'fk_purchase_user_update')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('created_by')->constrained(table: 'users', indexName: 'fk_sales_user_create')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('updated_by')->constrained(table: 'users', indexName: 'fk_sales_user_update')->onUpdate('cascade')->onDelete('cascade');
             // add note column
             $table->text('note')->nullable();
             $table->timestamps();
@@ -36,9 +36,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchases');
+        Schema::dropIfExists('sales');
         // // DDL October 28, 2025: Remove columns added for loyalty program
-        // ALTER TABLE purchases
+        // ALTER TABLE Sales
         // DROP COLUMN refunded_amount,
         // DROP COLUMN status,
         // DROP COLUMN shipping_status,

@@ -12,17 +12,17 @@ use App\Models\EmployeeDesignation;
 use App\Models\Attendance;
 use App\Models\EmployeeReview;
 use App\Models\Accountinfo;
-use App\Models\Purchase_items;
-use App\Exports\Reports\BeauticianReport;
+use App\Models\Sales_items;
+use App\Exports\Reports\StaffReport;
 
-class BeauticianReportController extends Controller
+class StaffReportController extends Controller
 {
-    public function beauticianReportView()
+    public function staffReportView()
     {
-        return view('reports.beautician.details');
+        return view('reports.staff.details');
     }
 
-    public function getBeauticianReportData(Request $request)
+    public function getStaffReportData(Request $request)
     {
         $from = $request->input('from_date', Carbon::now()->format('Y-m-d'));
         $to = $request->input('to_date', Carbon::now()->format('Y-m-d'));
@@ -42,28 +42,28 @@ class BeauticianReportController extends Controller
         //     ->unique()
         //     ->count();
 
-        // Get beautician designation
-        $beauticianDesignation = EmployeeDesignation::where('posid', $posId)
-            ->where('name', 'Beautician')
+        // Get staff designation
+        $staffDesignation = EmployeeDesignation::where('posid', $posId)
+            ->where('name', 'Staff')
             ->first();
 
-        // Get beauticians only
-        $beauticiansQuery = Employee::where('posid', $posId);
+        // Get staffs only
+        $staffsQuery = Employee::where('posid', $posId);
 
-        if ($beauticianDesignation) {
-            $beauticiansQuery->where('designation_id', $beauticianDesignation->id);
+        if ($staffDesignation) {
+            $staffsQuery->where('designation_id', $staffDesignation->id);
         } else {
-            // If no beautician designation exists, return empty result
-            $beauticiansQuery->whereRaw('1 = 0');
+            // If no staff designation exists, return empty result
+            $staffsQuery->whereRaw('1 = 0');
         }
 
-        $beauticians = $beauticiansQuery->get();
+        $staffs = $staffsQuery->get();
 
-        // Process each beautician
-        $beauticianData = $beauticians->map(function($beautician) use ($from, $to, $posId) {
+        // Process each staff
+        $staffData = $staffs->map(function($staff) use ($from, $to, $posId) {
             // Get attendance records within date range
             $attendances = Attendance::where('posid', $posId)
-                ->where('employee_id', $beautician->id)
+                ->where('employee_id', $staff->id)
                 ->whereBetween('attendance_date', [$from, $to])
                 ->get();
 
@@ -80,7 +80,7 @@ class BeauticianReportController extends Controller
 
             // Get reviews within date range
             $reviews = EmployeeReview::where('posid', $posId)
-                ->where('employee_id', $beautician->id)
+                ->where('employee_id', $staff->id)
                 ->whereBetween('review_date', [$from, $to])
                 ->get();
 
@@ -95,8 +95,8 @@ class BeauticianReportController extends Controller
             $negativePercentage = $totalReview > 0 ? round(($negativeCount / $totalReview) * 100, 2) : 0;
 
             // Get total services within date range
-            $totalServices = Purchase_items::where('posid', $posId)
-                ->where('beautician_id', $beautician->id)
+            $totalServices = Sales_items::where('posid', $posId)
+                ->where('staff_id', $staff->id)
                 ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
                 ->count();
 
@@ -104,7 +104,7 @@ class BeauticianReportController extends Controller
             $avgServicesPerDay = $workingDays > 0 ? round($totalServices / $workingDays, 2) : 0;
 
             // Phone masking
-            $phone = $beautician->phone ?? '';
+            $phone = $staff->phone ?? '';
             if (!hasAccess('show_phone')) {
                 $formattedPhone = maskPhoneNumber($phone);
             } else {
@@ -112,7 +112,7 @@ class BeauticianReportController extends Controller
             }
 
             return [
-                'employee_name' => $beautician->name ?? '-',
+                'employee_name' => $staff->name ?? '-',
                 'phone' => $formattedPhone ?: '-',
                 'total_working_days' => $workingDays,
                 'present' => $presentCount,
@@ -138,13 +138,13 @@ class BeauticianReportController extends Controller
         });
 
         // Sort by employee name
-        $beauticianData = $beauticianData->sortBy('employee_name')->values();
+        $staffData = $staffData->sortBy('employee_name')->values();
 
-        $totalRecord = $beauticianData->count();
+        $totalRecord = $staffData->count();
         $totalFilteredRecord = $totalRecord;
 
         // Pagination
-        $summaryData = $beauticianData->slice($start, $length)->values();
+        $summaryData = $staffData->slice($start, $length)->values();
 
         return response()->json([
             'data' => $summaryData,
@@ -154,7 +154,7 @@ class BeauticianReportController extends Controller
         ]);
     }
 
-    public function downloadBeauticianReport(Request $request)
+    public function downloadStaffReport(Request $request)
     {
         $from = $request->input('from_date', Carbon::now()->format('Y-m-d'));
         $to = $request->input('to_date', Carbon::now()->format('Y-m-d'));
@@ -172,28 +172,28 @@ class BeauticianReportController extends Controller
             ->unique()
             ->count();
 
-        // Get beautician designation
-        $beauticianDesignation = EmployeeDesignation::where('posid', $posId)
-            ->where('name', 'Beautician')
+        // Get staff designation
+        $staffDesignation = EmployeeDesignation::where('posid', $posId)
+            ->where('name', 'Staff')
             ->first();
 
-        // Get beauticians only
-        $beauticiansQuery = Employee::where('posid', $posId);
+        // Get staffs only
+        $staffsQuery = Employee::where('posid', $posId);
 
-        if ($beauticianDesignation) {
-            $beauticiansQuery->where('designation_id', $beauticianDesignation->id);
+        if ($staffDesignation) {
+            $staffsQuery->where('designation_id', $staffDesignation->id);
         } else {
-            // If no beautician designation exists, return empty result
-            $beauticiansQuery->whereRaw('1 = 0');
+            // If no staff designation exists, return empty result
+            $staffsQuery->whereRaw('1 = 0');
         }
 
-        $beauticians = $beauticiansQuery->get();
+        $staffs = $staffsQuery->get();
 
-        // Process each beautician (same logic as getBeauticianReportData)
-        $beauticianData = $beauticians->map(function($beautician) use ($from, $to, $posId, $workingDays) {
+        // Process each staff (same logic as getStaffReportData)
+        $staffData = $staffs->map(function($staff) use ($from, $to, $posId, $workingDays) {
             // Get attendance records within date range
             $attendances = Attendance::where('posid', $posId)
-                ->where('employee_id', $beautician->id)
+                ->where('employee_id', $staff->id)
                 ->whereBetween('attendance_date', [$from, $to])
                 ->get();
 
@@ -208,7 +208,7 @@ class BeauticianReportController extends Controller
 
             // Get reviews within date range
             $reviews = EmployeeReview::where('posid', $posId)
-                ->where('employee_id', $beautician->id)
+                ->where('employee_id', $staff->id)
                 ->whereBetween('review_date', [$from, $to])
                 ->get();
 
@@ -223,8 +223,8 @@ class BeauticianReportController extends Controller
             $negativePercentage = $totalReview > 0 ? round(($negativeCount / $totalReview) * 100, 2) : 0;
 
             // Get total services within date range
-            $totalServices = Purchase_items::where('posid', $posId)
-                ->where('beautician_id', $beautician->id)
+            $totalServices = Sales_items::where('posid', $posId)
+                ->where('staff_id', $staff->id)
                 ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
                 ->count();
 
@@ -232,7 +232,7 @@ class BeauticianReportController extends Controller
             $avgServicesPerDay = $workingDays > 0 ? round($totalServices / $workingDays, 2) : 0;
 
             // Phone masking
-            $phone = $beautician->phone ?? '';
+            $phone = $staff->phone ?? '';
             if (!hasAccess('show_phone')) {
                 $formattedPhone = maskPhoneNumber($phone);
             } else {
@@ -240,7 +240,7 @@ class BeauticianReportController extends Controller
             }
 
             return [
-                'employee_name' => $beautician->name ?? '-',
+                'employee_name' => $staff->name ?? '-',
                 'phone' => $formattedPhone ?: '-',
                 'total_working_days' => $workingDays,
                 'present_display' => $presentPercentage . '% (' . $presentCount . ')',
@@ -256,11 +256,11 @@ class BeauticianReportController extends Controller
         });
 
         // Sort by employee name
-        $beauticianData = $beauticianData->sortBy('employee_name')->values();
+        $staffData = $staffData->sortBy('employee_name')->values();
 
         $reportData = [
-            'beauticianData' => $beauticianData,
-            'title' => "Beautician Performance Report from $from to $to",
+            'staffData' => $staffData,
+            'title' => "Staff Performance Report from $from to $to",
             'fromDate' => $from,
             'toDate' => $to,
             'posid' => $posId ?? 'N/A',
@@ -269,10 +269,10 @@ class BeauticianReportController extends Controller
         ];
 
         if ($request->input('format', 'pdf') === 'pdf') {
-            $pdf = Pdf::loadView('reports.beautician.details-pdf', $reportData)->setPaper('a4', 'landscape');
-            return $pdf->download('beautician_performance_report_' . $from . '_' . $to . '.pdf');
+            $pdf = Pdf::loadView('reports.staff.details-pdf', $reportData)->setPaper('a4', 'landscape');
+            return $pdf->download('staff_performance_report_' . $from . '_' . $to . '.pdf');
         } else {
-            return Excel::download(new BeauticianReport($reportData), 'beautician_performance_report_' . $from . '_' . $to . '.xlsx');
+            return Excel::download(new StaffReport($reportData), 'staff_performance_report_' . $from . '_' . $to . '.xlsx');
         }
     }
 }

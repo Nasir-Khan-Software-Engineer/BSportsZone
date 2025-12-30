@@ -337,13 +337,13 @@
                         </a>
                         @endif
 
-                        @if(hasAccess('reports.beautician.details'))
-                        <a class="collapse-item {{ request()->routeIs('reports.beautician.details') ? 'active' : '' }}" href="{{ route('reports.beautician.details') }}">
-                            Beautician Report
+                        @if(hasAccess('reports.staff.details'))
+                        <a class="collapse-item {{ request()->routeIs('reports.staff.details') ? 'active' : '' }}" href="{{ route('reports.staff.details') }}">
+                            Staff Report
                         </a>
                         @else
-                        <a href="javascript:void(0);" class="collapse-item text-gray-400 cursor-not-allowed no-access-link" data-message="You do not have permission to view Beautician Reports.">
-                            Beautician Report
+                        <a href="javascript:void(0);" class="collapse-item text-gray-400 cursor-not-allowed no-access-link" data-message="You do not have permission to view Staff Reports.">
+                            Staff Report
                         </a>
                         @endif
                         

@@ -6,13 +6,13 @@ use Maatwebsite\Excel\Events\AfterSheet;
 use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class BeauticianReport implements FromArray, WithHeadings, WithEvents
+class StaffReport implements FromArray, WithHeadings, WithEvents
 {
     public function __construct($data)
     {
-        $this->data = $data['beauticianData'];
+        $this->data = $data['staffData'];
         $this->companyName = $data['companyName'];
-        $this->rptName = "Beautician Performance Report";
+        $this->rptName = "Staff Performance Report";
         $this->from = $data['fromDate'];
         $this->to = $data['toDate'];
         $this->generatedAt = $data['reportGenerationDateTime'];
@@ -54,7 +54,7 @@ class BeauticianReport implements FromArray, WithHeadings, WithEvents
             ['Working Days Calculation:'],
             ['Only days with attendance activity (Present, Absent, or Leave) are counted as working days. Days with no attendance records are considered holidays and excluded from the calculation.'],
             [],
-            ['Beautician Name', 'Phone', 'Total Working Days', 'Present', 'Absent', 'Total Leave', 'Total Review', 'Positive Review', 'Warning Review', 'Negative Review', 'TOT Service', 'AVG Service'],
+            ['Staff Name', 'Phone', 'Total Working Days', 'Present', 'Absent', 'Total Leave', 'Total Review', 'Positive Review', 'Warning Review', 'Negative Review', 'TOT Service', 'AVG Service'],
         ];
 
         return $headings;

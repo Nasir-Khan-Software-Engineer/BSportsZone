@@ -59,11 +59,11 @@
                             <!-- Section 3: Sales Info -->
                             <div class="customer-section">
                                 <p class="mb-1"><strong>New Card:</strong> {{ $loyaltyStatus['isEligibleForNewCard'] ? 'Eligible For New Card' : 'Not Eligible For New Card' }}</p>
-                                @if($loyaltyStatus['settings']['minimum_purchase_amount_applies_for'] == 'Single')
+                                @if($loyaltyStatus['settings']['minimum_sales_amount_applies_for'] == 'Single')
                                     <p class="mb-1"><strong>Max Sales:</strong> {{$loyaltyStatus['currentTotalSpent']}} Tk</p>
                                     <p class="mb-1"><strong>Required:</strong> {{$loyaltyStatus['needForNextCard']}} Tk (Single Sale)</p>
                                 @else
-                                    <p class="mb-1"><strong>Total Spent:</strong> {{$loyaltyStatus['currentTotalSpent']}} Tk / {{$loyaltyStatus['minPurchase']}} Tk</p>
+                                    <p class="mb-1"><strong>Total Spent:</strong> {{$loyaltyStatus['currentTotalSpent']}} Tk / {{$loyaltyStatus['minSales']}} Tk</p>
                                     <p class="mb-1"><strong>Required:</strong> {{$loyaltyStatus['needForNextCard']}} Tk</p>
                                 @endif
                             </div>

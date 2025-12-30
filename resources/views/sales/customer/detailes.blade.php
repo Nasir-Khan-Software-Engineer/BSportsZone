@@ -54,14 +54,14 @@
                                         </tr>
                                     </thead>
                                     <tbody class="border-0">
-                                        @foreach($customer->purchases as $index => $purchase)
+                                        @foreach($customer->sales as $index => $sales)
                                         <tr>
-                                            <td class="text-center">{{ $purchase->invoice_code }}</td>
-                                            <td class="text-center">{{ $purchase->formattedDateTime ?? $purchase->created_at->format('Y-m-d H:i') }}</td>
-                                            <td class="text-center">{{ $purchase->items->count() }}</td>
-                                            <td class="text-center">Tk. {{ number_format($purchase->payments->sum('paid_amount'), 2) }}</td>
+                                            <td class="text-center">{{ $sales->invoice_code }}</td>
+                                            <td class="text-center">{{ $sales->formattedDateTime ?? $sales->created_at->format('Y-m-d H:i') }}</td>
+                                            <td class="text-center">{{ $sales->items->count() }}</td>
+                                            <td class="text-center">Tk. {{ number_format($sales->payments->sum('paid_amount'), 2) }}</td>
                                             <td class="text-center">
-                                                <button data-id="{{ $purchase->id }}" class="btn thm-btn-bg thm-btn-text-color show-sale-modal btn-sm" data-toggle="tooltip" title="View Sale Details">
+                                                <button data-id="{{ $sales->id }}" class="btn thm-btn-bg thm-btn-text-color show-sale-modal btn-sm" data-toggle="tooltip" title="View Sale Details">
                                                     <i class="fa-solid fa-eye"></i>
                                                 </button>
                                             </td>

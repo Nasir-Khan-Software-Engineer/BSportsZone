@@ -6,12 +6,12 @@ use Illuminate\Http\Request;
 use App\Services\AccountSetup\IAccountSetupService;
 use App\Models\Shop;
 use App\Models\Accountinfo;
-use App\Models\Purchases;
+use App\Models\Sales;
 use App\Models\SalesPayment;
 use App\Models\Expense;
 use App\Models\ExpenseCategory;
 use App\Models\Product;
-use App\Models\Purchase_items;
+use App\Models\Sales_items;
 use Carbon\Carbon;
 use Illuminate\Support\Number;
 use DB;
@@ -46,7 +46,7 @@ class HomeController extends Controller
         $posid = auth()->user()->posid;
 
         $salesPaymentQuery = SalesPayment::where('posid', $posid);
-        $SalesQuery = Purchases::where('posid', $posid);
+        $SalesQuery = Sales::where('posid', $posid);
         $expenseQuery = Expense::where('posid', $posid);
        
         $today = Carbon::today();
@@ -203,7 +203,7 @@ class HomeController extends Controller
         $today = Carbon::today();
         
         // Apply the same date filter logic as the main dashboard
-        $salesQuery = Purchases::where('posid', $posid);
+        $salesQuery = Sales::where('posid', $posid);
         
         switch ($filter) {
             case 'today':
@@ -243,7 +243,7 @@ class HomeController extends Controller
                 break;
         }
 
-        // Get all customers who made purchases in the filtered period
+        // Get all customers who made Sales in the filtered period
         $customersInPeriod = $salesQuery->distinct('customerId')->pluck('customerId')->toArray();
         
         if (empty($customersInPeriod)) {
@@ -253,13 +253,13 @@ class HomeController extends Controller
             ];
         }
 
-        // Count customers who made their first purchase in this period (New Customers)
+        // Count customers who made their first sales in this period (New Customers)
         $newCustomers = 0;
         $returningCustomers = 0;
 
         foreach ($customersInPeriod as $customerId) {
-            // Check if this customer had any purchases before the current period
-            $hasPreviousPurchases = Purchases::where('posid', $posid)
+            // Check if this customer had any Sales before the current period
+            $hasPreviousSales = Sales::where('posid', $posid)
                 ->where('customerId', $customerId)
                 ->where(function($query) use ($filter, $today) {
                     switch ($filter) {
@@ -297,7 +297,7 @@ class HomeController extends Controller
                 })
                 ->exists();
 
-            if ($hasPreviousPurchases) {
+            if ($hasPreviousSales) {
                 $returningCustomers++;
             } else {
                 $newCustomers++;
@@ -323,11 +323,11 @@ class HomeController extends Controller
         $startDate = Carbon::now()->subMonths(11)->startOfMonth();
         $endDate   = Carbon::now()->endOfMonth();
 
-        $serviceQuery = Purchase_items::join('purchases', 'purchase_items.purchase_id', '=', 'purchases.id')
-            ->join('products', 'purchase_items.product_id', '=', 'products.id')
-            ->where('purchases.posid', $posid)
-            ->whereBetween('purchases.created_at', [$startDate, $endDate])
-            ->selectRaw('products.name as service_name, SUM(purchase_items.quantity) as total_count')
+        $serviceQuery = Sales_items::join('sales', 'sales_items.sales_id', '=', 'sales.id')
+            ->join('products', 'sales_items.product_id', '=', 'products.id')
+            ->where('sales.posid', $posid)
+            ->whereBetween('sales.created_at', [$startDate, $endDate])
+            ->selectRaw('products.name as service_name, SUM(sales_items.quantity) as total_count')
             ->groupBy('products.id', 'products.name')
             ->orderBy('total_count', 'desc')
             ->limit(8);
@@ -360,7 +360,7 @@ class HomeController extends Controller
             ->pluck('total', 'month');
 
         // SALES (filtered by posid)
-        $sales = Purchases::select(
+        $sales = Sales::select(
                 DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
                 DB::raw('SUM(total_amount) as total')
             )

@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->decimal('adjustmentAmt', 10, 2)->nullable()->default(0);
+        Schema::table('sales_items', function (Blueprint $table) {
+            $table->bigInteger('posid')->after('sales_id')->default(1);
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('purchases', function (Blueprint $table) {
-            $table->dropColumn('adjustmentAmt');
+        Schema::table('sales_items', function (Blueprint $table) {
+            $table->dropColumn('posid');
         });
     }
 };

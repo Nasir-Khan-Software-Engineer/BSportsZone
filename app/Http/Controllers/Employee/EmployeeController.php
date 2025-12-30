@@ -7,7 +7,7 @@ use App\Models\Employee;
 use App\Models\EmployeeDesignation;
 use App\Models\Attendance;
 use App\Models\EmployeeReview;
-use App\Models\Purchase_items;
+use App\Models\Sales_items;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -507,22 +507,22 @@ class EmployeeController extends Controller
             'warning_percentage' => $warningPercentage,
         ];
 
-        // Calculate beautician service metrics (only for beauticians)
-        $beauticianServiceMetrics = null;
-        $isBeautician = $employee->designation && $employee->designation->name === 'Beautician';
+        // Calculate staff service metrics (only for staffs)
+        $staffServiceMetrics = null;
+        $isStaff = $employee->designation && $employee->designation->name === 'Staff';
         
-        if ($isBeautician) {
+        if ($isStaff) {
             $today = Carbon::today();
             
             // Get today's service count
-            $todayServicesCount = Purchase_items::where('posid', $posId)
-                ->where('beautician_id', $employee->id)
+            $todayServicesCount = Sales_items::where('posid', $posId)
+                ->where('staff_id', $employee->id)
                 ->whereDate('created_at', $today)
                 ->count();
             
-            // Get all services for this beautician
-            $allServices = Purchase_items::where('posid', $posId)
-                ->where('beautician_id', $employee->id)
+            // Get all services for this staff
+            $allServices = Sales_items::where('posid', $posId)
+                ->where('staff_id', $employee->id)
                 ->get();
             
             // Calculate total services
@@ -536,7 +536,7 @@ class EmployeeController extends Controller
             // Calculate average services per day
             $averageServicesPerDay = $totalPresent > 0 ? round($totalServices / $totalPresent, 2) : 0;
             
-            $beauticianServiceMetrics = [
+            $staffServiceMetrics = [
                 'today_services' => $todayServicesCount,
                 'average_services_per_day' => $averageServicesPerDay,
                 'total_services' => $totalServices,
@@ -551,8 +551,8 @@ class EmployeeController extends Controller
             'allAbsences' => $allAbsences,
             'reviews' => $reviews,
             'reviewMetrics' => $reviewMetrics,
-            'beauticianServiceMetrics' => $beauticianServiceMetrics,
-            'isBeautician' => $isBeautician,
+            'staffServiceMetrics' => $staffServiceMetrics,
+            'isStaff' => $isStaff,
         ]);
     }
 

@@ -69,13 +69,13 @@ class Employee extends Model
 
     public function services()
     {
-        return $this->hasMany(Product::class, 'beautician_id')
+        return $this->hasMany(Product::class, 'staff_id')
                     ->where('type', 'Service');
     }
 
     public function products()
     {
-        return $this->hasMany(Product::class, 'beautician_id')
+        return $this->hasMany(Product::class, 'staff_id')
                     ->where('type', 'Product');
     }
 

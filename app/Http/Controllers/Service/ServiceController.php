@@ -12,7 +12,7 @@ use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Supplier;
 use App\Models\Shop;
-use App\Models\Purchases;
+use App\Models\Sales;
 use App\Models\Employee;
 use App\Models\EmployeeDesignation;
 use Illuminate\Support\Facades\DB;
@@ -28,16 +28,16 @@ class ServiceController extends Controller
         $units = Unit::where('posid', '=', $posid)->get();
         $suppliers = Supplier::where('posid', '=', $posid)->get();
         $shops = Shop::where('posid', '=', $posid)->get();
-        // Get beautician designation
-        $beauticianDesignation = EmployeeDesignation::where('posid', $posid)
-            ->where('name', 'Beautician')
+        // Get staff designation
+        $staffDesignation = EmployeeDesignation::where('posid', $posid)
+            ->where('name', 'Staff')
             ->first();
         
-        // Get only beauticians (employees with Beautician designation)
+        // Get only staffs (employees with Staff designation)
         $employees = Employee::where('posid', '=', $posid)
             ->where('status', 'Active')
-            ->when($beauticianDesignation, function($query) use ($beauticianDesignation) {
-                return $query->where('designation_id', $beauticianDesignation->id);
+            ->when($staffDesignation, function($query) use ($staffDesignation) {
+                return $query->where('designation_id', $staffDesignation->id);
             })
             ->orderBy('name')
             ->get();
@@ -58,7 +58,7 @@ class ServiceController extends Controller
         $searchCriteria = $request->input('search');
 
         $query = Product::where('products.posid', $posid)
-            ->with('creator', 'beautician')
+            ->with('creator', 'staff')
             ->where('type', 'Service')
             ->where(function($query) use ($searchCriteria) {
                 $query->where('code', 'like', "%{$searchCriteria}%")
@@ -129,7 +129,7 @@ class ServiceController extends Controller
 
     public function edit($id){
         $posid = auth()->user()->posid;
-        $service = Product::with('categories','sales_items', 'beautician')->where('posid', $posid)
+        $service = Product::with('categories','sales_items', 'staff')->where('posid', $posid)
             ->where('id', $id)->where('type', 'Service')
             ->first();
         
@@ -170,7 +170,7 @@ class ServiceController extends Controller
 
     public function show($id){
         $posid = auth()->user()->posid;
-        $service = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'sales_items', 'beautician')
+        $service = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'sales_items', 'staff')
             ->where('posid', $posid)->where('type', 'Service')
             ->where('id', $id)
             ->first();
@@ -192,8 +192,8 @@ class ServiceController extends Controller
             return ($item->selling_price - $item->discount) * $item->quantity;
         });
 
-        // Fetch related purchases (sales) for this service
-        $sales = Purchases::where('posid', $posid)
+        // Fetch related Sales (sales) for this service
+        $sales = Sales::where('posid', $posid)
             ->whereHas('items', function($query) use ($id) {
                 $query->where('product_id', $id);
             })
@@ -202,14 +202,14 @@ class ServiceController extends Controller
             }])
             ->orderBy('created_at', 'desc')
             ->get()
-            ->map(function($purchase) use ($id) {
-                // Get the quantity of this service in this purchase
-                $item = $purchase->items->first();
-                $purchase->product_quantity = $item ? $item->quantity : 0;
-                $purchase->formatted_date = formatDate($purchase->created_at);
-                $purchase->customer_name = $purchase->customer ? $purchase->customer->name : 'Walk-in Customer';
-                $purchase->customer_id = $purchase->customerId;
-                return $purchase;
+            ->map(function($sales) use ($id) {
+                // Get the quantity of this service in this sales
+                $item = $sales->items->first();
+                $sales->product_quantity = $item ? $item->quantity : 0;
+                $sales->formatted_date = formatDate($sales->created_at);
+                $sales->customer_name = $sales->customer ? $sales->customer->name : 'Walk-in Customer';
+                $sales->customer_id = $sales->customerId;
+                return $sales;
             });
 
         return view('service.show', compact('service', 'sales'));
@@ -248,7 +248,7 @@ class ServiceController extends Controller
             $service->name          = $request->name;
             $service->price             = (float)$request->price;
             $service->description       = $request->description;
-            $service->beautician_id     = $request->beautician_id ?: null;
+            $service->staff_id     = $request->staff_id ?: null;
             $service->created_by        = auth()->user()->id;
 
             $posid = auth()->user()->posid;
@@ -367,7 +367,7 @@ class ServiceController extends Controller
             $service->name          = $request->name;
             $service->price             = (float)$request->price;
             $service->description       = $request->description;
-            $service->beautician_id     = $request->beautician_id ?: null;
+            $service->staff_id     = $request->staff_id ?: null;
             $service->updated_by        = auth()->id();
 
             $posid = auth()->user()->posid;

@@ -51,9 +51,9 @@ WinPos.Pos = (function (Urls) {
         if (cartItem) {
             cartItem.quantity++;
         } else {
-            // Get default beautician from service if available
-            const beauticianId = service.todays_beautician ? service.beautician_id : null;
-            const beauticianName = service.todays_beautician ? service.todays_beautician.name : null;
+            // Get default staff from service if available
+            const staffId = service.todays_staff ? service.staff_id : null;
+            const staffName = service.todays_staff ? service.todays_staff.name : null;
             
             cartObj.items.push({ 
                 id: service.id, 
@@ -61,8 +61,8 @@ WinPos.Pos = (function (Urls) {
                 code: service.code, 
                 price: parseFloat(service.price), 
                 quantity: 1,
-                beautician_id: beauticianId,
-                beautician_name: beauticianName
+                staff_id: staffId,
+                staff_name: staffName
             });
         }
 
@@ -184,7 +184,7 @@ WinPos.Pos = (function (Urls) {
                 services: cartObj.items.map(item => ({ 
                     id: item.id, 
                     quantity: item.quantity,
-                    beautician_id: item.beautician_id || null
+                    staff_id: item.staff_id || null
                 })),
                 discountType: cartObj.discountType,
                 discount: cartObj.discount,
@@ -411,11 +411,11 @@ WinPos.Pos = (function (Urls) {
         $('#terminalCustomerName').focus();
     }
 
-    var updateCartBeautician = function(itemId, beauticianId, beauticianName) {
+    var updateCartStaff = function(itemId, staffId, staffName) {
         const cartItem = WinPos.Pos.cartObj.items.find(item => item.id == itemId);
         if (cartItem) {
-            cartItem.beautician_id = beauticianId;
-            cartItem.beautician_name = beauticianName;
+            cartItem.staff_id = staffId;
+            cartItem.staff_name = staffName;
             notify();
             return true;
         }
@@ -423,21 +423,21 @@ WinPos.Pos = (function (Urls) {
         return false;
     }
 
-    var renderBeauticianCards = function (beauticians, selectedBeauticianId) {
-        const container = $('#beauticianCardsContainer');
+    var renderStaffCards = function (staffs, selectedStaffId) {
+        const container = $('#staffCardsContainer');
         container.html('');
         
-        if (beauticians.length === 0) {
-            container.html('<p class="text-center">No beauticians available.</p>');
+        if (staffs.length === 0) {
+            container.html('<p class="text-center">No staffs available.</p>');
             return;
         }
         
-        beauticians.forEach(function (beautician) {
-            const isAssigned = beautician.id == selectedBeauticianId;
+        staffs.forEach(function (staff) {
+            const isAssigned = staff.id == selectedStaffId;
 
-            let cardClass = 'beautician-card cursor-pointer';
+            let cardClass = 'staff-card cursor-pointer';
 
-            if (!beautician.is_present) {
+            if (!staff.is_present) {
                 cardClass += ' disabled';
             } else if (isAssigned) {
                 cardClass += ' assigned';
@@ -448,18 +448,18 @@ WinPos.Pos = (function (Urls) {
             const card = `
                 <div class="col-md-4 col-lg-3">
                     <div class="${cardClass}"
-                        data-beautician-id="${beautician.id}"
-                        data-beautician-name="${beautician.name}">
+                        data-staff-id="${staff.id}"
+                        data-staff-name="${staff.name}">
                         
-                        <div class="beautician-info">
-                            <p class="mb-1"><strong>ID:</strong> ${beautician.id}</p>
-                            <p class="mb-1"><strong>Name:</strong> ${beautician.name}</p>
-                            <p class="mb-1"><strong>Today's Service:</strong> ${beautician.today_service_count}</p>
+                        <div class="staff-info">
+                            <p class="mb-1"><strong>ID:</strong> ${staff.id}</p>
+                            <p class="mb-1"><strong>Name:</strong> ${staff.name}</p>
+                            <p class="mb-1"><strong>Today's Service:</strong> ${staff.today_service_count}</p>
 
                             ${
-                                !beautician.is_present
-                                    ? '<p class="mb-1 text-danger beautician-status"><strong>Absent Today</strong></p>'
-                                    : isAssigned ? '<p class="mb-1 beautician-status"><strong>Assigned <i class="fa fa-solid fa-check"></i></strong></p>' : '<p class="mb-1 beautician-status"><strong>Available</strong></p>'
+                                !staff.is_present
+                                    ? '<p class="mb-1 text-danger staff-status"><strong>Absent Today</strong></p>'
+                                    : isAssigned ? '<p class="mb-1 staff-status"><strong>Assigned <i class="fa fa-solid fa-check"></i></strong></p>' : '<p class="mb-1 staff-status"><strong>Available</strong></p>'
                             }
                         </div>
                     </div>
@@ -484,14 +484,14 @@ WinPos.Pos = (function (Urls) {
             setCustomer: setCartCustomer,
             setCashier: setCartCashier,
             applyAdjustment: addCartAdjustment,
-            updateBeautician: updateCartBeautician
+            updateStaff: updateCartStaff
 
         },
         saveSalesDetails: saveSalesDetails,
         printReceipt: printReceiptFunc,
         getImageAsBase64: getImageAsBase64,
         RenderSearchService: RenderSearchService,
-        renderBeauticianCards: renderBeauticianCards,
+        renderStaffCards: renderStaffCards,
         customer: {
             setTerminalCustomerForm: setTerminalCustomerForm,
             clearTerminalCustomerForm: clearTerminalCustomerForm,

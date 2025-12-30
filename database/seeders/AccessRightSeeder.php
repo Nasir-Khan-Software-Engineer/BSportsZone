@@ -227,13 +227,13 @@ class AccessRightSeeder extends Seeder
 
             // Reports
             [
-                'title' => 'Reports->Sales-> View Sales Report(Details)',
+                'title' => 'Reports->sales-> View Sales Report(Details)',
                 'route_name' => 'reports.sales.details',
                 'short_id' => 'report_sales_details',
                 'description' => 'Allows viewing details sales report',
             ],
             [
-                'title' => 'Reports->Sales-> Download Sales Report(Details)',
+                'title' => 'Reports->sales-> Download Sales Report(Details)',
                 'route_name' => 'reports.sales.details.download',
                 'short_id' => 'report_sales_download',
                 'description' => 'Allows downloading details sales report',

@@ -13,13 +13,8 @@ return new class extends Migration
     {
         Schema::create('loyalty_histories', function (Blueprint $table) {
             $table->id();
-
-            // First create the column
             $table->bigInteger('POSID');
-
-            // Then define the foreign key
             $table->foreign('POSID')->references('POSID')->on('accountinfos')->onDelete('cascade');
-
             $table->foreignId('card_id')->constrained('loyalty_cards')->onDelete('cascade');
             $table->foreignId('sales_id')->constrained('sales')->onDelete('cascade');
 
@@ -44,8 +39,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('loyalty_histories');
-        // -- Add index to loyalty_histories.card_id for fast visit count lookup
-        // CREATE INDEX idx_loyalty_histories_card_id
-        // ON loyalty_histories (card_id);
     }
 };

@@ -16,10 +16,9 @@ return new class extends Migration
             $table->bigInteger('POSID');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->text('permissions');
-            $table->boolean('isActive')->default(1);
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
+            $table->unique(['POSID', 'name']);
             $table->timestamps();
         });
     }

@@ -39,17 +39,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('loyalty_settings');
-        // ddl script to remove max_discount_amount
-        // ALTER TABLE loyalty_settings
-        // DROP COLUMN max_discount_amount;
-        // ddl to add max_visits_per_day
-        // ALTER TABLE loyalty_settings
-        // ADD COLUMN max_visits_per_day INTEGER;
-        // ALTER TABLE `loyalty_settings`
-        // DROP COLUMN `status`;
-
-        // ALTER TABLE loyalty_settings
-        // ADD COLUMN minimum_sales_amount_applies_for ENUM('Single', 'All') NOT NULL DEFAULT 'Single'
-        // AFTER minimum_sales_amount;
     }
 };

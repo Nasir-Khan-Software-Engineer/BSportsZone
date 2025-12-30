@@ -17,15 +17,16 @@ return new class extends Migration
             $table->string('name');
             $table->string('gender');
             $table->string('email')->nullable()->unique();
-            $table->string('phone1')->unique();
+            $table->string('phone1')->unique()->unique();
             $table->string('phone2')->nullable()->unique();
             $table->string('address')->nullable();
             $table->text('note')->nullable();
             $table->boolean('isActive')->default(true);
+            $table->string('age_group')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
-
+            $table->softDeletes();
             $table->unsignedBigInteger('latest_card_id')->nullable();
             $table->index('latest_card_id', 'idx_latest_card_id');
            

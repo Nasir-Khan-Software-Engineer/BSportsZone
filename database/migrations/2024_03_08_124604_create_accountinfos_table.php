@@ -23,6 +23,8 @@ return new class extends Migration
             $table->string('district');
             $table->string('area');
             $table->text('address');
+            $table->string('productCodePrefix', 100)->nullable();
+            $table->string('invoiceNumberPrefix', 100)->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();

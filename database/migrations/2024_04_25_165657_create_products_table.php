@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('POSID');
             $table->string('code');
             $table->string('name'); 
+            $table->string('image')->nullable();
             $table->string('type')->default('Service');
             $table->integer('unit_id')->nullable();
             $table->integer('brand_id')->nullable();
@@ -26,6 +27,9 @@ return new class extends Migration
             $table->timestamps();
             $table->unique(['POSID', 'code'], 'posid_code_unique');
             $table->unique(['POSID', 'name'], 'posid_name_unique');
+
+            $table->unsignedBigInteger('staff_id')->nullable();
+            $table->foreign('staff_id')->references('id')->on('employees')->onDelete('set null');
         });
     }
 

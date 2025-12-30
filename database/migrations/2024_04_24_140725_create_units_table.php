@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer('POSID');
             $table->string('name');
+            $table->string('shortform')->nullable(); 
             $table->text('note')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

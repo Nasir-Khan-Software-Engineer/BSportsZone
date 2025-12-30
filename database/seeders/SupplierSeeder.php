@@ -18,7 +18,7 @@ class SupplierSeeder extends Seeder
             $supplier->POSID = 1;
             $supplier->name = "Supplier-".$i;
             $supplier->email = "supplier-".$i."@gmail.com";
-            $supplier->phone = "0163701792".$i;
+            $supplier->phone_1 = "0163701792".$i;
             $supplier->address = "Dhaka, Bangladesh, Dhaka";
             $supplier->note = "This is demo note";
             $supplier->created_by = 1;

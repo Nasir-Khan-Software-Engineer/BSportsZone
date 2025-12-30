@@ -20,14 +20,18 @@ return new class extends Migration
             $table->decimal('total_amount', $precision = 8, $scale = 2)->default(0);
             $table->decimal('discount_amount', $precision = 8, $scale = 2)->default(0);
             $table->decimal('total_payable_amount', $precision = 8, $scale = 2)->default(0);
-
+            $table->string('sales_from')->default('offline');
+            $table->foreignId('customerId')->constrained(table: 'customers', indexName: 'FK_Sales_customer')->onUpdate('cascade')->onDelete('cascade');
 
             $table->dateTimeTz('payment_date')->useCurrent();
             $table->foreignId('created_by')->constrained(table: 'users', indexName: 'fk_sales_user_create')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('updated_by')->constrained(table: 'users', indexName: 'fk_sales_user_update')->onUpdate('cascade')->onDelete('cascade');
-            // add note column
+            $table->string('discount_type')->nullable(); 
+            $table->decimal('discount_value', 15, 2)->nullable();
             $table->text('note')->nullable();
+            $table->decimal('adjustmentAmt', 10, 2)->nullable()->default(0);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -37,12 +41,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('sales');
-        // // DDL October 28, 2025: Remove columns added for loyalty program
-        // ALTER TABLE Sales
-        // DROP COLUMN refunded_amount,
-        // DROP COLUMN status,
-        // DROP COLUMN shipping_status,
-        // DROP COLUMN next_payment_date,
-        // ADD COLUMN note TEXT NULL;
     }
 };

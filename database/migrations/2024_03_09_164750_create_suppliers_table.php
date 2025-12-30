@@ -12,18 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('suppliers', function (Blueprint $table) {
-            $table->bigInteger('POSID')->primary();
-            $table->string('id')->unique();
-            $table->string('shortID')->unique();
+            $table->id();
+            $table->bigInteger('POSID');
+            $table->string('shortID')->nullable()->unique();
             $table->string('name');
             $table->string('phone_1')->unique();
             $table->string('phone_2')->nullable();
-            $table->string('phone_3')->nullable();
             $table->string('landPhone')->nullable();
             $table->string('email')->unique();
-            $table->string('country');
-            $table->string('city');
-            $table->text('address');
+            $table->string('country')->nullable();
+            $table->string('city')->nullable();
+            $table->text('address')->nullable();
             $table->text('note')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

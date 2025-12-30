@@ -13,20 +13,19 @@ return new class extends Migration
     {
         Schema::create('sales_items', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('POSID')->default(1);
             $table->foreignId('sales_id')->constrained(table: 'sales', indexName: 'fk_sales_items_Sales')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('product_id')->constrained(table: 'products', indexName: 'fk_sales_item_products')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('product_stock_id')->constrained(table: 'product_stocks', indexName: 'fk_sales_items_product_stocks')->onUpdate('cascade')->onDelete('cascade');
-            // removed this product_stock_id
-            // this column will be act like barcode, but in future we use actual barcode number or replace the id as barcode
-            $table->enum('sales_item_type', ['SALES', 'REFUND'])->default('SALES');
 
             $table->decimal('product_price', $precision = 8, $scale = 2)->default(0);
             $table->decimal('selling_price', $precision = 8, $scale = 2)->default(0);
-            $table->decimal('discount', $precision = 8, $scale = 2)->default(0);
-            $table->decimal('tax', $precision = 8, $scale = 2)->default(0);
             $table->integer('quantity')->default(1);
             $table->string('description')->nullable();
             $table->timestamps();
+            $table->softDeletes();
+
+            $table->unsignedBigInteger('staff_id')->nullable();
+            $table->foreign('staff_id')->references('id')->on('employees')->onDelete('set null');
         });
     }
 

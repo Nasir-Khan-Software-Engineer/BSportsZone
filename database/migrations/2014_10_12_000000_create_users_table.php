@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->unsignedInteger('role_id')->default(1);
+            $table->string('user_type', 50)->default('pos_user');
             $table->rememberToken();
             $table->timestamps();
         });

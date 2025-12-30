@@ -18,12 +18,7 @@ return new class extends Migration
             $table->string('short_id')->nullable();
             $table->string('description')->nullable()->unique();
             $table->timestamps();
-
-            // Unique constraint for route_name + short_id combination
             $table->unique(['route_name', 'short_id']);
-
-            // Check constraint: route_name or short_id must not be null
-            //$table->check('route_name IS NOT NULL OR short_id IS NOT NULL');
         });
     }
 

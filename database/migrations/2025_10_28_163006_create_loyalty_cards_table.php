@@ -36,8 +36,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('loyalty_cards');
-        // -- Add index to loyalty_cards.customer_id for fast joins
-        // CREATE INDEX idx_loyalty_cards_customer_id
-        // ON loyalty_cards (customer_id);
     }
 };

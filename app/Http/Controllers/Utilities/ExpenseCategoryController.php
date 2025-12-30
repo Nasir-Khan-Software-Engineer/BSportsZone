@@ -15,7 +15,7 @@ class ExpenseCategoryController extends Controller
      */
     public function index()
     {
-        $expenseCategories = ExpenseCategory::with('creator')->where('posid', '=', auth()->user()->posid)->get();
+        $expenseCategories = ExpenseCategory::with('creator')->where('POSID', '=', auth()->user()->POSID)->get();
 
         foreach ($expenseCategories as $expenseCategory) {
             $expenseCategory->formattedDate = formatDate($expenseCategory->created_at);
@@ -48,13 +48,13 @@ class ExpenseCategoryController extends Controller
                     'min:3',
                     'max:100',
                     Rule::unique('expense_categories', 'title')
-                        ->where(fn($query) => $query->where('posid', auth()->user()->posid)),
+                        ->where(fn($query) => $query->where('POSID', auth()->user()->POSID)),
                 ],
             ]);
 
             $expenseCategory             = new ExpenseCategory;
             $expenseCategory->title      = $request->expenseCategoryTitle;
-            $expenseCategory->posid      = auth()->user()->posid;
+            $expenseCategory->POSID      = auth()->user()->POSID;
             $expenseCategory->created_by = auth()->user()->id;
 
             $expenseCategory->save();
@@ -108,7 +108,7 @@ class ExpenseCategoryController extends Controller
                     'min:3',
                     'max:100',
                     Rule::unique('expense_categories', 'title')
-                        ->where(fn($query) => $query->where('posid', auth()->user()->posid))
+                        ->where(fn($query) => $query->where('POSID', auth()->user()->POSID))
                         ->ignore($category->id),
                 ],
             ]);

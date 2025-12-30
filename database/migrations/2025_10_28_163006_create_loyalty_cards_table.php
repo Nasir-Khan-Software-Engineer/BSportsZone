@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('loyalty_cards', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id');
-            $table->bigInteger('posid'); // matches accountinfos
+            $table->bigInteger('POSID'); // matches accountinfos
             $table->string('card_number', 20)->unique();
             $table->date('valid_until');
             $table->unsignedBigInteger('created_by')->nullable();
@@ -22,9 +22,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('customer_id')->references('id')->on('customers')->onDelete('cascade');
-            $table->foreign('posid')->references('POSID')->on('accountinfos')->onDelete('cascade');
+            $table->foreign('POSID')->references('POSID')->on('accountinfos')->onDelete('cascade');
 
-            $table->unique(['posid', 'card_number']);
+            $table->unique(['POSID', 'card_number']);
 
             $table->index('customer_id', 'idx_loyalty_cards_customer_id');
         });

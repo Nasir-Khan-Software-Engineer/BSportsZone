@@ -16,7 +16,7 @@ class CategorySeeder extends Seeder
     {
         for($i=1; $i<=15; $i++){
             $category = new Category;
-            $category->posid = 1;
+            $category->POSID = 1;
             $category->name = "Category-".$i;
             $category->icon = "demo";
             $category->created_by = 1;

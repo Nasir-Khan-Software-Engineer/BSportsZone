@@ -32,7 +32,7 @@ class SalesReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $salesData = $this->reportService->getSalesDetailsReportData(auth()->user()->posid, $from, $to, $start, $length, 'view');
+        $salesData = $this->reportService->getSalesDetailsReportData(auth()->user()->POSID, $from, $to, $start, $length, 'view');
         $sales = $salesData['draw'] = $request->input('draw');
 
         return response()->json($salesData);
@@ -46,14 +46,14 @@ class SalesReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $salesData = $this->reportService->getSalesDetailsReportData(auth()->user()->posid, $from, $to, $start, $length, 'download');
+        $salesData = $this->reportService->getSalesDetailsReportData(auth()->user()->POSID, $from, $to, $start, $length, 'download');
 
         $salesData['sales'] = $salesData['data'];
         $salesData["title"] = "Sales Report from $from to $to";
         $salesData["fromDate"] = $from;
         $salesData["toDate"] = $to;
-        $salesData["posid"] = auth()->user()->posid ?? 'N/A';
-        $salesData["companyName"] = Accountinfo::where('posid', auth()->user()->posid)->value('companyName') ?? 'N/A';
+        $salesData["POSID"] = auth()->user()->POSID ?? 'N/A';
+        $salesData["companyName"] = Accountinfo::where('POSID', auth()->user()->POSID)->value('companyName') ?? 'N/A';
 
         if($request->input('format', 'pdf') === 'pdf'){
             $pdf = Pdf::loadView('report.sales-pdf', $salesData)->setPaper('a4', 'landscape');

@@ -43,11 +43,11 @@ class HomeController extends Controller
     {
         $filter = $request->input('filter');
 
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
-        $salesPaymentQuery = SalesPayment::where('posid', $posid);
-        $SalesQuery = Sales::where('posid', $posid);
-        $expenseQuery = Expense::where('posid', $posid);
+        $salesPaymentQuery = SalesPayment::where('POSID', $POSID);
+        $SalesQuery = Sales::where('POSID', $POSID);
+        $expenseQuery = Expense::where('POSID', $POSID);
        
         $today = Carbon::today();
         
@@ -123,7 +123,7 @@ class HomeController extends Controller
         $totalExpense = str_replace("BDT", "Tk", Number::currency($expenseQuery->sum('amount') ?? 0, 'BDT'));
 
         // Calculate customer distribution (New vs Returning)
-        $customerDistribution = $this->calculateCustomerDistribution($posid, $filter);
+        $customerDistribution = $this->calculateCustomerDistribution($POSID, $filter);
 
         $totals = $salesPaymentQuery
         ->selectRaw("
@@ -160,9 +160,9 @@ class HomeController extends Controller
     }
 
     public function fixedMetrics(Request $request) {
-        $posid = auth()->user()->posid;
-        $topServices = $this->getTopServicesLast12Months($posid);
-        $monthlySalesAndExpense = $this->monthlySalesExpenseLast12Months($posid);
+        $POSID = auth()->user()->POSID;
+        $topServices = $this->getTopServicesLast12Months($POSID);
+        $monthlySalesAndExpense = $this->monthlySalesExpenseLast12Months($POSID);
 
         return response()->json([
             'topServices' => $topServices,
@@ -180,7 +180,7 @@ class HomeController extends Controller
     public function changeCurrentShop(Request $request, $id){
 
         $shopId = (int) $id;
-        $isShopExist = Shop::where('posid', auth()->user()->posid)
+        $isShopExist = Shop::where('POSID', auth()->user()->POSID)
                         ->where('id', $shopId)
                         ->exists();
 
@@ -194,16 +194,16 @@ class HomeController extends Controller
     /**
      * Calculate customer distribution (New vs Returning) based on sales history
      *
-     * @param int $posid
+     * @param int $POSID
      * @param string $filter
      * @return array
      */
-    private function calculateCustomerDistribution($posid, $filter)
+    private function calculateCustomerDistribution($POSID, $filter)
     {
         $today = Carbon::today();
         
         // Apply the same date filter logic as the main dashboard
-        $salesQuery = Sales::where('posid', $posid);
+        $salesQuery = Sales::where('POSID', $POSID);
         
         switch ($filter) {
             case 'today':
@@ -259,7 +259,7 @@ class HomeController extends Controller
 
         foreach ($customersInPeriod as $customerId) {
             // Check if this customer had any Sales before the current period
-            $hasPreviousSales = Sales::where('posid', $posid)
+            $hasPreviousSales = Sales::where('POSID', $POSID)
                 ->where('customerId', $customerId)
                 ->where(function($query) use ($filter, $today) {
                     switch ($filter) {
@@ -313,11 +313,11 @@ class HomeController extends Controller
     /**
      * Get Top 5 Services based on total taken count
      *
-     * @param int $posid
+     * @param int $POSID
      * @param string $filter
      * @return array
      */
-    private function getTopServicesLast12Months($posid)
+    private function getTopServicesLast12Months($POSID)
     {
         // Last 11 months + current month (total 12 months)
         $startDate = Carbon::now()->subMonths(11)->startOfMonth();
@@ -325,7 +325,7 @@ class HomeController extends Controller
 
         $serviceQuery = Sales_items::join('sales', 'sales_items.sales_id', '=', 'sales.id')
             ->join('products', 'sales_items.product_id', '=', 'products.id')
-            ->where('sales.posid', $posid)
+            ->where('sales.POSID', $POSID)
             ->whereBetween('sales.created_at', [$startDate, $endDate])
             ->selectRaw('products.name as service_name, SUM(sales_items.quantity) as total_count')
             ->groupBy('products.id', 'products.name')
@@ -343,28 +343,28 @@ class HomeController extends Controller
     }
 
 
-    private function monthlySalesExpenseLast12Months($posid)
+    private function monthlySalesExpenseLast12Months($POSID)
     {
         // Current month + previous 11 months (total 12)
         $startDate = Carbon::now()->subMonths(11)->startOfMonth();
         $endDate   = Carbon::now()->endOfMonth();
 
-        // EXPENSE (filtered by posid)
+        // EXPENSE (filtered by POSID)
         $expense = Expense::select(
                 DB::raw('DATE_FORMAT(expenseDate, "%Y-%m") as month'),
                 DB::raw('SUM(amount) as total')
             )
-            ->where('posid', $posid)
+            ->where('POSID', $POSID)
             ->whereBetween('expenseDate', [$startDate, $endDate])
             ->groupBy('month')
             ->pluck('total', 'month');
 
-        // SALES (filtered by posid)
+        // SALES (filtered by POSID)
         $sales = Sales::select(
                 DB::raw('DATE_FORMAT(created_at, "%Y-%m") as month'),
                 DB::raw('SUM(total_amount) as total')
             )
-            ->where('posid', $posid)
+            ->where('POSID', $POSID)
             ->whereBetween('created_at', [$startDate, $endDate])
             ->groupBy('month')
             ->pluck('total', 'month');

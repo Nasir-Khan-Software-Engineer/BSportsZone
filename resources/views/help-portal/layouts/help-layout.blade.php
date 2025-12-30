@@ -164,7 +164,7 @@
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 user-name">{{ $authUser->name }}({{ $authUser->posid }})</span>
+                                <span class="mr-2 user-name">{{ $authUser->name }}({{ $authUser->POSID }})</span>
                                 <img class="img-profile rounded-circle" src="{{asset('images/default-profile.png')}}">
                             </a>
 

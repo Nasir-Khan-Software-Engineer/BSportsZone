@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('expense_categories', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->string('title');
             $table->unsignedBigInteger('created_by')->unsigned()->index()->nullable();
             $table->unsignedBigInteger('updated_by')->unsigned()->index()->nullable();

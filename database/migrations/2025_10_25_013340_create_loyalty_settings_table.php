@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('loyalty_settings', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('posid')->unique();
+            $table->bigInteger('POSID')->unique();
             $table->decimal('minimum_sales_amount', 10, 2);
             $table->enum('minimum_sales_amount_applies_for', ['Single', 'All'])
               ->default('Single');

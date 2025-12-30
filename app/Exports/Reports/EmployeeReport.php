@@ -17,7 +17,7 @@ class EmployeeReport implements FromArray, WithHeadings, WithEvents
         $this->to = $data['toDate'];
         $this->designationName = $data['designationName'] ?? 'All';
         $this->generatedAt = $data['reportGenerationDateTime'];
-        $this->posid = $data['posid'];
+        $this->POSID = $data['POSID'];
     }
 
     public function array(): array
@@ -47,7 +47,7 @@ class EmployeeReport implements FromArray, WithHeadings, WithEvents
             [$this->companyName],
             [$this->rptName],
             [],
-            ['POSID: ', $this->posid],
+            ['POSID: ', $this->POSID],
             ['From:', $this->from, 'To:', $this->to],
         ];
 

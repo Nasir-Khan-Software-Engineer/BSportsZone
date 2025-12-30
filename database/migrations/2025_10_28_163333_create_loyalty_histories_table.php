@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
 
             // First create the column
-            $table->bigInteger('posid');
+            $table->bigInteger('POSID');
 
             // Then define the foreign key
-            $table->foreign('posid')->references('POSID')->on('accountinfos')->onDelete('cascade');
+            $table->foreign('POSID')->references('POSID')->on('accountinfos')->onDelete('cascade');
 
             $table->foreignId('card_id')->constrained('loyalty_cards')->onDelete('cascade');
             $table->foreignId('sales_id')->constrained('sales')->onDelete('cascade');

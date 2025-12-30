@@ -18,7 +18,7 @@ class EmployeeReviewController extends Controller
     public function store(Request $request)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
             $request->validate([
                 'employee_id' => 'required|exists:employees,id',
@@ -28,9 +28,9 @@ class EmployeeReviewController extends Controller
                 'details' => 'nullable|string|max:5000',
             ]);
 
-            // Ensure employee belongs to current posid
+            // Ensure employee belongs to current POSID
             $employee = Employee::where('id', $request->employee_id)
-                ->where('posid', $posId)
+                ->where('POSID', $posId)
                 ->first();
 
             if (!$employee) {
@@ -41,7 +41,7 @@ class EmployeeReviewController extends Controller
             }
 
             $review = new EmployeeReview();
-            $review->posid = $posId;
+            $review->POSID = $posId;
             $review->employee_id = $request->employee_id;
             $review->review_date = $request->review_date;
             $review->title = $request->title;
@@ -75,10 +75,10 @@ class EmployeeReviewController extends Controller
     public function update(Request $request, EmployeeReview $review)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
-            // Ensure review belongs to current posid
-            if ($review->posid != $posId) {
+            // Ensure review belongs to current POSID
+            if ($review->POSID != $posId) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized access.',
@@ -124,10 +124,10 @@ class EmployeeReviewController extends Controller
     public function destroy(EmployeeReview $review)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
-            // Ensure review belongs to current posid
-            if ($review->posid != $posId) {
+            // Ensure review belongs to current POSID
+            if ($review->POSID != $posId) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized access.',

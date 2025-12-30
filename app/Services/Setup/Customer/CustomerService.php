@@ -6,8 +6,8 @@ use App\Models\Customer;
 class CustomerService implements ICustomerService{
 
     public function index(){
-        $posid = auth()->user()->posid;
-        $customers = Customer::where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $customers = Customer::where('POSID', $POSID)
                             ->with('sales', 'creator')
                             ->orderBy('id', 'DESC')
                             ->get();
@@ -24,9 +24,9 @@ class CustomerService implements ICustomerService{
 
 
     public function show($id){
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $customer = Customer::with('sales', 'creator', 'updater')
-                ->where('posid', $posid)
+                ->where('POSID', $POSID)
                 ->where('id', $id)
                 ->firstOrFail();
 
@@ -47,7 +47,7 @@ class CustomerService implements ICustomerService{
 
     public function store(Request $request){
         $customer = new Customer();
-        $customer->posid        = auth()->user()->posid;
+        $customer->POSID        = auth()->user()->POSID;
         $customer->name         = ucwords($request->name);
         $customer->gender       = $request->gender;
         $customer->email        = $request->email;
@@ -70,8 +70,8 @@ class CustomerService implements ICustomerService{
 
     public function edit($id)
     {
-        $posid = auth()->user()->posid;
-        $customer = Customer::where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $customer = Customer::where('POSID', $POSID)
             ->where('id', $id)
             ->first();
 
@@ -81,8 +81,8 @@ class CustomerService implements ICustomerService{
 
     public function update(Request $request, $id){
 
-        $posid = auth()->user()->posid;
-        $customer = Customer::where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $customer = Customer::where('POSID', $POSID)
             ->with('creator')
             ->where('id', $id)
             ->first();
@@ -108,8 +108,8 @@ class CustomerService implements ICustomerService{
     }
 
     public function destroy($id){
-        $posid = auth()->user()->posid;
-        $customer = Customer::where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $customer = Customer::where('POSID', $POSID)
             ->where('id', $id)
             ->first();
         $customer->delete();

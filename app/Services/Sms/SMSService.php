@@ -52,7 +52,7 @@ class SMSService implements SMSServiceInterface
      */
     protected function loadConfigFromDatabase(int $posId): void
     {
-        $smsConfig = SmsConfig::where('posid', $posId)
+        $smsConfig = SmsConfig::where('POSID', $posId)
             ->where('is_active', true)
             ->first();
 
@@ -128,7 +128,7 @@ class SMSService implements SMSServiceInterface
             'trxn_id'   => $responseJson['trxnId'] ?? null,
             'result'    => $responseJson['responseResult'] ?? null,
             'from'      => $from,
-            'posid'     => $posId,
+            'POSID'     => $posId,
         ];
 
         if (($responseJson['statusCode'] ?? null) !== '200') {
@@ -139,7 +139,7 @@ class SMSService implements SMSServiceInterface
         // Log successful SMS to database
         try {
             SmsHistory::create([
-                'posid' => $posId,
+                'POSID' => $posId,
                 'to_number' => $phone,
                 'from_number' => $this->senderId,
                 'source' => $from,
@@ -149,7 +149,7 @@ class SMSService implements SMSServiceInterface
         } catch (\Exception $e) {
             Log::warning('SMS_HISTORY_SAVE_FAILED', [
                 'error' => $e->getMessage(),
-                'posid' => $posId,
+                'POSID' => $posId,
                 'phone' => maskPhone($phone),
             ]);
         }

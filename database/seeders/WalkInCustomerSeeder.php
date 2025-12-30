@@ -15,7 +15,7 @@ class WalkInCustomerSeeder extends Seeder
     {
         Customer::create([
             'id' => 0,
-            'posid' => 0,
+            'POSID' => 0,
             'name' => 'Walk-In',
             'gender' => '',
             'email'=> '',

@@ -18,7 +18,7 @@ class EmployeeReportController extends Controller
 {
     public function employeeReportView()
     {
-        $designations = EmployeeDesignation::where('posid', auth()->user()->posid)->get();
+        $designations = EmployeeDesignation::where('POSID', auth()->user()->POSID)->get();
         return view('reports.employee.details', compact('designations'));
     }
 
@@ -30,10 +30,10 @@ class EmployeeReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 10);
 
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
 
         // Get all unique attendance dates in the date range (working days = days with any attendance activity)
-        // $workingDays = Attendance::where('posid', $posId)
+        // $workingDays = Attendance::where('POSID', $posId)
         //     ->whereBetween('attendance_date', [$from, $to])
         //     ->distinct()
         //     ->pluck('attendance_date')
@@ -44,7 +44,7 @@ class EmployeeReportController extends Controller
         //     ->count();
 
         // Get employees filtered by designation
-        $employeesQuery = Employee::where('posid', $posId)
+        $employeesQuery = Employee::where('POSID', $posId)
             ->with('designation');
 
         if ($designationId !== 'all') {
@@ -56,7 +56,7 @@ class EmployeeReportController extends Controller
         // Process each employee
         $employeeData = $employees->map(function($employee) use ($from, $to, $posId) {
             // Get attendance records within date range
-            $attendances = Attendance::where('posid', $posId)
+            $attendances = Attendance::where('POSID', $posId)
                 ->where('employee_id', $employee->id)
                 ->whereBetween('attendance_date', [$from, $to])
                 ->get();
@@ -73,7 +73,7 @@ class EmployeeReportController extends Controller
             $absentPercentage = $workingDays > 0 ? round(($absentCount / $workingDays) * 100, 2) : 0;
 
             // Get reviews within date range
-            $reviews = EmployeeReview::where('posid', $posId)
+            $reviews = EmployeeReview::where('POSID', $posId)
                 ->where('employee_id', $employee->id)
                 ->whereBetween('review_date', [$from, $to])
                 ->get();
@@ -146,10 +146,10 @@ class EmployeeReportController extends Controller
         $to = $request->input('to_date', Carbon::now()->format('Y-m-d'));
         $designationId = $request->input('designation_id', 'all');
 
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
 
         // Get all unique attendance dates in the date range (working days = days with any attendance activity)
-        $workingDays = Attendance::where('posid', $posId)
+        $workingDays = Attendance::where('POSID', $posId)
             ->whereBetween('attendance_date', [$from, $to])
             ->distinct()
             ->pluck('attendance_date')
@@ -160,7 +160,7 @@ class EmployeeReportController extends Controller
             ->count();
 
         // Get employees filtered by designation
-        $employeesQuery = Employee::where('posid', $posId)
+        $employeesQuery = Employee::where('POSID', $posId)
             ->with('designation');
 
         if ($designationId !== 'all') {
@@ -172,7 +172,7 @@ class EmployeeReportController extends Controller
         // Process each employee (same logic as getEmployeeReportData)
         $employeeData = $employees->map(function($employee) use ($from, $to, $posId, $workingDays) {
             // Get attendance records within date range
-            $attendances = Attendance::where('posid', $posId)
+            $attendances = Attendance::where('POSID', $posId)
                 ->where('employee_id', $employee->id)
                 ->whereBetween('attendance_date', [$from, $to])
                 ->get();
@@ -187,7 +187,7 @@ class EmployeeReportController extends Controller
             $absentPercentage = $workingDays > 0 ? round(($absentCount / $workingDays) * 100, 2) : 0;
 
             // Get reviews within date range
-            $reviews = EmployeeReview::where('posid', $posId)
+            $reviews = EmployeeReview::where('POSID', $posId)
                 ->where('employee_id', $employee->id)
                 ->whereBetween('review_date', [$from, $to])
                 ->get();
@@ -242,8 +242,8 @@ class EmployeeReportController extends Controller
             'fromDate' => $from,
             'toDate' => $to,
             'designationName' => $designationName,
-            'posid' => $posId ?? 'N/A',
-            'companyName' => Accountinfo::where('posid', $posId)->value('companyName') ?? 'N/A',
+            'POSID' => $posId ?? 'N/A',
+            'companyName' => Accountinfo::where('POSID', $posId)->value('companyName') ?? 'N/A',
             'reportGenerationDateTime' => formatTime(Carbon::now()) . ' ' . formatDate(Carbon::now()),
         ];
 

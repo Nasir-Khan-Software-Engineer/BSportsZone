@@ -6,14 +6,14 @@ use App\Models\Brand;
 
 class BrandRepository implements IBrandRepository
 {
-    public function getBrands($posid)
+    public function getBrands($POSID)
     {
-        return Brand::with('creator')->where('posid', $posid)->get();
+        return Brand::with('creator')->where('POSID', $POSID)->get();
     }
 
-    public function getBrand($posid, $brandid)
+    public function getBrand($POSID, $brandid)
     {
-        return Brand::with('creator')->where('posid', $posid)->where('id', $brandid)->get();
+        return Brand::with('creator')->where('POSID', $POSID)->where('id', $brandid)->get();
     }
 
     public function createBrand($brand): void
@@ -24,7 +24,7 @@ class BrandRepository implements IBrandRepository
 
     public function updateBrand($brand)
     {
-        $brandInfo = Brand::with('creator')->where('posid', $brand['posid'])->where('id', $brand['id'])->find();
+        $brandInfo = Brand::with('creator')->where('POSID', $brand['POSID'])->where('id', $brand['id'])->find();
 
         $brandInfo->name = $brand['name'];
         $brandInfo->updated_by = auth()->user()->id;
@@ -32,8 +32,8 @@ class BrandRepository implements IBrandRepository
         return $brand->save();
     }
 
-    public function deleteBrand($posid, $brandid)
+    public function deleteBrand($POSID, $brandid)
     {
-        return Brand::where('posid', $posid)->where('id', $brandid)->delete();
+        return Brand::where('POSID', $POSID)->where('id', $brandid)->delete();
     }
 }

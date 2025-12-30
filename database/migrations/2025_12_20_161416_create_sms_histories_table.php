@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sms_histories', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('posid');
+            $table->bigInteger('POSID');
             $table->string('to_number');
             $table->string('from_number')->nullable();
             $table->string('source');
@@ -21,8 +21,8 @@ return new class extends Migration
             $table->integer('sms_count');
             $table->timestamps();
             
-            $table->foreign('posid')->references('POSID')->on('accountinfos')->onDelete('cascade');
-            $table->index(['posid', 'created_at']);
+            $table->foreign('POSID')->references('POSID')->on('accountinfos')->onDelete('cascade');
+            $table->index(['POSID', 'created_at']);
             $table->index('source');
         });
     }

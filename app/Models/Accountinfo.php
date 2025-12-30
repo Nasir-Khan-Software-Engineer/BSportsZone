@@ -15,16 +15,16 @@ class Accountinfo extends Model
 
     public function posSettings()
     {
-        return $this->hasOne(POSSettings::class, 'posid', 'POSID');
+        return $this->hasOne(POSSettings::class, 'POSID', 'POSID');
     }
 
     public function sitefeatures()
     {
-        return $this->belongsToMany(SiteFeature::class, 'pos_feature', 'posid', 'feature_id');
+        return $this->belongsToMany(SiteFeature::class, 'pos_feature', 'POSID', 'feature_id');
     }
 
     public function loyaltySettings()
     {
-        return $this->hasOne(LoyaltySetting::class, 'posid', 'POSID');
+        return $this->hasOne(LoyaltySetting::class, 'POSID', 'POSID');
     }
 }

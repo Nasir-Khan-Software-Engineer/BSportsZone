@@ -11,7 +11,7 @@ class EmployeeReview extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'employee_id',
         'review_date',
         'title',

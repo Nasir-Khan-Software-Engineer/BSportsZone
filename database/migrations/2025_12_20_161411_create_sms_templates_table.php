@@ -13,15 +13,15 @@ return new class extends Migration
     {
         Schema::create('sms_templates', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('posid');
+            $table->bigInteger('POSID');
             $table->text('template');
             $table->timestamps();
             
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             
-            $table->unique('posid');
-            $table->foreign('posid')->references('POSID')->on('accountinfos')->onDelete('cascade');
+            $table->unique('POSID');
+            $table->foreign('POSID')->references('POSID')->on('accountinfos')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
         });

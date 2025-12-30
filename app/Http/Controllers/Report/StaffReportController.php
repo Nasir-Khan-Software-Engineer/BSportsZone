@@ -29,10 +29,10 @@ class StaffReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 10);
 
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
 
         // Get all unique attendance dates in the date range (working days = days with any attendance activity)
-        // $workingDays = Attendance::where('posid', $posId)
+        // $workingDays = Attendance::where('POSID', $posId)
         //     ->whereBetween('attendance_date', [$from, $to])
         //     ->distinct()
         //     ->pluck('attendance_date')
@@ -43,12 +43,12 @@ class StaffReportController extends Controller
         //     ->count();
 
         // Get staff designation
-        $staffDesignation = EmployeeDesignation::where('posid', $posId)
+        $staffDesignation = EmployeeDesignation::where('POSID', $posId)
             ->where('name', 'Staff')
             ->first();
 
         // Get staffs only
-        $staffsQuery = Employee::where('posid', $posId);
+        $staffsQuery = Employee::where('POSID', $posId);
 
         if ($staffDesignation) {
             $staffsQuery->where('designation_id', $staffDesignation->id);
@@ -62,7 +62,7 @@ class StaffReportController extends Controller
         // Process each staff
         $staffData = $staffs->map(function($staff) use ($from, $to, $posId) {
             // Get attendance records within date range
-            $attendances = Attendance::where('posid', $posId)
+            $attendances = Attendance::where('POSID', $posId)
                 ->where('employee_id', $staff->id)
                 ->whereBetween('attendance_date', [$from, $to])
                 ->get();
@@ -79,7 +79,7 @@ class StaffReportController extends Controller
             $absentPercentage = $workingDays > 0 ? round(($absentCount / $workingDays) * 100, 2) : 0;
 
             // Get reviews within date range
-            $reviews = EmployeeReview::where('posid', $posId)
+            $reviews = EmployeeReview::where('POSID', $posId)
                 ->where('employee_id', $staff->id)
                 ->whereBetween('review_date', [$from, $to])
                 ->get();
@@ -95,7 +95,7 @@ class StaffReportController extends Controller
             $negativePercentage = $totalReview > 0 ? round(($negativeCount / $totalReview) * 100, 2) : 0;
 
             // Get total services within date range
-            $totalServices = Sales_items::where('posid', $posId)
+            $totalServices = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $staff->id)
                 ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
                 ->count();
@@ -159,10 +159,10 @@ class StaffReportController extends Controller
         $from = $request->input('from_date', Carbon::now()->format('Y-m-d'));
         $to = $request->input('to_date', Carbon::now()->format('Y-m-d'));
 
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
 
         // Get all unique attendance dates in the date range (working days = days with any attendance activity)
-        $workingDays = Attendance::where('posid', $posId)
+        $workingDays = Attendance::where('POSID', $posId)
             ->whereBetween('attendance_date', [$from, $to])
             ->distinct()
             ->pluck('attendance_date')
@@ -173,12 +173,12 @@ class StaffReportController extends Controller
             ->count();
 
         // Get staff designation
-        $staffDesignation = EmployeeDesignation::where('posid', $posId)
+        $staffDesignation = EmployeeDesignation::where('POSID', $posId)
             ->where('name', 'Staff')
             ->first();
 
         // Get staffs only
-        $staffsQuery = Employee::where('posid', $posId);
+        $staffsQuery = Employee::where('POSID', $posId);
 
         if ($staffDesignation) {
             $staffsQuery->where('designation_id', $staffDesignation->id);
@@ -192,7 +192,7 @@ class StaffReportController extends Controller
         // Process each staff (same logic as getStaffReportData)
         $staffData = $staffs->map(function($staff) use ($from, $to, $posId, $workingDays) {
             // Get attendance records within date range
-            $attendances = Attendance::where('posid', $posId)
+            $attendances = Attendance::where('POSID', $posId)
                 ->where('employee_id', $staff->id)
                 ->whereBetween('attendance_date', [$from, $to])
                 ->get();
@@ -207,7 +207,7 @@ class StaffReportController extends Controller
             $absentPercentage = $workingDays > 0 ? round(($absentCount / $workingDays) * 100, 2) : 0;
 
             // Get reviews within date range
-            $reviews = EmployeeReview::where('posid', $posId)
+            $reviews = EmployeeReview::where('POSID', $posId)
                 ->where('employee_id', $staff->id)
                 ->whereBetween('review_date', [$from, $to])
                 ->get();
@@ -223,7 +223,7 @@ class StaffReportController extends Controller
             $negativePercentage = $totalReview > 0 ? round(($negativeCount / $totalReview) * 100, 2) : 0;
 
             // Get total services within date range
-            $totalServices = Sales_items::where('posid', $posId)
+            $totalServices = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $staff->id)
                 ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
                 ->count();
@@ -263,8 +263,8 @@ class StaffReportController extends Controller
             'title' => "Staff Performance Report from $from to $to",
             'fromDate' => $from,
             'toDate' => $to,
-            'posid' => $posId ?? 'N/A',
-            'companyName' => Accountinfo::where('posid', $posId)->value('companyName') ?? 'N/A',
+            'POSID' => $posId ?? 'N/A',
+            'companyName' => Accountinfo::where('POSID', $posId)->value('companyName') ?? 'N/A',
             'reportGenerationDateTime' => formatTime(Carbon::now()) . ' ' . formatDate(Carbon::now()),
         ];
 

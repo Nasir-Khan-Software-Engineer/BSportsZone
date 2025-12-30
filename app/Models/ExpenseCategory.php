@@ -12,7 +12,7 @@ class ExpenseCategory extends Model
     protected $table = 'expense_categories';
     
     protected $fillable = [
-        'posid', 'title', 'created_by', 'updated_by'
+        'POSID', 'title', 'created_by', 'updated_by'
     ];
 
     protected $dates = [

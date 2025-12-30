@@ -19,7 +19,7 @@ class AttendanceController extends Controller
     public function getAttendanceData(Request $request)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             $date = $request->input('date', \Carbon\Carbon::today()->format('Y-m-d'));
             $designationId = $request->input('designation_id', null);
 
@@ -35,7 +35,7 @@ class AttendanceController extends Controller
             }
 
             // Get all employees for the POS
-            $query = Employee::where('posid', $posId)
+            $query = Employee::where('POSID', $posId)
                 ->where('status', 'Active')
                 ->with('designation');
 
@@ -46,7 +46,7 @@ class AttendanceController extends Controller
             $employees = $query->orderBy('name')->get();
 
             // Get existing attendance records for the date
-            $attendances = Attendance::where('posid', $posId)
+            $attendances = Attendance::where('POSID', $posId)
                 ->where('attendance_date', $date)
                 ->get()
                 ->keyBy('employee_id');
@@ -105,7 +105,7 @@ class AttendanceController extends Controller
     public function saveAttendance(Request $request)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
             $request->validate([
                 'employee_id' => 'required|exists:employees,id',
@@ -143,7 +143,7 @@ class AttendanceController extends Controller
 
             // Verify employee belongs to POS
             $employee = Employee::where('id', $request->employee_id)
-                ->where('posid', $posId)
+                ->where('POSID', $posId)
                 ->first();
 
             if (!$employee) {
@@ -153,14 +153,14 @@ class AttendanceController extends Controller
                 ], 404);
             }
 
-            $existingAttendance = Attendance::where('posid', $posId)
+            $existingAttendance = Attendance::where('POSID', $posId)
                 ->where('employee_id', $request->employee_id)
                 ->where('attendance_date', $request->attendance_date)
                 ->first();
 
             $attendance = Attendance::updateOrCreate(
                 [
-                    'posid' => $posId,
+                    'POSID' => $posId,
                     'employee_id' => $request->employee_id,
                     'attendance_date' => $request->attendance_date,
                 ],
@@ -214,7 +214,7 @@ class AttendanceController extends Controller
     public function markAllPresent(Request $request)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
             $request->validate([
                 'date' => 'required|date',
@@ -235,14 +235,14 @@ class AttendanceController extends Controller
             foreach ($employeeIds as $employeeId) {
                 // Verify employee belongs to POS
                 $employee = Employee::where('id', $employeeId)
-                    ->where('posid', $posId)
+                    ->where('POSID', $posId)
                     ->first();
 
                 if (!$employee) {
                     continue;
                 }
 
-                $attendance = Attendance::where('posid', $posId)
+                $attendance = Attendance::where('POSID', $posId)
                     ->where('employee_id', $employeeId)
                     ->where('attendance_date', $date)
                     ->first();
@@ -257,7 +257,7 @@ class AttendanceController extends Controller
                     $attendance->save();
                 } else {
                     Attendance::create([
-                        'posid' => $posId,
+                        'POSID' => $posId,
                         'employee_id' => $employeeId,
                         'attendance_date' => $date,
                         'status' => 'Present',
@@ -297,8 +297,8 @@ class AttendanceController extends Controller
     public function getDesignations()
     {
         try {
-            $posId = auth()->user()->posid;
-            $designations = EmployeeDesignation::where('posid', $posId)
+            $posId = auth()->user()->POSID;
+            $designations = EmployeeDesignation::where('POSID', $posId)
                 ->orderBy('name')
                 ->get(['id', 'name']);
 
@@ -320,16 +320,16 @@ class AttendanceController extends Controller
     public function checkTodayAttendanceStatus()
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             $today = \Carbon\Carbon::today()->format('Y-m-d');
 
             // Get all active employees for the POS
-            $totalEmployees = Employee::where('posid', $posId)
+            $totalEmployees = Employee::where('POSID', $posId)
                 ->where('status', 'Active')
                 ->count();
 
             // Get existing attendance records for today
-            $completedCount = Attendance::where('posid', $posId)
+            $completedCount = Attendance::where('POSID', $posId)
                 ->where('attendance_date', $today)
                 ->whereNotNull('status')
                 ->count();

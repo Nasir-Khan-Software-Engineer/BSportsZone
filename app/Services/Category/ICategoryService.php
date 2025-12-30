@@ -4,9 +4,9 @@ namespace App\Services\Category;
 
 interface ICategoryService
 {
-    public function getAllCategories($posid);
+    public function getAllCategories($POSID);
     public function saveCategory($category);
     public function updateCategory($category);
 
-    public function deleteCategory($posid, $id);
+    public function deleteCategory($POSID, $id);
 }

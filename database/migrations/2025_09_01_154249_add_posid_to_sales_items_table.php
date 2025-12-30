@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sales_items', function (Blueprint $table) {
-            $table->bigInteger('posid')->after('sales_id')->default(1);
+            $table->bigInteger('POSID')->after('sales_id')->default(1);
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sales_items', function (Blueprint $table) {
-            $table->dropColumn('posid');
+            $table->dropColumn('POSID');
         });
     }
 };

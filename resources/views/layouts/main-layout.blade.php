@@ -119,7 +119,7 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
                 <div class="sidebar-brand-icon rotate-n-15">
-                    <img width="50px" src="{{ asset('images') }}/{{ session('accountInfo.posid') }}/{{ session('accountInfo.logo') }}" alt="Logo">
+                    <img width="50px" src="{{ asset('images') }}/{{ session('accountInfo.POSID') }}/{{ session('accountInfo.logo') }}" alt="Logo">
                 </div>
                 <div class="sidebar-brand-text mx-1">{{ session('accountInfo.companyName') }}</div>
             </a>
@@ -520,7 +520,7 @@
                         <!-- Nav Item - User Information -->
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 user-name">{{ $authUser->name }}({{ $authUser->posid }})</span>
+                                <span class="mr-2 user-name">{{ $authUser->name }}({{ $authUser->POSID }})</span>
                                 <img class="img-profile rounded-circle" src="{{asset('images/default-profile.png')}}">
                             </a>
 
@@ -639,7 +639,7 @@
             console.log("✅ Loaded logo from cache");
         }else{
             try {
-                const logoUrl = window.origin + '/images/' + accountInfoSettings.posid + '/' + accountInfoSettings.logo;
+                const logoUrl = window.origin + '/images/' + accountInfoSettings.POSID + '/' + accountInfoSettings.logo;
                 const logoBase64 = await WinPos.Common.getImageAsBase64(logoUrl);
                 WinPos.Common.CommonVariables.accountLogo = logoBase64;
 

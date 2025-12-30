@@ -24,7 +24,7 @@ class ReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $query = Sales::where('posid', auth()->user()->posid);
+        $query = Sales::where('POSID', auth()->user()->POSID);
         $totalRecord = $query->count();
 
         if ($from) {
@@ -75,7 +75,7 @@ class ReportController extends Controller
         $from = $request->input('from_date', Carbon::now()->format('Y-m-d'));
         $to = $request->input('to_date', Carbon::now()->format('Y-m-d'));
 
-        $query = Sales::where('posid', auth()->user()->posid);
+        $query = Sales::where('POSID', auth()->user()->POSID);
         $totalRecord = $query->count();
 
         if ($from) {

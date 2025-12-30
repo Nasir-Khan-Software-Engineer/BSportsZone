@@ -14,7 +14,7 @@ class POSSettingsSeeder extends Seeder
     public function run(): void
     {
         POSSettings::create([
-            'posid' => 1, // POS ID
+            'POSID' => 1, // POS ID
             'adjustment_min' => -5,
             'adjustment_max' => 5,
             //'created_by' => 1, // admin user
@@ -22,7 +22,7 @@ class POSSettingsSeeder extends Seeder
         ]);
 
         POSSettings::create([
-            'posid' => 2, // POS ID
+            'POSID' => 2, // POS ID
             'adjustment_min' => -5,
             'adjustment_max' => 5,
             //'created_by' => 3, // admin user

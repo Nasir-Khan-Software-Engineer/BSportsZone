@@ -40,8 +40,8 @@ class CheckSessionMiddleware
 
             // store site features
             if (!session()->has('site_features')) {
-                $posid = auth()->user()->posid;
-                $pos = Accountinfo::with('sitefeatures')->where('POSID', $posid)->first();
+                $POSID = auth()->user()->POSID;
+                $pos = Accountinfo::with('sitefeatures')->where('POSID', $POSID)->first();
                 $formated_features = $pos->sitefeatures->map(function($feature) {
                     return [
                         'feature_name' => $feature->feature_name
@@ -94,7 +94,7 @@ class CheckSessionMiddleware
             if ($accountInfo) {
                 session([
                     'accountInfo' => [
-                        'posid'               => $user->posid,
+                        'POSID'               => $user->POSID,
                         'companyName'         => $accountInfo->companyName,
                         'logo'                => $accountInfo->logo,
                         'primaryEmail'        => $accountInfo->primaryEmail,
@@ -112,8 +112,8 @@ class CheckSessionMiddleware
 
 
         if (Auth::check() && !session()->has('posSettings')) {
-            $posid = auth()->user()->posid;
-            $posSettings = POSSettings::where('posid', $posid)->first();
+            $POSID = auth()->user()->POSID;
+            $posSettings = POSSettings::where('POSID', $POSID)->first();
 
             if (!$posSettings) {
                 Auth::logout();
@@ -137,8 +137,8 @@ class CheckSessionMiddleware
         }
 
         if (Auth::check() && !session()->has('loyaltySettings') && isFeatureEnabled('ENABLED_LOYALTY')) {
-            $posid = auth()->user()->posid;
-            $loyaltySettings = LoyaltySetting::where('posid', $posid)->first();
+            $POSID = auth()->user()->POSID;
+            $loyaltySettings = LoyaltySetting::where('POSID', $POSID)->first();
 
             if ($loyaltySettings) {
                 session([
@@ -158,8 +158,8 @@ class CheckSessionMiddleware
 
         // Load SMS configuration into session
         if (Auth::check() && !session()->has('sms_config')) {
-            $posid = auth()->user()->posid;
-            $smsConfig = SmsConfig::where('posid', $posid)
+            $POSID = auth()->user()->POSID;
+            $smsConfig = SmsConfig::where('POSID', $POSID)
                 ->where('is_active', true)
                 ->first();
 

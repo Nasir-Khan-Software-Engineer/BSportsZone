@@ -10,12 +10,12 @@ use Illuminate\Support\Number;
 
 class ExpenseService implements IExpenseService
 {
-    public function getExpenseListWithPagination(Request $request, $posid)
+    public function getExpenseListWithPagination(Request $request, $POSID)
     {
         $searchCriteria = $request->input('search');
 
         $query = Expense::with('expenseCategory')
-            ->where('posid', $posid)
+            ->where('POSID', $POSID)
             ->when($searchCriteria, function ($q) use ($searchCriteria) {
                 $q->where('title', 'like', "%{$searchCriteria}%")
                     ->orWhereHas('expenseCategory', function ($q2) use ($searchCriteria) {
@@ -23,7 +23,7 @@ class ExpenseService implements IExpenseService
                     });
             });
 
-        $totalRecord = Expense::where('posid', $posid)->count();
+        $totalRecord = Expense::where('POSID', $POSID)->count();
         $filteredRecord = $query->count();
 
         $orderColumn = $request->input('order.0.column', 0);
@@ -59,7 +59,7 @@ class ExpenseService implements IExpenseService
         // Create expense
         $expense = new Expense();
         $expense->title = $request->expenseTitle;
-        $expense->posid = auth()->user()->posid;
+        $expense->POSID = auth()->user()->POSID;
         $expense->shopid = 1; // You may replace with dynamic shop id
         $expense->categoryId = $request->expenseCategory;
         $expense->expenseDate = $request->expensedOn;
@@ -77,7 +77,7 @@ class ExpenseService implements IExpenseService
         $expense->formattedExpenseDate = Carbon::parse($expense->expenseDate)->format('Y-m-d');
 
         // Get categories for current POS
-        $expenseCategories = ExpenseCategory::where('posid', auth()->user()->posid)->get();
+        $expenseCategories = ExpenseCategory::where('POSID', auth()->user()->POSID)->get();
 
         return [
             'expense' => $expense,

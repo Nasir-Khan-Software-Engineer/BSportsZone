@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->string('code');
             $table->string('name'); 
             $table->string('type')->default('Service');
@@ -24,8 +24,8 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();
             $table->timestamps();
-            $table->unique(['posid', 'code'], 'posid_code_unique');
-            $table->unique(['posid', 'name'], 'posid_name_unique');
+            $table->unique(['POSID', 'code'], 'posid_code_unique');
+            $table->unique(['POSID', 'name'], 'posid_name_unique');
         });
     }
 

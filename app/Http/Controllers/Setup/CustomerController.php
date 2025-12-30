@@ -27,14 +27,14 @@ class CustomerController extends Controller
 
     public function datatable(Request $request)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $search = $request->input('search', '');
         $start = $request->input('start', 0);
         $length = $request->input('length', 10);
 
         // Base query
         if(isFeatureEnabled('ENABLED_LOYALTY')){
-            $query = Customer::where('posid', $posid)
+            $query = Customer::where('POSID', $POSID)
                     ->withCount('sales')
                     ->when($search, function($q) use ($search) {
                         $q->where(function($sub) use ($search) {
@@ -44,7 +44,7 @@ class CustomerController extends Controller
                         });
             });
         }else{
-            $query = Customer::where('posid', $posid)
+            $query = Customer::where('POSID', $POSID)
                     ->withCount('sales')
                     ->when($search, function($q) use ($search) {
                         $q->where(function($sub) use ($search) {
@@ -55,7 +55,7 @@ class CustomerController extends Controller
         }
 
         // Get total and filtered counts
-        $totalRecords = Customer::where('posid', $posid)->count();
+        $totalRecords = Customer::where('POSID', $POSID)->count();
         $filteredRecords = $query->count();
 
         // Handle ordering dynamically
@@ -206,8 +206,8 @@ class CustomerController extends Controller
         ];
 
         if (isFeatureEnabled('ENABLED_LOYALTY')) {
-            $posid = auth()->user()->posid;
-            $loyaltyStatus = $this->loyaltyService->getCustomerLoayltyStatus($posid, $id);
+            $POSID = auth()->user()->POSID;
+            $loyaltyStatus = $this->loyaltyService->getCustomerLoayltyStatus($POSID, $id);
             $customerRibbonData = array_merge($customerRibbonData, $loyaltyStatus);
         }
 
@@ -217,9 +217,9 @@ class CustomerController extends Controller
     public function store(Request $request)
     {
         try{
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
 
-            $customer = Customer::where('posid', $posid)->where('phone1', $request->phone1)->first();
+            $customer = Customer::where('POSID', $POSID)->where('phone1', $request->phone1)->first();
 
             if ($customer) {
                 return response()->json([
@@ -237,8 +237,8 @@ class CustomerController extends Controller
                     'string',
                     'min:11',
                     'max:20',
-                    Rule::unique('customers')->where(function ($query) use ($posid) {
-                        return $query->where('posid', $posid)->whereNull('deleted_at');
+                    Rule::unique('customers')->where(function ($query) use ($POSID) {
+                        return $query->where('POSID', $POSID)->whereNull('deleted_at');
                     })
                 ],
                 'phone2' => [
@@ -247,8 +247,8 @@ class CustomerController extends Controller
                 'email' => [
                     'nullable',
                     'email',
-                    Rule::unique('customers')->where(function ($query) use ($posid) {
-                        return $query->where('posid', $posid)->whereNull('deleted_at');
+                    Rule::unique('customers')->where(function ($query) use ($POSID) {
+                        return $query->where('POSID', $POSID)->whereNull('deleted_at');
                     })
                 ],
                 'address' => 'nullable|string|min:3|max:200',
@@ -293,7 +293,7 @@ class CustomerController extends Controller
 
     public function update(Request $request, $id){
         try{
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $request->validate([
                 'name'   => 'required|string|min:3|max:100',
                 'gender' => 'required',
@@ -303,8 +303,8 @@ class CustomerController extends Controller
                     'string',
                     'min:11',
                     'max:20',
-                    Rule::unique('customers')->where(function ($query) use ($posid) {
-                        return $query->where('posid', $posid)->whereNull('deleted_at');
+                    Rule::unique('customers')->where(function ($query) use ($POSID) {
+                        return $query->where('POSID', $POSID)->whereNull('deleted_at');
                     })->ignore($id, 'id')
                 ],
                 'phone2' => [
@@ -313,8 +313,8 @@ class CustomerController extends Controller
                 'email' => [
                     'nullable',
                     'email',
-                    Rule::unique('customers')->where(function ($query) use ($posid) {
-                        return $query->where('posid', $posid)->whereNull('deleted_at');
+                    Rule::unique('customers')->where(function ($query) use ($POSID) {
+                        return $query->where('POSID', $POSID)->whereNull('deleted_at');
                     })->ignore($id, 'id')
                 ],
                 'address' => 'nullable|string|min:3|max:200',
@@ -360,7 +360,7 @@ class CustomerController extends Controller
     {
         $search = $request->term;
 
-        $customers = Customer::with('sales')->where('posid', auth()->user()->posid)
+        $customers = Customer::with('sales')->where('POSID', auth()->user()->POSID)
             ->where('phone1', 'like', "%{$search}%")
             ->select('id', 'name', 'phone1', 'age_group')
             ->limit(5)

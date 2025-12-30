@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->string('name');
             $table->date('date_of_birth');
             $table->enum('gender', ['Male', 'Female', 'Other']);
@@ -31,7 +31,7 @@ return new class extends Migration
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
             
-            $table->index('posid', 'idx_employees_posid');
+            $table->index('POSID', 'idx_employees_posid');
         });
     }
 

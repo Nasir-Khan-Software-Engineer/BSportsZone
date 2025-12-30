@@ -11,7 +11,7 @@ class Category extends Model
     protected $table = 'category';
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'name',
         'logo',
         'created_by',

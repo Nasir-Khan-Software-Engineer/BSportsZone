@@ -16,7 +16,7 @@ class SalesDetailsReport implements FromArray, WithHeadings, WithEvents
         $this->from = $data['fromDate'];
         $this->to = $data['toDate'];
         $this->generatedAt = date('Y-m-d H:i:s');
-        $this->posid = $data['posid'];
+        $this->POSID = $data['POSID'];
 
         $this->totalAmount = $data['totals']['totalAmount'];
         $this->totalDiscount = $data['totals']['totalDiscountAmount'];
@@ -51,7 +51,7 @@ class SalesDetailsReport implements FromArray, WithHeadings, WithEvents
             [$this->companyName],
             [$this->rptName],
             [],
-            ['POSID: ', $this->posid],
+            ['POSID: ', $this->POSID],
             ['From:', $this->from, 'To:', $this->to],
             ['Report Generated At: ', $this->generatedAt],
             ['Invoice ID', 'Customer Name', 'Customer Phone', 'Date', 'Total Amount', 'Discount Amount', 'Adjustment Amount', 'Payable Amount', 'Paid Amount', 'Sales By'],

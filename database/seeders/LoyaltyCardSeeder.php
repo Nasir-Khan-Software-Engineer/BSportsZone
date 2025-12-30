@@ -23,7 +23,7 @@ class LoyaltyCardSeeder extends Seeder
 
             LoyaltyCard::create([
                 'customer_id' => $customer->id,
-                'posid' => 1,
+                'POSID' => 1,
                 'card_number' => $cardNumber,
                 'valid_until' => Carbon::now()->addYear(),
                 'created_by' => 1,

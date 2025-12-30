@@ -13,8 +13,8 @@ textarea {
 @endsection
 
 @php
-$posid = auth()->user()->posid;
-$imagePath = "/images/{$posid}/services/";
+$POSID = auth()->user()->POSID;
+$imagePath = "/images/{$POSID}/services/";
 @endphp
 
 @section('content')

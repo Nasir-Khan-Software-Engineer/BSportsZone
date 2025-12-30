@@ -15,7 +15,7 @@ class CustomerSeeder extends Seeder
     {
         for($i=0; $i<15; $i++){
             $customer = new Customer();
-            $customer->posid    = 1;
+            $customer->POSID    = 1;
             $customer->name     = "Customer-".$i;
             $customer->gender   = "M";
             $customer->email    = "customer-".$i."@gmail.com";

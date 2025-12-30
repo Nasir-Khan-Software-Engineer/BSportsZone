@@ -12,7 +12,7 @@ class ShopSetupService implements IShopSetupService{
 
     public function store(Request $request){
         $metaData = new stdClass();
-        $metaData->POSID        = auth()->user()->posid;
+        $metaData->POSID        = auth()->user()->POSID;
         $metaData->createdBy    = auth()->user()->id;
 
         $shopInfo = [
@@ -32,7 +32,7 @@ class ShopSetupService implements IShopSetupService{
     
     public function update(Request $request, $id){
         $metaData = new stdClass();
-        $metaData->POSID        = auth()->user()->posid;
+        $metaData->POSID        = auth()->user()->POSID;
         $metaData->updatedBy    = auth()->user()->id;
         $metaData->shopID       = $id;
 

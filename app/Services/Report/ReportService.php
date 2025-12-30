@@ -14,8 +14,8 @@ class ReportService implements IReportService{
 
     public function getSalesDetailsReportData($posId, $from, $to, $start, $length, $type= 'view'){
         
-        $query = Sales::where('posid', $posId);
-        $totalRecord = Sales::where('posid', $posId)->count();
+        $query = Sales::where('POSID', $posId);
+        $totalRecord = Sales::where('POSID', $posId)->count();
 
 
         if ($from) {
@@ -74,8 +74,8 @@ class ReportService implements IReportService{
 
     public function getExpenseDetailsReportData($posId, $from, $to, $start, $length, $type= 'view'){
         
-        $query = Expense::where('posid', $posId);
-        $totalRecord = Expense::where('posid', $posId)->count();
+        $query = Expense::where('POSID', $posId);
+        $totalRecord = Expense::where('POSID', $posId)->count();
 
         if ($from) {
             $query->whereDate('expenseDate', '>=', $from);
@@ -122,7 +122,7 @@ class ReportService implements IReportService{
 
     public function getDiscountAdjustmentReportData($posId, $from, $to, $start, $length, $type= 'view'){
         
-        $query = Sales::where('posid', $posId);
+        $query = Sales::where('POSID', $posId);
 
         if ($from) {
             $query->whereDate('created_at', '>=', $from);
@@ -200,7 +200,7 @@ class ReportService implements IReportService{
 
     public function getRevenueReportData($posId, $from, $to, $start, $length, $type= 'view'){
         
-        $query = Sales::where('posid', $posId);
+        $query = Sales::where('POSID', $posId);
 
         if ($from) {
             $query->whereDate('created_at', '>=', $from);
@@ -304,7 +304,7 @@ class ReportService implements IReportService{
     public function getNetProfitReportData($posId, $from, $to, $start = 0, $length = 9, $type = 'view'){
         
         // Get Sales with payments grouped by date
-        $SalesQuery = Sales::where('posid', $posId);
+        $SalesQuery = Sales::where('POSID', $posId);
         
         if ($from) {
             $SalesQuery->whereDate('created_at', '>=', $from);
@@ -316,7 +316,7 @@ class ReportService implements IReportService{
         $sales = $SalesQuery->with('payments')->get();
 
         // Get expenses grouped by date
-        $expensesQuery = Expense::where('posid', $posId);
+        $expensesQuery = Expense::where('POSID', $posId);
         
         if ($from) {
             $expensesQuery->whereDate('expenseDate', '>=', $from);
@@ -428,7 +428,7 @@ class ReportService implements IReportService{
     public function getCustomerReportData($posId, $from, $to, $customerType, $start, $length, $type = 'view'){
         
         // Get customers filtered by creation date
-        $customersQuery = \App\Models\Customer::where('posid', $posId);
+        $customersQuery = \App\Models\Customer::where('POSID', $posId);
         
         if ($from) {
             $customersQuery->whereDate('created_at', '>=', $from);
@@ -446,7 +446,7 @@ class ReportService implements IReportService{
         $customerData = $customers->map(function($customer) use ($threeMonthsAgo) {
             // Get ALL Sales for this customer (lifetime, not filtered by date range)
             $allSales = \App\Models\Sales::where('customerId', $customer->id)
-                ->where('posid', $customer->posid)
+                ->where('POSID', $customer->POSID)
                 ->with(['items', 'payments'])
                 ->get();
             

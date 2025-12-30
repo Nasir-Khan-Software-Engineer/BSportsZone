@@ -37,11 +37,11 @@ class PosController extends Controller
     }
 
     public function index(){
-        $posid = auth()->user()->posid;
-        $categories = $this->categoryService->getAllCategories(auth()->user()->posid);
-        $brands = $this->brandService->getBrands(auth()->user()->posid);
+        $POSID = auth()->user()->POSID;
+        $categories = $this->categoryService->getAllCategories(auth()->user()->POSID);
+        $brands = $this->brandService->getBrands(auth()->user()->POSID);
 
-        $topSellingServices = $this->posService->getPosPageServices(auth()->user()->posid);
+        $topSellingServices = $this->posService->getPosPageServices(auth()->user()->POSID);
 
         return view('pos/index',[
             'recentServices' => $topSellingServices,
@@ -54,19 +54,19 @@ class PosController extends Controller
         $serviceName = $request->input('searchCriteria');
         $categoryId  = $request->input('categoryId');
         $brandId     = $request->input('brandId');
-        $posId       = auth()->user()->posid;
+        $posId       = auth()->user()->POSID;
 
         $services = Product::select(
                 'products.id',
                 'products.name',
-                'products.posid',
+                'products.POSID',
                 'code',
                 'products.price',
                 'products.image',
                 'products.staff_id'
             )
             ->with('TodaysStaff:id,name')
-            ->where('products.posid', $posId)
+            ->where('products.POSID', $posId)
             ->where('type', 'Service')
             // search by name or code
             ->when($serviceName, function ($query, $serviceName) {
@@ -119,10 +119,10 @@ class PosController extends Controller
         }
 
         $serviceIds = array_column($request->services, 'id');
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
         $services = Product::select('products.id', 'products.price')
-            ->where('products.posid', $posid)
+            ->where('products.POSID', $POSID)
             ->where('type', 'Service')
             ->whereIn('products.id', $serviceIds)
             ->get();
@@ -142,7 +142,7 @@ class PosController extends Controller
 
         // Sales table sales
         $sales = new Sales;
-        $sales->posid = $posid;
+        $sales->POSID = $POSID;
         $sales->shop_id = 1;
         $sales->invoice_code = (session('accountInfo.invoiceNumberPrefix') ?? 'AU') . '-'.date('YmdHis');
         $sales->customerId = ((int) $request->customerId);
@@ -172,7 +172,7 @@ class PosController extends Controller
                 ? (int)$serviceData['staff_id'] 
                 : null;
 
-            $salesItemObj['posid'] = $posid;
+            $salesItemObj['POSID'] = $POSID;
             $salesItemObj['sales_id'] = $sales->id;
             $salesItemObj['product_id'] = $service->id;
             $salesItemObj['staff_id'] = $staffId;
@@ -222,7 +222,7 @@ class PosController extends Controller
 
         try {
             $payment = SalesPayment::create([
-                'posid'          => $posid,
+                'POSID'          => $POSID,
                 'sales_id'       => $sales->id,
                 'payment_method' => $payment_method,
                 'payment_via'    => $payment_via,
@@ -242,7 +242,7 @@ class PosController extends Controller
         if(isFeatureEnabled('ENABLED_LOYALTY')){
             if($request->loyaltyCardVerified && $request->loyaltyCardId){
                 $storeLoyalty = $this->storeLoyaltyHistory(
-                    $posid,
+                    $POSID,
                     $request->loyaltyCardId,
                     $sales->id,
                     $request->discountType,
@@ -253,7 +253,7 @@ class PosController extends Controller
                 );
             }else if($request->skipLoyalty && $request->loyaltyCardId){
                 $storeLoyalty = $this->storeLoyaltyHistory(
-                    $posid,
+                    $POSID,
                     $request->loyaltyCardId,
                     $sales->id,
                     'Fixed',
@@ -269,7 +269,7 @@ class PosController extends Controller
 
     public function getAccountInfo(){
 
-        $accountInfo = $this->accountService->getAccountInfo(auth()->user()->posid);
+        $accountInfo = $this->accountService->getAccountInfo(auth()->user()->POSID);
 
         return response()->json($accountInfo, 200);
     }
@@ -277,10 +277,10 @@ class PosController extends Controller
     public function getCustomerLastSales($customerId)
     {
         try {
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
 
             // Get the last sale for this customer
-            $lastSale = Sales::where('posid', $posid)
+            $lastSale = Sales::where('POSID', $POSID)
                 ->where('customerId', $customerId)
                 ->with([
                     'items.service',
@@ -340,11 +340,11 @@ class PosController extends Controller
     }
 
 
-    public function storeLoyaltyHistory($posid, $card_id, $sales_id, $discount_type, $discount_value, $discount_amount, $note, $isSkipped) 
+    public function storeLoyaltyHistory($POSID, $card_id, $sales_id, $discount_type, $discount_value, $discount_amount, $note, $isSkipped) 
     {
         try {
             LoyaltyHistory::create([
-                'posid' => $posid,
+                'POSID' => $POSID,
                 'card_id' => $card_id,
                 'sales_id' => $sales_id,
                 'discount_type' => $discount_type,
@@ -404,7 +404,7 @@ class PosController extends Controller
                 $phone,
                 '', // Empty message - will be built from template
                 'T', // Transactional
-                $sales->posid,
+                $sales->POSID,
                 'POS_SALE', // Source tracking
                 $templateData
             );
@@ -414,7 +414,7 @@ class PosController extends Controller
             \Log::error('SMS_SEND_ERROR', [
                 'error' => $e->getMessage(),
                 'sales_id' => $sales->id ?? null,
-                'posid' => $sales->posid ?? null,
+                'POSID' => $sales->POSID ?? null,
             ]);
             return false;
         }
@@ -423,11 +423,11 @@ class PosController extends Controller
     public function getStaffs(Request $request)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             $today = Carbon::today()->format('Y-m-d');
 
             // Get staff designation
-            $staffDesignation = EmployeeDesignation::where('posid', $posId)
+            $staffDesignation = EmployeeDesignation::where('POSID', $posId)
                 ->where('name', 'Staff')
                 ->first();
 
@@ -439,21 +439,21 @@ class PosController extends Controller
             }
 
             // Get all staffs
-            $staffs = Employee::where('posid', $posId)
+            $staffs = Employee::where('POSID', $posId)
                 ->where('designation_id', $staffDesignation->id)
                 ->where('status', 'Active')
                 ->orderBy('name')
                 ->get();
 
             // Get today's attendance for staffs
-            $todayAttendances = Attendance::where('posid', $posId)
+            $todayAttendances = Attendance::where('POSID', $posId)
                 ->where('attendance_date', $today)
                 ->whereIn('employee_id', $staffs->pluck('id'))
                 ->get()
                 ->keyBy('employee_id');
 
             // Get today's service count for each staff
-            $todayServiceCounts = Sales_items::where('posid', $posId)
+            $todayServiceCounts = Sales_items::where('POSID', $posId)
                 ->whereDate('created_at', $today)
                 ->whereNotNull('staff_id')
                 ->selectRaw('staff_id, COUNT(*) as service_count')

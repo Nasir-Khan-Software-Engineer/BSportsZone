@@ -308,7 +308,7 @@ WinPos.Pos = (function (Urls) {
 
             if (item.image && item.image.trim() !== '') {
                 imgCon = $('<img>');
-                imgCon.attr('src', `${publicUrl}images/${item.posid}/services/${item.image}`);
+                imgCon.attr('src', `${publicUrl}images/${item.POSID}/services/${item.image}`);
                 imgCon.addClass('rounded');
                 imgCon.attr('style', 'width: 100px; height: 50px; object-fit: cover;');
             } else {

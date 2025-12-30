@@ -24,7 +24,7 @@ class UserSetupController extends Controller
 
     public function index()
     {
-        $users = $this->userSetupService->getUsers(auth()->user()->posid);
+        $users = $this->userSetupService->getUsers(auth()->user()->POSID);
 
         foreach ($users as $user) {
             $user->formattedDate = formatDate($user->created_at);
@@ -39,8 +39,8 @@ class UserSetupController extends Controller
     public function create()
     {
         $role_id = auth()->user()->role_id;
-        $posid   = auth()->user()->posid;
-        $roles   = Role::where('posid', $posid)->get();
+        $POSID   = auth()->user()->POSID;
+        $roles   = Role::where('POSID', $POSID)->get();
         return view('setup/userSetup/create', ['roles' => $roles]);
     }
 
@@ -50,7 +50,7 @@ class UserSetupController extends Controller
     public function store(Request $request)
     {
 
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
         $request->validate([
             'name'                  => 'required|string|min:3|max:100',
@@ -59,8 +59,8 @@ class UserSetupController extends Controller
                 'required',
                 'email',
                 'unique:users,email',
-                Rule::unique('users')->where(function ($query) use ($posid) {
-                    return $query->where('posid', $posid);
+                Rule::unique('users')->where(function ($query) use ($POSID) {
+                    return $query->where('POSID', $POSID);
                 }),
             ],
 
@@ -69,8 +69,8 @@ class UserSetupController extends Controller
                 'string',
                 'size:11',
                 'regex:/^01[0-9]{9}$/',
-                Rule::unique('users')->where(function ($query) use ($posid) {
-                    return $query->where('posid', $posid);
+                Rule::unique('users')->where(function ($query) use ($POSID) {
+                    return $query->where('POSID', $POSID);
                 }),
             ],
 
@@ -93,7 +93,7 @@ class UserSetupController extends Controller
         ]);
 
         $user                = new User;
-        $user->posid         = $posid;
+        $user->POSID         = $POSID;
         $user->name          = $request->name;
         $user->email         = $request->email;
         $user->password      = Hash::make($request->password);
@@ -120,9 +120,9 @@ class UserSetupController extends Controller
      */
     public function edit(string $id)
     {
-        $posid = auth()->user()->posid;
-        $roles = Role::where('posid', $posid)->get();
-        $user  = $this->userSetupService->getUser($posid, $id);
+        $POSID = auth()->user()->POSID;
+        $roles = Role::where('POSID', $POSID)->get();
+        $user  = $this->userSetupService->getUser($POSID, $id);
         return view('setup/userSetup/edit', ['user' => $user, 'roles' => $roles]);
     }
 
@@ -131,15 +131,15 @@ class UserSetupController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $request->validate([
             'name'    => 'required|string|min:3|max:100',
             'phone'   => [
                 'required',
                 'min:11',
                 'max:11',
-                Rule::unique('users')->where(function ($query) use ($posid, $user) {
-                    return $query->where('posid', $posid)->where('id', '!=', $user->id);
+                Rule::unique('users')->where(function ($query) use ($POSID, $user) {
+                    return $query->where('POSID', $POSID)->where('id', '!=', $user->id);
                 }),
             ],
             'role_id' => 'required',
@@ -160,7 +160,7 @@ class UserSetupController extends Controller
     public function destroy(string $id)
     {
         try {
-            $userCount = $this->userSetupService->delete(auth()->user()->posid, $id);
+            $userCount = $this->userSetupService->delete(auth()->user()->POSID, $id);
 
             if ($userCount > 0) {
                 return response()->json(

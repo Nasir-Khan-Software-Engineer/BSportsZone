@@ -17,7 +17,7 @@ class SalesPayment extends Model
     protected $primaryKey = null;
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'id',
         'sales_id',
         'payment_method',
@@ -32,7 +32,7 @@ class SalesPayment extends Model
     public function sales()
     {
         return $this->belongsTo(Sales::class, 'sales_id', 'id')
-                    ->where('posid', $this->posid);
+                    ->where('POSID', $this->POSID);
     }
     
     public function createdByUser()

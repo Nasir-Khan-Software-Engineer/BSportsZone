@@ -12,7 +12,7 @@ class SmsTemplate extends Model
     protected $table = 'sms_templates';
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'template',
         'created_by',
         'updated_by',
@@ -21,7 +21,7 @@ class SmsTemplate extends Model
     // Relation to POS/account
     public function account()
     {
-        return $this->belongsTo(Accountinfo::class, 'posid', 'POSID');
+        return $this->belongsTo(Accountinfo::class, 'POSID', 'POSID');
     }
 
     // Relation to user who created

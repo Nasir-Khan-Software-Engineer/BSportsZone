@@ -21,7 +21,7 @@ class SupplierController extends Controller
 
     public function index()
     {
-        $suppliers = Supplier::where('posid', auth()->user()->posid)->get();
+        $suppliers = Supplier::where('POSID', auth()->user()->POSID)->get();
 
         foreach($suppliers as $supplier){
             $supplier->formattedDate = formatDate($supplier->created_at);
@@ -54,7 +54,7 @@ class SupplierController extends Controller
             ]);
 
             $supplier = new Supplier;
-            $supplier->posid = auth()->user()->posid;
+            $supplier->POSID = auth()->user()->POSID;
             $supplier->name = $request->name;
             $supplier->phone = $request->phone;
             $supplier->email = $request->email;
@@ -163,7 +163,7 @@ class SupplierController extends Controller
     public function destroy(Supplier $supplier)
     {
         try{
-            if($supplier->posid == auth()->user()->posid
+            if($supplier->POSID == auth()->user()->POSID
                 && $supplier->delete()){
 
                 return response()->json(

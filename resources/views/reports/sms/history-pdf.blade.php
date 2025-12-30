@@ -19,7 +19,7 @@
     <h4 class="text-center" style="margin: 0px;">SMS History Report</h4>
 
     <div style="margin-bottom: 10px;">
-        <strong>POSID:</strong> {{ $posid }}
+        <strong>POSID:</strong> {{ $POSID }}
     </div>
     <div style="margin-bottom: 10px;">
         <strong>From:</strong> {{ $fromDate }} &nbsp;&nbsp; <strong>To:</strong> {{ $toDate }}

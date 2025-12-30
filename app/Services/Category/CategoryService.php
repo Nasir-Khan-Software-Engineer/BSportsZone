@@ -11,8 +11,8 @@ class CategoryService implements ICategoryService
         $this->categoryRepository = $iCategoryRepository;
     }
 
-    public function getAllCategories($posid){
-        return $this->categoryRepository->getAllCategories($posid);
+    public function getAllCategories($POSID){
+        return $this->categoryRepository->getAllCategories($POSID);
     }
 
     public function saveCategory($category){
@@ -23,8 +23,8 @@ class CategoryService implements ICategoryService
         return $this->categoryRepository->updateCategory($category);
     }
 
-    public function deleteCategory($posid, $id)
+    public function deleteCategory($POSID, $id)
     {
-        return $this->categoryRepository->deleteCategory($posid, $id);
+        return $this->categoryRepository->deleteCategory($POSID, $id);
     }
 }

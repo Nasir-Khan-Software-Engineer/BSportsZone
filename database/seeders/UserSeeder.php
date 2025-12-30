@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         //User::truncate();
 
         $user = new User();
-        $user->posid = 1;
+        $user->POSID = 1;
         $user->name = "Aura17";
         $user->email = "Aura17@gmail.com";
         $user->password  = Hash::make("12345678");
@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
         $user->save();
 
         $user = new User();
-        $user->posid = 1;
+        $user->POSID = 1;
         $user->name = "Admin";
         $user->email = "admin@gmail.com";
         $user->password  = Hash::make("12345678");
@@ -33,7 +33,7 @@ class UserSeeder extends Seeder
         $user->save();
 
         $user = new User();
-        $user->posid = 2;
+        $user->POSID = 2;
         $user->name = "BackupAccount";
         $user->email = "Aura17Ba@gmail.com";
         $user->password  = Hash::make("12345678");

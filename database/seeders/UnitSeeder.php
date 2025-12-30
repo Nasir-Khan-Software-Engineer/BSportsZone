@@ -16,7 +16,7 @@ class UnitSeeder extends Seeder
         
         for($i=1; $i<=5; $i++){
             $unit = new Unit();
-            $unit->posid = 1;
+            $unit->POSID = 1;
             $unit->name = "Unit-".$i;
             $unit->shortform = "Shortform-".$i;
             $unit->note = "This is demo note";

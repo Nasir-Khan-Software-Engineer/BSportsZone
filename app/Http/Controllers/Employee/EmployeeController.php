@@ -17,20 +17,20 @@ class EmployeeController extends Controller
 {
     public function index()
     {
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
         
-        $employees = Employee::where('posid', $posId)
+        $employees = Employee::where('POSID', $posId)
             ->with(['designation', 'creator'])
             ->orderBy('id', 'desc')
             ->get();
 
-        $designations = EmployeeDesignation::where('posid', $posId)
+        $designations = EmployeeDesignation::where('POSID', $posId)
             ->orderBy('name')
             ->get();
 
         // Get today's attendance for all employees
         $today = Carbon::today()->format('Y-m-d');
-        $todayAttendances = Attendance::where('posid', $posId)
+        $todayAttendances = Attendance::where('POSID', $posId)
             ->where('attendance_date', $today)
             ->get()
             ->keyBy('employee_id');
@@ -78,7 +78,7 @@ class EmployeeController extends Controller
     {
         $today = Carbon::today()->format('Y-m-d');
         
-        return Attendance::where('posid', $posId)
+        return Attendance::where('POSID', $posId)
             ->where('employee_id', $employeeId)
             ->where('attendance_date', $today)
             ->first();
@@ -86,8 +86,8 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        $posId = auth()->user()->posid;
-        $designations = EmployeeDesignation::where('posid', $posId)
+        $posId = auth()->user()->POSID;
+        $designations = EmployeeDesignation::where('POSID', $posId)
             ->orderBy('name')
             ->get();
         return view("employee/create", ['designations' => $designations]);
@@ -96,7 +96,7 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
             $request->validate([
                 'employeeName' => 'required|string|min:2|max:100',
@@ -108,7 +108,7 @@ class EmployeeController extends Controller
                     'exists:employee_designations,id',
                     function ($attribute, $value, $fail) use ($posId) {
                         $designation = EmployeeDesignation::where('id', $value)
-                            ->where('posid', $posId)
+                            ->where('POSID', $posId)
                             ->first();
                         if (!$designation) {
                             $fail('The selected designation is invalid.');
@@ -122,7 +122,7 @@ class EmployeeController extends Controller
             ]);
 
             $employee = new Employee;
-            $employee->posid = $posId;
+            $employee->POSID = $posId;
             $employee->name = ucwords($request->employeeName);
             $employee->phone = $request->phone;
             $employee->date_of_birth = $request->dateOfBirth;
@@ -186,14 +186,14 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
         
-        // Ensure employee belongs to current posid
-        if ($employee->posid != $posId) {
+        // Ensure employee belongs to current POSID
+        if ($employee->POSID != $posId) {
             abort(403, 'Unauthorized access.');
         }
         
-        $designations = EmployeeDesignation::where('posid', $posId)
+        $designations = EmployeeDesignation::where('POSID', $posId)
             ->orderBy('name')
             ->get();
         return view("employee/create", [
@@ -205,10 +205,10 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
-            // Ensure employee belongs to current posid
-            if ($employee->posid != $posId) {
+            // Ensure employee belongs to current POSID
+            if ($employee->POSID != $posId) {
                 return response()->json(
                     [
                         'status' => 'error',
@@ -227,7 +227,7 @@ class EmployeeController extends Controller
                     'exists:employee_designations,id',
                     function ($attribute, $value, $fail) use ($posId) {
                         $designation = EmployeeDesignation::where('id', $value)
-                            ->where('posid', $posId)
+                            ->where('POSID', $posId)
                             ->first();
                         if (!$designation) {
                             $fail('The selected designation is invalid.');
@@ -306,10 +306,10 @@ class EmployeeController extends Controller
 
     public function show(Employee $employee)
     {
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
         
-        // Ensure employee belongs to current posid
-        if ($employee->posid != $posId) {
+        // Ensure employee belongs to current POSID
+        if ($employee->POSID != $posId) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Unauthorized access.',
@@ -343,10 +343,10 @@ class EmployeeController extends Controller
 
     public function details(Employee $employee)
     {
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
         
-        // Ensure employee belongs to current posid
-        if ($employee->posid != $posId) {
+        // Ensure employee belongs to current POSID
+        if ($employee->POSID != $posId) {
             abort(403, 'Unauthorized access.');
         }
         
@@ -371,7 +371,7 @@ class EmployeeController extends Controller
         }
 
         // Calculate attendance metrics (all-time)
-        $attendances = Attendance::where('posid', $posId)
+        $attendances = Attendance::where('POSID', $posId)
             ->where('employee_id', $employee->id)
             ->whereNotNull('status')
             ->get();
@@ -398,7 +398,7 @@ class EmployeeController extends Controller
         // Get last 30 days attendance
         $thirtyDaysAgo = Carbon::now()->subDays(30)->startOfDay();
         $today = Carbon::today();
-        $last30DaysAttendance = Attendance::where('posid', $posId)
+        $last30DaysAttendance = Attendance::where('POSID', $posId)
             ->where('employee_id', $employee->id)
             ->where('attendance_date', '>=', $thirtyDaysAgo)
             ->orderBy('attendance_date', 'desc')
@@ -454,7 +454,7 @@ class EmployeeController extends Controller
         }
 
         // Get all leaves
-        $allLeaves = Attendance::where('posid', $posId)
+        $allLeaves = Attendance::where('POSID', $posId)
             ->where('employee_id', $employee->id)
             ->where('status', 'Leave')
             ->orderBy('attendance_date', 'desc')
@@ -465,7 +465,7 @@ class EmployeeController extends Controller
         }
 
         // Get all absences
-        $allAbsences = Attendance::where('posid', $posId)
+        $allAbsences = Attendance::where('POSID', $posId)
             ->where('employee_id', $employee->id)
             ->where('status', 'Absent')
             ->orderBy('attendance_date', 'desc')
@@ -476,7 +476,7 @@ class EmployeeController extends Controller
         }
 
         // Get employee reviews
-        $reviews = EmployeeReview::where('posid', $posId)
+        $reviews = EmployeeReview::where('POSID', $posId)
             ->where('employee_id', $employee->id)
             ->orderBy('review_date', 'desc')
             ->orderBy('created_at', 'desc')
@@ -515,13 +515,13 @@ class EmployeeController extends Controller
             $today = Carbon::today();
             
             // Get today's service count
-            $todayServicesCount = Sales_items::where('posid', $posId)
+            $todayServicesCount = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $employee->id)
                 ->whereDate('created_at', $today)
                 ->count();
             
             // Get all services for this staff
-            $allServices = Sales_items::where('posid', $posId)
+            $allServices = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $employee->id)
                 ->get();
             
@@ -559,10 +559,10 @@ class EmployeeController extends Controller
     public function destroy(string $id)
     {
         try {
-            $posId = auth()->user()->posid;
+            $posId = auth()->user()->POSID;
             
             $employee = Employee::where('id', $id)
-                ->where('posid', $posId)
+                ->where('POSID', $posId)
                 ->first();
 
             if (!$employee) {

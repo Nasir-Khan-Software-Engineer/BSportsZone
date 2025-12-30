@@ -17,7 +17,7 @@ class ServiceSeeder extends Seeder
         for($i=0; $i<10; $i++){
             $service = new Product();
 
-            $service->posid         = 1;
+            $service->POSID         = 1;
             $service->code          = "WIN-".$i;
             $service->name          = "Service-".$i;
             $service->unit_id       = 1;

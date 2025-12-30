@@ -12,7 +12,7 @@ class Attendance extends Model
     protected $table = 'employee_attendances';
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'employee_id',
         'attendance_date',
         'status',

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('posid');
+            $table->bigInteger('POSID');
             $table->foreignId('shop_id')->constrained(table: 'shops', indexName: 'fk_sales_shop')->onUpdate('cascade')->onDelete('cascade');
             $table->string('invoice_code');
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('category', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->string('name');
             $table->string('icon');
             $table->unsignedBigInteger('created_by')->unsigned()->index()->nullable();

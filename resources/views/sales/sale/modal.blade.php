@@ -30,7 +30,7 @@
                             <div class="col-12 col-lg-6">
                                 <div class="row">
                                     <dt class="col-sm-4">POS ID</dt>
-                                    <dd class="col-sm-8" id="posid"></dd>
+                                    <dd class="col-sm-8" id="POSID"></dd>
 
                                     <dt class="col-sm-4">Invoice No.</dt>
                                     <dd class="col-sm-8" id="invoice_code"></dd>

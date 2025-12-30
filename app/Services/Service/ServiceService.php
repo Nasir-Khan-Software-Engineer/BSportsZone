@@ -16,7 +16,7 @@ class ServiceService implements IServiceService {
         return Product::select(
                 'products.id',
                 'products.name',
-                'products.posid',
+                'products.POSID',
                 'products.code',
                 'products.price',
                 'products.image',
@@ -34,7 +34,7 @@ class ServiceService implements IServiceService {
 
     public function getTopSellingServiceIds($posId){
         $serviceGroupBy = Sales_items::select('product_id as id', DB::raw('COUNT(product_id) as qty'))
-        ->where('posid', $posId)
+        ->where('POSID', $posId)
         ->groupBy('product_id')
         ->orderByDesc('qty')
         ->limit(32)
@@ -48,7 +48,7 @@ class ServiceService implements IServiceService {
         return Product::select(
                 'products.id',
                 'products.name',
-                'products.posid',
+                'products.POSID',
                 'products.code',
                 'products.price',
                 'products.image',
@@ -58,7 +58,7 @@ class ServiceService implements IServiceService {
                 'TodaysStaff:id,name'
             ])
             ->where('type', 'Service')
-            ->where('products.posid', $posId)
+            ->where('products.POSID', $posId)
             ->orderBy('products.updated_at', 'desc')
             ->limit(30)
             ->get();

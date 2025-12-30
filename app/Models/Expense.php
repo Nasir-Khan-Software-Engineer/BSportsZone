@@ -14,7 +14,7 @@ class Expense extends Model
     protected $table = 'expenses';
 
     protected $fillable = [
-        'posid', 'shopid', 'categoryId', 'title', 'amount', 'note', 'expenseDate', 'created_by', 'updated_by'
+        'POSID', 'shopid', 'categoryId', 'title', 'amount', 'note', 'expenseDate', 'created_by', 'updated_by'
     ];
 
     protected $dates = [

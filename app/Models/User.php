@@ -28,7 +28,7 @@ class User extends Authenticatable
     }
     
     protected $fillable = [
-        'posid',
+        'POSID',
         'name',
         'email',
         'password',
@@ -75,6 +75,6 @@ class User extends Authenticatable
 
     public function accountInfo()
     {
-        return $this->hasOne(AccountInfo::class, 'posid', 'posid');
+        return $this->hasOne(AccountInfo::class, 'POSID', 'POSID');
     }
 }

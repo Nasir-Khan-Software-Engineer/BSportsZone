@@ -15,7 +15,7 @@ class SupplierSeeder extends Seeder
     {
         for($i=1; $i<=5; $i++){
             $supplier = new Supplier();
-            $supplier->posid = 1;
+            $supplier->POSID = 1;
             $supplier->name = "Supplier-".$i;
             $supplier->email = "supplier-".$i."@gmail.com";
             $supplier->phone = "0163701792".$i;

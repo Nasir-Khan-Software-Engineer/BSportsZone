@@ -11,16 +11,16 @@ class UserSetupService implements IUserSetupService{
         $this->userSetupRepository = $userSetupRepository;
     }
 
-    public function getUsers($posid){
-        return $this->userSetupRepository->getUsers($posid);
+    public function getUsers($POSID){
+        return $this->userSetupRepository->getUsers($POSID);
     }
 
-    public function getUser($posid, $userid){
-        return $this->userSetupRepository->getUser($posid, $userid);
+    public function getUser($POSID, $userid){
+        return $this->userSetupRepository->getUser($POSID, $userid);
     }
 
     public function createUser($user){
-        $user['posid'] = auth()->user()->posid;
+        $user['POSID'] = auth()->user()->POSID;
         $user['defaultshopid'] = 1;
         return $this->userSetupRepository->store($user);
     }
@@ -29,10 +29,10 @@ class UserSetupService implements IUserSetupService{
         return $this->userSetupRepository->update($user);
     }
 
-    public function delete($posid, $userid){
+    public function delete($POSID, $userid){
         // verify that user can deletable
         // otherwise deactivate the user
 
-        return $this->userSetupRepository->delete($posid, $userid);
+        return $this->userSetupRepository->delete($POSID, $userid);
     }
 }

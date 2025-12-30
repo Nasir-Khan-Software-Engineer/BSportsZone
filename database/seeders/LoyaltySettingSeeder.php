@@ -11,7 +11,7 @@ class LoyaltySettingSeeder extends Seeder
     {
         $data = [
             [
-                'posid' => 1,
+                'POSID' => 1,
                 'minimum_sales_amount' => 10000,
                 'validity_period_months' => 12,
                 'max_visits' => 10,
@@ -19,7 +19,7 @@ class LoyaltySettingSeeder extends Seeder
                 'rules_text' => 'Earn discounts on each visit. Complete all visits to receive additional benefits.',
             ],
             [
-                'posid' => 2,
+                'POSID' => 2,
                 'minimum_sales_amount' => 10000,
                 'validity_period_months' => 12,
                 'max_visits' => 8,
@@ -27,7 +27,7 @@ class LoyaltySettingSeeder extends Seeder
                 'rules_text' => 'Special loyalty privileges available for returning customers.',
             ],
             [
-                'posid' => 3,
+                'POSID' => 3,
                 'minimum_sales_amount' => 10000,
                 'validity_period_months' => 6,
                 'max_visits' => 6,
@@ -38,7 +38,7 @@ class LoyaltySettingSeeder extends Seeder
 
         foreach ($data as $item) {
             LoyaltySetting::updateOrCreate(
-                ['posid' => $item['posid']],
+                ['POSID' => $item['POSID']],
                 $item
             );
         }

@@ -18,7 +18,7 @@ class BrandController extends Controller
 
     public function index()
     {
-        $brands = $this->brandService->getBrands(auth()->user()->posid);
+        $brands = $this->brandService->getBrands(auth()->user()->POSID);
 
         foreach ($brands as $brand){
 
@@ -50,7 +50,7 @@ class BrandController extends Controller
             ]);
 
             $brand = new Brand;
-            $brand->posid = auth()->user()->posid;
+            $brand->POSID = auth()->user()->POSID;
             $brand->name = $request->brandName;
             $brand->logo = "";
             $brand->description = "";
@@ -101,8 +101,8 @@ class BrandController extends Controller
     {
         try{
 
-            $posid = auth()->user()->posid;
-            $brand = Brand::with('creator')->where('id', $id)->where('posid', $posid)->first();
+            $POSID = auth()->user()->POSID;
+            $brand = Brand::with('creator')->where('id', $id)->where('POSID', $POSID)->first();
 
             $request->validate([
                 'brandName' => 'required|string|min:1|max:100',

@@ -10,7 +10,7 @@ class LoyaltyCard extends Model
     use HasFactory;
     protected $fillable = [
         'customer_id',
-        'posid',
+        'POSID',
         'card_number',
         'valid_until',
         'created_by',
@@ -36,7 +36,7 @@ class LoyaltyCard extends Model
     // POS AccountInfo
     public function account()
     {
-        return $this->belongsTo(AccountInfo::class, 'posid');
+        return $this->belongsTo(AccountInfo::class, 'POSID');
     }
 
     // Loyalty histories

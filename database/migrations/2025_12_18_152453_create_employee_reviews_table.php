@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('employee_reviews', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->unsignedBigInteger('employee_id');
             $table->date('review_date');
             $table->string('title');
@@ -28,7 +28,7 @@ return new class extends Migration
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
             
-            $table->index('posid', 'idx_employee_reviews_posid');
+            $table->index('POSID', 'idx_employee_reviews_posid');
             $table->index('employee_id', 'idx_employee_reviews_employee_id');
             $table->index('review_date', 'idx_employee_reviews_date');
         });

@@ -19,7 +19,7 @@ class SmsHistoryReport implements FromArray, WithHeadings, WithEvents
         $this->totalMessageLength = $data['totalMessageLength'] ?? 0;
         $this->totalCost = $data['totalCost'] ?? '0.00';
         $this->generatedAt = $data['reportGenerationDateTime'];
-        $this->posid = $data['posid'];
+        $this->POSID = $data['POSID'];
     }
 
     public function array(): array
@@ -58,7 +58,7 @@ class SmsHistoryReport implements FromArray, WithHeadings, WithEvents
             [$this->companyName],
             [$this->rptName],
             [],
-            ['POSID: ', $this->posid],
+            ['POSID: ', $this->POSID],
             ['From:', $this->from, 'To:', $this->to],
         ];
 

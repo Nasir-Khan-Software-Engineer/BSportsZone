@@ -10,7 +10,7 @@ class EmployeeDesignation extends Model
     use HasFactory;
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'name',
     ];
 

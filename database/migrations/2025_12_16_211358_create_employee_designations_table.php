@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('employee_designations', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->string('name');
             $table->timestamps();
             
-            $table->index('posid', 'idx_employee_designations_posid');
+            $table->index('POSID', 'idx_employee_designations_posid');
         });
     }
 

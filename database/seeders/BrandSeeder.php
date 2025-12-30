@@ -15,7 +15,7 @@ class BrandSeeder extends Seeder
     {
         for($i=1; $i<=15; $i++){
             $brand = new Brand;
-            $brand->posid = 1;
+            $brand->POSID = 1;
             $brand->name = "Brand-".$i;
             $brand->logo = "demo";
             $brand->description = "demo description";

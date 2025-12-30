@@ -23,17 +23,17 @@ class AccountSetupController extends Controller
 
     public function index()
     {
-        $POSID = $posid = auth()->user()->posid;
+        $POSID = $POSID = auth()->user()->POSID;
         $accountInfo = $this->accountSetupService->getAccountInfo($POSID);
         
         // Load SMS template
-        $smsTemplate = SmsTemplate::where('posid', $posid)->first();
+        $smsTemplate = SmsTemplate::where('POSID', $POSID)->first();
         
         // Default template if none exists
         $defaultTemplate = "Thanks for visiting [COMPANY_NAME].\n[## Inv:10235 Payable:Tk10000 Qty:5 Disc:Tk100 Adj:Tk10 ##]\nSee you again!";
         
         // Load SMS config
-        $smsConfig = SmsConfig::where('posid', $posid)->first();
+        $smsConfig = SmsConfig::where('POSID', $POSID)->first();
         
         return view('setup/accountSetup/index', [
             'accountInfo' => $accountInfo,
@@ -68,7 +68,7 @@ class AccountSetupController extends Controller
             );
     
             $accountInfo = [
-                'POSID' => auth()->user()->posid,
+                'POSID' => auth()->user()->POSID,
                 'companyName' => $request->companyName,
                 'logo' => $request->input('logo'),
                 'primaryEmail' => $request->primaryEmail,
@@ -81,7 +81,7 @@ class AccountSetupController extends Controller
                 'address' => $request->address
             ];
 
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             if ($request->has('logo')) {
                 $base64Image = $request->input('logo');
 
@@ -103,7 +103,7 @@ class AccountSetupController extends Controller
                     return response()->json(['error' => 'base64_decode failed'], 422);
                 }
 
-                $directory = public_path("images/{$posid}");
+                $directory = public_path("images/{$POSID}");
 
                 if (!file_exists($directory)) {
                     mkdir($directory, 0755, true);
@@ -171,10 +171,10 @@ class AccountSetupController extends Controller
             );
 
 
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
 
-            $accountInfo = Accountinfo::where('POSID', $posid)->first();
-            $posSettings = POSSettings::where('posid', $posid)->first();
+            $accountInfo = Accountinfo::where('POSID', $POSID)->first();
+            $posSettings = POSSettings::where('POSID', $POSID)->first();
 
             if (!$accountInfo) {
                 return response()->json([
@@ -248,12 +248,12 @@ class AccountSetupController extends Controller
                 'minimum_sales_amount_applies_for' => 'required|in:Single,All'
             ]);
 
-            // 2. Get posid and logged-in user id
-            $posid = Auth::user()->posid;
+            // 2. Get POSID and logged-in user id
+            $POSID = Auth::user()->POSID;
             $userId = Auth::id();
 
             // 3. Add created_by / modified_by based on existence
-            $existing = LoyaltySetting::where('posid', $posid)->first();
+            $existing = LoyaltySetting::where('POSID', $POSID)->first();
 
             if ($existing) {
                 // Update existing
@@ -262,7 +262,7 @@ class AccountSetupController extends Controller
                 $settings = $existing; // return model
             } else {
                 // Create new
-                $validated['posid'] = $posid;
+                $validated['POSID'] = $POSID;
                 $validated['created_by'] = $userId;
                 $settings = LoyaltySetting::create($validated);
             }
@@ -301,7 +301,7 @@ class AccountSetupController extends Controller
                 'template' => 'SMS Template',
             ]);
 
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $userId = auth()->id();
             
             // Validate placeholder exists
@@ -330,7 +330,7 @@ class AccountSetupController extends Controller
             }
 
             // Find or create SMS template
-            $smsTemplate = SmsTemplate::where('posid', $posid)->first();
+            $smsTemplate = SmsTemplate::where('POSID', $POSID)->first();
 
             if ($smsTemplate) {
                 // Update existing
@@ -340,7 +340,7 @@ class AccountSetupController extends Controller
             } else {
                 // Create new
                 $smsTemplate = SmsTemplate::create([
-                    'posid' => $posid,
+                    'POSID' => $POSID,
                     'template' => $validated['template'],
                     'created_by' => $userId,
                     'updated_by' => $userId,
@@ -390,11 +390,11 @@ class AccountSetupController extends Controller
                 'is_active' => 'Active Status',
             ]);
 
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $userId = auth()->id();
 
             // Find or create SMS config
-            $smsConfig = SmsConfig::where('posid', $posid)->first();
+            $smsConfig = SmsConfig::where('POSID', $POSID)->first();
 
             if ($smsConfig) {
                 // Update existing
@@ -409,7 +409,7 @@ class AccountSetupController extends Controller
             } else {
                 // Create new
                 $smsConfig = SmsConfig::create([
-                    'posid' => $posid,
+                    'POSID' => $POSID,
                     'base_url' => $validated['base_url'],
                     'username' => $validated['username'],
                     'api_key' => $validated['api_key'],

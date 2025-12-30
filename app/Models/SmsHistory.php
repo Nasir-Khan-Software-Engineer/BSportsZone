@@ -12,7 +12,7 @@ class SmsHistory extends Model
     protected $table = 'sms_histories';
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'to_number',
         'from_number',
         'source',
@@ -23,6 +23,6 @@ class SmsHistory extends Model
     // Relation to POS/account
     public function account()
     {
-        return $this->belongsTo(Accountinfo::class, 'posid', 'POSID');
+        return $this->belongsTo(Accountinfo::class, 'POSID', 'POSID');
     }
 }

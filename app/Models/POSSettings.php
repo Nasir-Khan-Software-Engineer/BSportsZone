@@ -11,7 +11,7 @@ class POSSettings extends Model
         protected $table = 'pos_settings';
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'adjustment_min',
         'adjustment_max',
         'created_by',
@@ -21,7 +21,7 @@ class POSSettings extends Model
     // Relation to POS/account
     public function account()
     {
-        return $this->belongsTo(AccountInfo::class, 'posid', 'posid');
+        return $this->belongsTo(AccountInfo::class, 'POSID', 'POSID');
     }
 
     // Relation to user who created

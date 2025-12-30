@@ -213,7 +213,7 @@
                         <div data-toggle="tooltip" data-placement="top" title="{{ $recProd->name }}" class="grid-item recent-service d-flex flex-column align-items-center p-2"
                             style="background-color: #ccc;" data-id="{{ $recProd->id }}">
                             @if(!empty($recProd->image))
-                            <img src="{{ asset("images/{$recProd->posid}/services/{$recProd->image}") }}" class="rounded" style="width: 100px; height: 50px; object-fit: cover;">
+                            <img src="{{ asset("images/{$recProd->POSID}/services/{$recProd->image}") }}" class="rounded" style="width: 100px; height: 50px; object-fit: cover;">
                             @else
                             <div class="rounded" style="background-color: #fff; width: 100px; height: 50px;"></div>
                             @endif

@@ -25,10 +25,10 @@ class SmsHistoryReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 10);
 
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
 
         // Build query - only date range filter (no source filter per PRD)
-        $query = SmsHistory::where('posid', $posId)
+        $query = SmsHistory::where('POSID', $posId)
             ->whereBetween('created_at', [
                 Carbon::parse($from)->startOfDay(),
                 Carbon::parse($to)->endOfDay()
@@ -92,10 +92,10 @@ class SmsHistoryReportController extends Controller
         $from = $request->input('from_date', Carbon::now()->format('Y-m-d'));
         $to = $request->input('to_date', Carbon::now()->format('Y-m-d'));
 
-        $posId = auth()->user()->posid;
+        $posId = auth()->user()->POSID;
 
         // Build query
-        $query = SmsHistory::where('posid', $posId)
+        $query = SmsHistory::where('POSID', $posId)
             ->whereBetween('created_at', [
                 Carbon::parse($from)->startOfDay(),
                 Carbon::parse($to)->endOfDay()
@@ -143,8 +143,8 @@ class SmsHistoryReportController extends Controller
             'totalSmsCount' => $totalSmsCount,
             'totalMessageLength' => $totalMessageLength,
             'totalCost' => number_format($totalCost, 2) . ' taka',
-            'posid' => $posId ?? 'N/A',
-            'companyName' => Accountinfo::where('posid', $posId)->value('companyName') ?? 'N/A',
+            'POSID' => $posId ?? 'N/A',
+            'companyName' => Accountinfo::where('POSID', $posId)->value('companyName') ?? 'N/A',
             'reportGenerationDateTime' => formatTime(Carbon::now()) . ' ' . formatDate(Carbon::now()),
         ];
 

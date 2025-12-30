@@ -18,12 +18,12 @@ class SaleController extends Controller
     }
 
     public function datatable(Request $request){
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $searchCriteria = $request->input('search');
 
         // here orWhereHas is subquery - we can improve this
         $query = Sales::with('customer', 'createdByUser')
-                            ->where('sales.posid', $posid)
+                            ->where('sales.POSID', $POSID)
                             ->where(function($query) use ($searchCriteria){
                                 $query->where('invoice_code', 'like', "%{$searchCriteria}%")
                                       ->orWhereHas('customer',function($query) use($searchCriteria){
@@ -32,7 +32,7 @@ class SaleController extends Controller
                                       });
                             });
 
-        $totalRecord = Sales::where('posid', $posid)->count();
+        $totalRecord = Sales::where('POSID', $POSID)->count();
         $filteredRecord = $query->count();
 
         $sales = (clone $query)->orderBy('created_at', 'desc')
@@ -85,10 +85,10 @@ class SaleController extends Controller
      */
     public function modal($id)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
         try {
-            $sale = Sales::where('posid', $posid)
+            $sale = Sales::where('POSID', $POSID)
             ->with([
                 'items.service',
                 'items.staff',
@@ -129,10 +129,10 @@ class SaleController extends Controller
 
     public function show($id)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
         try {
-            $sale = Sales::where('posid', $posid)
+            $sale = Sales::where('POSID', $POSID)
                 ->with([
                     'items.service',
                     'items.staff',

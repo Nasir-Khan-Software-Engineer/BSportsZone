@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('employee_attendances', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->unsignedBigInteger('employee_id');
             $table->date('attendance_date');
             $table->enum('status', ['Present', 'Absent', 'Leave', 'Off'])->nullable();
@@ -29,8 +29,8 @@ return new class extends Migration
             $table->foreign('created_by')->references('id')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('id')->on('users')->onDelete('set null');
             
-            $table->unique(['posid', 'employee_id', 'attendance_date'], 'unique_employee_attendance');
-            $table->index('posid', 'idx_employee_attendances_posid');
+            $table->unique(['POSID', 'employee_id', 'attendance_date'], 'unique_employee_attendance');
+            $table->index('POSID', 'idx_employee_attendances_posid');
             $table->index('attendance_date', 'idx_employee_attendances_date');
         });
     }

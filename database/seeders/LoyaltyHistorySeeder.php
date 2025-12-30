@@ -22,11 +22,11 @@ class LoyaltyHistorySeeder extends Seeder
         foreach ($cards as $index => $card) {
             $customer_id = $card->customer_id;
             $historyCount = $index === 0 ? 5 : 10;
-            $sales = Sales::where('posid', $card->posid)->where('customerId', $customer_id)->take($historyCount)->get();
+            $sales = Sales::where('POSID', $card->POSID)->where('customerId', $customer_id)->take($historyCount)->get();
 
             foreach ($sales as $sale) {
                 LoyaltyHistory::create([
-                    'posid' => $card->posid,
+                    'POSID' => $card->POSID,
                     'card_id' => $card->id,
                     'sales_id' => $sale->id,
                     'discount_type' => 'Percentage',

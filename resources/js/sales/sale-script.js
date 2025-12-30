@@ -10,7 +10,7 @@ WinPos.sale = (function (Urls){
                 var sale = response.sale;
 
                 // Sale basic info
-                $('#posid').text(sale.posid);
+                $('#POSID').text(sale.POSID);
                 $('#invoice_code').text(sale.invoice_code);
                 $('#created_by').text(response.created_by_user.name);
                 $('#updated_by').text(response.updated_by_user.name);

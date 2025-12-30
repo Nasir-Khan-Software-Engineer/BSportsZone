@@ -30,7 +30,7 @@ class shopSetupRepository implements IShopSetupRepository{
 
     public function update($shopInfo,$metaData){
 
-        $shop = Shop::where('posid', $metaData->POSID)
+        $shop = Shop::where('POSID', $metaData->POSID)
             ->where('id', $metaData->shopID)
             ->first();
 

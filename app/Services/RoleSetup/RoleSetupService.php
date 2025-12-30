@@ -6,10 +6,10 @@ use App\Models\Role;
 class RoleSetupService implements IRoleSetupService{
 
     public function store(Request $request){
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
         $Role = new Role();
-        $Role->POSID            = $posid;
+        $Role->POSID            = $POSID;
         $Role->name             = $request->name;
         $Role->description      = $request->description;
         $Role->permissions      = $request->permissions;
@@ -21,8 +21,8 @@ class RoleSetupService implements IRoleSetupService{
     
     public function update(Request $request, $id){
 
-        $posid = auth()->user()->posid;
-        $Role = Role::where('posid', '=', $posid)
+        $POSID = auth()->user()->POSID;
+        $Role = Role::where('POSID', '=', $POSID)
                     ->where('id', '=', $id)
                     ->first();
         

@@ -20,6 +20,6 @@ class AccountSetupService implements IAccountSetupService{
 
     public function loyaltySettings()
     {
-        return $this->hasOne(LoyaltySettings::class, 'posid', 'posid');
+        return $this->hasOne(LoyaltySettings::class, 'POSID', 'POSID');
     }
 }

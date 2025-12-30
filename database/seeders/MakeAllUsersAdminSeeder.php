@@ -21,12 +21,12 @@ class MakeAllUsersAdminSeeder extends Seeder
         // Assign Admin role to all users based on their POSID
         $users = User::all();
         foreach ($users as $user) {
-            if (isset($adminRoles[$user->posid])) {
-                $user->role_id = $adminRoles[$user->posid]->id;
+            if (isset($adminRoles[$user->POSID])) {
+                $user->role_id = $adminRoles[$user->POSID]->id;
                 $user->save();
-                $this->command->info("✅ User {$user->id} assigned Admin role for POSID {$user->posid}");
+                $this->command->info("✅ User {$user->id} assigned Admin role for POSID {$user->POSID}");
             } else {
-                $this->command->warn("⚠️ No Admin role found for POSID {$user->posid}, user {$user->id} skipped.");
+                $this->command->warn("⚠️ No Admin role found for POSID {$user->POSID}, user {$user->id} skipped.");
             }
         }
     }

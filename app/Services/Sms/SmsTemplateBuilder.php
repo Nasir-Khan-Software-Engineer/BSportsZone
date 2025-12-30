@@ -20,7 +20,7 @@ class SmsTemplateBuilder
      */
     public function build(int $posId, string $systemLine): string
     {
-        $template = SmsTemplate::where('posid', $posId)->first();
+        $template = SmsTemplate::where('POSID', $posId)->first();
         
         if (!$template || empty($template->template)) {
             // Fallback: return just the system line if no template exists

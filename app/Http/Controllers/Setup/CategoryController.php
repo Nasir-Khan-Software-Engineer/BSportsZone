@@ -18,7 +18,7 @@ class CategoryController extends Controller
 
     public function index()
     {
-        $categories = $this->categoryService->getAllCategories(auth()->user()->posid);
+        $categories = $this->categoryService->getAllCategories(auth()->user()->POSID);
 
         foreach ($categories as $category) {
             $category->formattedDate = formatDate($category->created_at);
@@ -38,12 +38,12 @@ class CategoryController extends Controller
                     'min:3',
                     'max:100',
                     Rule::unique('category', 'name') // 👈 specify DB column
-                        ->where('posid', auth()->user()->posid),
+                        ->where('POSID', auth()->user()->POSID),
                 ],
             ]);
 
             $category             = new Category;
-            $category->posid      = auth()->user()->posid;
+            $category->POSID      = auth()->user()->POSID;
             $category->name       = ucwords($request->categoryName);
             $category->icon       = '';
             $category->created_by = auth()->user()->id;
@@ -89,7 +89,7 @@ class CategoryController extends Controller
                     'min:3',
                     'max:100',
                     Rule::unique('category', 'name') // 👈 tell Laravel to check 'name' column
-                        ->where(fn($query) => $query->where('posid', auth()->user()->posid))
+                        ->where(fn($query) => $query->where('POSID', auth()->user()->POSID))
                         ->ignore($category->id), // 👈 exclude current row when updating
                 ],
                 'categoryID'   => 'required',
@@ -131,7 +131,7 @@ class CategoryController extends Controller
     {
         try {
 
-            $category = Category::Where('posid', auth()->user()->posid)->where('id', $id)->first();
+            $category = Category::Where('POSID', auth()->user()->POSID)->where('id', $id)->first();
 
             if ($category->services()->count() > 0) {
                 return response()->json([
@@ -141,7 +141,7 @@ class CategoryController extends Controller
                     ],
                 ]);
             } else {
-                $categoryCount = $this->categoryService->deleteCategory(auth()->user()->posid, $id);
+                $categoryCount = $this->categoryService->deleteCategory(auth()->user()->POSID, $id);
 
                 if ($categoryCount > 0) {
                     return response()->json(

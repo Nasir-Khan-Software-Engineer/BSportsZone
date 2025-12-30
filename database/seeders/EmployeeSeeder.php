@@ -15,11 +15,11 @@ class EmployeeSeeder extends Seeder
      */
     public function run(): void
     {
-        $posId = 1; // Default posid
+        $posId = 1; // Default POSID
         $createdBy = 1; // Default admin user ID
         
-        // Get all designations for the posid
-        $designations = EmployeeDesignation::where('posid', $posId)->get();
+        // Get all designations for the POSID
+        $designations = EmployeeDesignation::where('POSID', $posId)->get();
         
         if ($designations->isEmpty()) {
             $this->command->warn('No designations found. Please run EmployeeDesignationSeeder first.');
@@ -48,7 +48,7 @@ class EmployeeSeeder extends Seeder
                 $jobTitle = $designation->name;
                 
                 Employee::create([
-                    'posid' => $posId,
+                    'POSID' => $posId,
                     'name' => 'Demo Employee ' . $employeeCounter,
                     'date_of_birth' => $dateOfBirth->format('Y-m-d'),
                     'gender' => $gender,

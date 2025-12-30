@@ -18,16 +18,16 @@ class RoleSetupController extends Controller
 
     public function index()
     {
-        $posid        = auth()->user()->posid;
-        $roles        = Role::where('posid', '=', $posid)->get();
+        $POSID        = auth()->user()->POSID;
+        $roles        = Role::where('POSID', '=', $POSID)->get();
         $accessRights = AccessRight::all();
         return view('setup/role/index', ['roles' => $roles, 'accessRights' => $accessRights]);
     }
 
     public function show($id)
     {
-        $posid = auth()->user()->posid;
-        $role  = Role::where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $role  = Role::where('POSID', $POSID)
             ->where('id', $id)
             ->firstOrFail();
 
@@ -50,9 +50,9 @@ class RoleSetupController extends Controller
 
     public function edit($id)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
-        $role = Role::where('posid', $posid)
+        $role = Role::where('POSID', $POSID)
             ->where('id', $id)
             ->firstOrFail();
 
@@ -70,20 +70,20 @@ class RoleSetupController extends Controller
 
     public function store(Request $request)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $validated = $request->validate([
             'name'           => [
                 'required',
                 'string',
                 'min:3',
-                Rule::unique('roles')->where('posid', $posid),
+                Rule::unique('roles')->where('POSID', $POSID),
             ],
             'description'    => 'nullable|string|min:3',
             'assignedAccess' => 'required|array',
         ]);
 
         $role = Role::create([
-            'POSID'       => $posid,
+            'POSID'       => $POSID,
             'name'        => $validated['name'],
             'description' => $validated['description'] ?? null,
             'created_by'  => auth()->id(),
@@ -96,19 +96,19 @@ class RoleSetupController extends Controller
 
     public function update(Request $request, $id)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $validated = $request->validate([
             'name'           => [
                 'required',
                 'string',
                 'min:3',
-                Rule::unique('roles')->where('posid', $posid)->ignore($id),
+                Rule::unique('roles')->where('POSID', $POSID)->ignore($id),
             ],
             'description'    => 'nullable|string|min:3',
             'assignedAccess' => 'required|array',
         ]);
 
-        $role = Role::where('posid', $posid)
+        $role = Role::where('POSID', $POSID)
             ->where('id', $id)
             ->firstOrFail();
 
@@ -124,9 +124,9 @@ class RoleSetupController extends Controller
     public function destroy($id)
     {
         try {
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
 
-            $role = Role::where('posid', $posid)
+            $role = Role::where('POSID', $POSID)
                 ->where('id', $id)
                 ->first();
 

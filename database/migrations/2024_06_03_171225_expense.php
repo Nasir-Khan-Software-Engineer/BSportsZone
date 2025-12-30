@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->integer('posid');
+            $table->integer('POSID');
             $table->unsignedBigInteger('shopId');
             $table->foreign('shopId')->references('id')->on('shops')->onDelete('cascade');
             $table->unsignedBigInteger("categoryId");

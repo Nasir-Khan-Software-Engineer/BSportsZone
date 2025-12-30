@@ -11,8 +11,8 @@ class UnitController extends Controller
 {
     public function index()
     {
-        $posid = auth()->user()->posid;
-        $units = Unit::with('creator')->where('posid', '=', $posid)->get();
+        $POSID = auth()->user()->POSID;
+        $units = Unit::with('creator')->where('POSID', '=', $POSID)->get();
 
         foreach ($units as $unit) {
 
@@ -30,8 +30,8 @@ class UnitController extends Controller
     }
 
     public function edit($id){
-        $posid = auth()->user()->posid;
-        $unit = Unit::where('posid', '=', $posid)
+        $POSID = auth()->user()->POSID;
+        $unit = Unit::where('POSID', '=', $POSID)
                     ->where('id', '=', $id)
                     ->first();
         
@@ -40,21 +40,21 @@ class UnitController extends Controller
 
     public function store(Request $request){
         try{
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $request->validate([
                 'name' => [
                     'required','string','min:3','max:100',
-                    Rule::unique('units')->where('posid', $posid)
+                    Rule::unique('units')->where('POSID', $POSID)
                 ],
                 'shortform' => [
                     'required','string','min:1','max:20',
-                    Rule::unique('units')->where('posid', $posid)
+                    Rule::unique('units')->where('POSID', $POSID)
                 ],
                 'note' => 'nullable|string|min:3|max:1000'
             ]);
 
             $unit = new Unit();
-            $unit->posid = $posid;
+            $unit->POSID = $POSID;
             $unit->name = $request->name;
             $unit->shortform = $request->shortform;
             $unit->note = $request->note;
@@ -87,20 +87,20 @@ class UnitController extends Controller
 
     public function update(Request $request, $id){
         try{
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $request->validate([
                 'name' => [
                     'required','string','min:3','max:100',
-                    Rule::unique('units')->ignore($id)->where('posid', $posid)
+                    Rule::unique('units')->ignore($id)->where('POSID', $POSID)
                 ],
                 'shortform' => [
                     'required','string','min:1','max:100',
-                    Rule::unique('units')->ignore($id)->where('posid', $posid)
+                    Rule::unique('units')->ignore($id)->where('POSID', $POSID)
                 ],
                 'note' => 'nullable|string|min:3|max:1000'
             ]);
 
-            $unit = Unit::with('creator')->where('posid', $posid)
+            $unit = Unit::with('creator')->where('POSID', $POSID)
                 ->where('id', $id)
                 ->first();
             $unit->name = $request->name;
@@ -133,8 +133,8 @@ class UnitController extends Controller
     } // end update
 
     public function destroy($id){
-        $posid = auth()->user()->posid;
-        $unit = Unit::where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $unit = Unit::where('POSID', $POSID)
             ->where('id', $id)
             ->first();
 

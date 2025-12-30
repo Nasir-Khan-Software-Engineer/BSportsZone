@@ -19,15 +19,15 @@ class ShopSetupController extends Controller
 
     public function index()
     {
-        $posid = auth()->user()->posid;
-        $shops = Shop::where('posid',$posid)->get();
+        $POSID = auth()->user()->POSID;
+        $shops = Shop::where('POSID',$POSID)->get();
         return view('setup/shop/index',['shops' => $shops]);
     }
 
     public function show($id)
     {
-        $posid = auth()->user()->posid;
-        $shop = Shop::where('posid', '=', $posid)
+        $POSID = auth()->user()->POSID;
+        $shop = Shop::where('POSID', '=', $POSID)
                     ->where('id', '=', $id)
                     ->first();
         
@@ -36,8 +36,8 @@ class ShopSetupController extends Controller
 
     public function edit($id)
     {
-        $posid = auth()->user()->posid;
-        $shop = Shop::where('posid', '=', $posid)
+        $POSID = auth()->user()->POSID;
+        $shop = Shop::where('POSID', '=', $POSID)
                     ->where('id', '=', $id)
                     ->first();
         
@@ -46,7 +46,7 @@ class ShopSetupController extends Controller
 
     public function store(Request $request){
         try{
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
 
             $request->validate([           
                 'name'              => 'required|string|min:3|max:100',
@@ -60,7 +60,7 @@ class ShopSetupController extends Controller
                 'email' => [
                     'required',
                     'email',
-                    Rule::unique('shops')->where('posid', $posid)
+                    Rule::unique('shops')->where('POSID', $POSID)
                 ]
             ]);
 
@@ -88,7 +88,7 @@ class ShopSetupController extends Controller
 
     public function update(Request $request, $id){
 
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         
         $request->validate([           
             'name'              => 'required|string|min:3|max:100',
@@ -102,7 +102,7 @@ class ShopSetupController extends Controller
             'email' => [
                 'required',
                 'email',
-                Rule::unique('shops')->ignore($id)->where('posid', $posid)
+                Rule::unique('shops')->ignore($id)->where('POSID', $POSID)
             ],
         ]);
 
@@ -116,8 +116,8 @@ class ShopSetupController extends Controller
     } // end update
 
     public function destroy(Request $request, $id){
-        $posid = auth()->user()->posid;
-        $shop = Shop::where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $shop = Shop::where('POSID', $POSID)
             ->where('id', $id)
             ->first();
         

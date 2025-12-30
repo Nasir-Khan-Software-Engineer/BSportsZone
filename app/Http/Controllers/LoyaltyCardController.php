@@ -27,9 +27,9 @@ class LoyaltyCardController extends Controller
             abort(403, 'Loyalty feature is not enabled.');
         }
 
-        $posid = auth()->user()->posid;
-        $loyaltyStatus = $this->loyaltyService->getCustomerLoayltyStatus($posid, $customerId);
-        $LoyaltyCards = $this->loyaltyService->getCustomerCardsWithStatus($posid, $customerId);
+        $POSID = auth()->user()->POSID;
+        $loyaltyStatus = $this->loyaltyService->getCustomerLoayltyStatus($POSID, $customerId);
+        $LoyaltyCards = $this->loyaltyService->getCustomerCardsWithStatus($POSID, $customerId);
 
         return view('sales.customer.loyalty.details', ['loyaltyStatus' => $loyaltyStatus, 'loyaltyCards' => $LoyaltyCards, 'customerId' => $customerId]);
     }
@@ -45,8 +45,8 @@ class LoyaltyCardController extends Controller
         }
 
         try {
-            $posid = auth()->user()->posid;
-            $statusData = $this->loyaltyService->getCustomerLoayltyStatus($posid, $customerId);
+            $POSID = auth()->user()->POSID;
+            $statusData = $this->loyaltyService->getCustomerLoayltyStatus($POSID, $customerId);
 
             return response()->json([
                 'status' => 'success',
@@ -71,8 +71,8 @@ class LoyaltyCardController extends Controller
             ], 403);
         }
 
-        $posid = auth()->user()->posid;
-        $statusData = $this->loyaltyService->getCustomerLoayltyStatus($posid, $request->input('customer_id'));
+        $POSID = auth()->user()->POSID;
+        $statusData = $this->loyaltyService->getCustomerLoayltyStatus($POSID, $request->input('customer_id'));
 
         if($statusData['isEligibleForNewCard'] == false) {
             return response()->json([
@@ -93,9 +93,9 @@ class LoyaltyCardController extends Controller
             'valid_until.after' => 'Valid until must be greater than today.',
         ]);
 
-        // Add unique-per-posid check manually
-        $validator->after(function ($validator) use ($request, $posid) {
-            $exists = LoyaltyCard::where('posid', $posid)
+        // Add unique-per-POSID check manually
+        $validator->after(function ($validator) use ($request, $POSID) {
+            $exists = LoyaltyCard::where('POSID', $POSID)
                 ->where('card_number', $request->input('card_number'))
                 ->exists();
 
@@ -132,14 +132,14 @@ class LoyaltyCardController extends Controller
         try {
             $card = LoyaltyCard::create([
                 'customer_id' => $request->input('customer_id'),
-                'posid' => $posid,
+                'POSID' => $POSID,
                 'card_number' => $request->input('card_number'),
                 'valid_until' => $request->input('valid_until'),
                 'created_by' => auth()->user()->id
             ]);
 
             Customer::where('id', $request->input('customer_id'))
-                    ->where('posid', $posid)
+                    ->where('POSID', $POSID)
                     ->update(['latest_card_id' => $card->id, 'type' => 'Loyal']);
 
             return response()->json([
@@ -178,11 +178,11 @@ class LoyaltyCardController extends Controller
         }
 
         try {
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $customerId = $request->input('customer_id');
             $cardNumber = $request->input('card_number');
             
-            $cardData = $this->loyaltyService->getCustomerCardStatusByCardNumber($posid, $customerId, $cardNumber);
+            $cardData = $this->loyaltyService->getCustomerCardStatusByCardNumber($POSID, $customerId, $cardNumber);
 
             if (!$cardData) {
                 return response()->json([
@@ -218,8 +218,8 @@ class LoyaltyCardController extends Controller
         }
 
         try {
-            $posid = auth()->user()->posid;
-            $history = $this->loyaltyService->getCardHistory($posid, $cardId);
+            $POSID = auth()->user()->POSID;
+            $history = $this->loyaltyService->getCardHistory($POSID, $cardId);
 
             return response()->json([
                 'status' => 'success',
@@ -263,7 +263,7 @@ class LoyaltyCardController extends Controller
             
 
         try {
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $cardNumber = $request->input('card_number');
             $valid_until = Carbon::parse($request->input('valid_until'));
             $settings = session('loyaltySettings');

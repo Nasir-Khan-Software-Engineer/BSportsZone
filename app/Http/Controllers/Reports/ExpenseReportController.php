@@ -31,7 +31,7 @@ class ExpenseReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $expenseData = $this->reportService->getExpenseDetailsReportData(auth()->user()->posid, $from, $to, $start, $length, 'view');
+        $expenseData = $this->reportService->getExpenseDetailsReportData(auth()->user()->POSID, $from, $to, $start, $length, 'view');
         $expenseData['draw'] = $request->input('draw');
 
         return response()->json($expenseData);
@@ -44,14 +44,14 @@ class ExpenseReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $expenseData = $this->reportService->getExpenseDetailsReportData(auth()->user()->posid, $from, $to, $start, $length, 'download');
+        $expenseData = $this->reportService->getExpenseDetailsReportData(auth()->user()->POSID, $from, $to, $start, $length, 'download');
 
         $expenseData['expenses'] = $expenseData['data'];
         $expenseData["title"] = "Expense Report from $from to $to";
         $expenseData["fromDate"] = $from;
         $expenseData["toDate"] = $to;
-        $expenseData["posid"] = auth()->user()->posid ?? 'N/A';
-        $expenseData["companyName"] = Accountinfo::where('posid', auth()->user()->posid)->value('companyName') ?? 'N/A';
+        $expenseData["POSID"] = auth()->user()->POSID ?? 'N/A';
+        $expenseData["companyName"] = Accountinfo::where('POSID', auth()->user()->POSID)->value('companyName') ?? 'N/A';
         $expenseData['reportGenerationDateTime'] = formatTime(Carbon::now()).' '. formatDate(Carbon::now());
 
         if($request->input('format', 'pdf') === 'pdf'){

@@ -12,7 +12,7 @@ class LoyaltySetting extends Model
     protected $primaryKey = 'id';
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'minimum_sales_amount',
         'validity_period_months',
         'max_visits',
@@ -24,7 +24,7 @@ class LoyaltySetting extends Model
 
     public function accountInfo()
     {
-        return $this->belongsTo(AccountInfo::class, 'posid', 'posid');
+        return $this->belongsTo(AccountInfo::class, 'POSID', 'POSID');
     }
 
     public function creator()

@@ -30,7 +30,7 @@ class DiscountAdjustmentReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $reportData = $this->reportService->getDiscountAdjustmentReportData(auth()->user()->posid, $from, $to, $start, $length, 'view');
+        $reportData = $this->reportService->getDiscountAdjustmentReportData(auth()->user()->POSID, $from, $to, $start, $length, 'view');
         $reportData['draw'] = $request->input('draw');
 
         return response()->json($reportData);
@@ -43,14 +43,14 @@ class DiscountAdjustmentReportController extends Controller
         $start = $request->input('start', 0);
         $length = $request->input('length', 9);
 
-        $reportData = $this->reportService->getDiscountAdjustmentReportData(auth()->user()->posid, $from, $to, $start, $length, 'download');
+        $reportData = $this->reportService->getDiscountAdjustmentReportData(auth()->user()->POSID, $from, $to, $start, $length, 'download');
 
         $reportData['summaryData'] = $reportData['data'];
         $reportData["title"] = "Discount & Adjustment Summary Report from $from to $to";
         $reportData["fromDate"] = $from;
         $reportData["toDate"] = $to;
-        $reportData["posid"] = auth()->user()->posid ?? 'N/A';
-        $reportData["companyName"] = Accountinfo::where('posid', auth()->user()->posid)->value('companyName') ?? 'N/A';
+        $reportData["POSID"] = auth()->user()->POSID ?? 'N/A';
+        $reportData["companyName"] = Accountinfo::where('POSID', auth()->user()->POSID)->value('companyName') ?? 'N/A';
         $reportData['reportGenerationDateTime'] = formatTime(Carbon::now()).' '. formatDate(Carbon::now());
 
         if($request->input('format', 'pdf') === 'pdf'){

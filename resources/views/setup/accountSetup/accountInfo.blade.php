@@ -228,8 +228,8 @@
                                         </div>
                                         <div class="avatar-preview">
                                             @php
-                                            $posid = auth()->user()->posid;
-                                            $logoPath = "/images/{$posid}/" . $accountInfo->logo; // relative to public/
+                                            $POSID = auth()->user()->POSID;
+                                            $logoPath = "/images/{$POSID}/" . $accountInfo->logo; // relative to public/
                                             @endphp
 
                                             <div class="rounded" id="logoPreview" style="background-image: url('{{ asset($logoPath) }}');">

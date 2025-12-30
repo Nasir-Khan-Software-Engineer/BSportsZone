@@ -16,7 +16,7 @@ class DiscountAdjustmentReport implements FromArray, WithHeadings, WithEvents
         $this->from = $data['fromDate'];
         $this->to = $data['toDate'];
         $this->generatedAt = $data['reportGenerationDateTime'];
-        $this->posid = $data['posid'];
+        $this->POSID = $data['POSID'];
 
         $this->totalDiscountAmount = $data['totals']['totalDiscountAmount'];
         $this->totalPositiveAdjustment = $data['totals']['totalPositiveAdjustment'];
@@ -45,7 +45,7 @@ class DiscountAdjustmentReport implements FromArray, WithHeadings, WithEvents
             [$this->companyName],
             [$this->rptName],
             [],
-            ['POSID: ', $this->posid],
+            ['POSID: ', $this->POSID],
             ['From:', $this->from, 'To:', $this->to],
             ['Report Generated At: ', $this->generatedAt],
             ['Date', 'Total Discount Amount', 'Total Positive Adjustment', 'Total Negative Adjustment', 'Net Adjustment Impact'],

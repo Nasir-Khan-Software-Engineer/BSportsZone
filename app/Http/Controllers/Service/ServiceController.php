@@ -22,19 +22,19 @@ use Exception;
 class ServiceController extends Controller
 {
     public function index(){
-        $posid = auth()->user()->posid;
-        $brands = Brand::where('posid', '=', $posid)->get();
-        $categories = Category::where('posid', '=', $posid)->get();
-        $units = Unit::where('posid', '=', $posid)->get();
-        $suppliers = Supplier::where('posid', '=', $posid)->get();
-        $shops = Shop::where('posid', '=', $posid)->get();
+        $POSID = auth()->user()->POSID;
+        $brands = Brand::where('POSID', '=', $POSID)->get();
+        $categories = Category::where('POSID', '=', $POSID)->get();
+        $units = Unit::where('POSID', '=', $POSID)->get();
+        $suppliers = Supplier::where('POSID', '=', $POSID)->get();
+        $shops = Shop::where('POSID', '=', $POSID)->get();
         // Get staff designation
-        $staffDesignation = EmployeeDesignation::where('posid', $posid)
+        $staffDesignation = EmployeeDesignation::where('POSID', $POSID)
             ->where('name', 'Staff')
             ->first();
         
         // Get only staffs (employees with Staff designation)
-        $employees = Employee::where('posid', '=', $posid)
+        $employees = Employee::where('POSID', '=', $POSID)
             ->where('status', 'Active')
             ->when($staffDesignation, function($query) use ($staffDesignation) {
                 return $query->where('designation_id', $staffDesignation->id);
@@ -54,10 +54,10 @@ class ServiceController extends Controller
 
     public function datatable(Request $request)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $searchCriteria = $request->input('search');
 
-        $query = Product::where('products.posid', $posid)
+        $query = Product::where('products.POSID', $POSID)
             ->with('creator', 'staff')
             ->where('type', 'Service')
             ->where(function($query) use ($searchCriteria) {
@@ -65,7 +65,7 @@ class ServiceController extends Controller
                       ->orWhere('name', 'like', "%{$searchCriteria}%");
             });
 
-        $totalRecord = Product::where('posid', $posid)->where('type', 'Service')->count();
+        $totalRecord = Product::where('POSID', $POSID)->where('type', 'Service')->count();
         $filteredRecord = $query->count();
 
         // Handle sorting
@@ -128,8 +128,8 @@ class ServiceController extends Controller
     }
 
     public function edit($id){
-        $posid = auth()->user()->posid;
-        $service = Product::with('categories','sales_items', 'staff')->where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $service = Product::with('categories','sales_items', 'staff')->where('POSID', $POSID)
             ->where('id', $id)->where('type', 'Service')
             ->first();
         
@@ -145,8 +145,8 @@ class ServiceController extends Controller
     }
 
     public function copy($id){
-        $posid = auth()->user()->posid;
-        $service = Product::with('categories')->where('posid', $posid)
+        $POSID = auth()->user()->POSID;
+        $service = Product::with('categories')->where('POSID', $POSID)
             ->where('id', $id)->where('type', 'Service')
             ->first();
         
@@ -169,9 +169,9 @@ class ServiceController extends Controller
     }
 
     public function show($id){
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
         $service = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'sales_items', 'staff')
-            ->where('posid', $posid)->where('type', 'Service')
+            ->where('POSID', $POSID)->where('type', 'Service')
             ->where('id', $id)
             ->first();
 
@@ -193,7 +193,7 @@ class ServiceController extends Controller
         });
 
         // Fetch related Sales (sales) for this service
-        $sales = Sales::where('posid', $posid)
+        $sales = Sales::where('POSID', $POSID)
             ->whereHas('items', function($query) use ($id) {
                 $query->where('product_id', $id);
             })
@@ -219,7 +219,7 @@ class ServiceController extends Controller
     public function store(Request $request){
 
         try{
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             $request->validate([
                 'code' => [
                     'required',
@@ -227,7 +227,7 @@ class ServiceController extends Controller
                     'min:3',
                     'max:20',
                     Rule::unique('products', 'code')
-                        ->where('posid', $posid),
+                        ->where('POSID', $POSID),
                 ],
                 'name' => [
                     'required',
@@ -235,7 +235,7 @@ class ServiceController extends Controller
                     'min:3',
                     'max:200',
                     Rule::unique('products', 'name')
-                        ->where('posid', $posid),
+                        ->where('POSID', $POSID),
                 ],
                 'category_id' => 'required',
                 'price' => 'required|numeric',
@@ -243,7 +243,7 @@ class ServiceController extends Controller
             ]);
 
             $service = new Product();
-            $service->posid         = $posid;
+            $service->POSID         = $POSID;
             $service->code          = (session('accountInfo.serviceCodePrefix') ?? 'AU').'-'.$request->code;
             $service->name          = $request->name;
             $service->price             = (float)$request->price;
@@ -251,7 +251,7 @@ class ServiceController extends Controller
             $service->staff_id     = $request->staff_id ?: null;
             $service->created_by        = auth()->user()->id;
 
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             if ($request->has('image')) {
                 $base64Image = $request->input('image');
 
@@ -273,7 +273,7 @@ class ServiceController extends Controller
                     return response()->json(['error' => 'base64_decode failed'], 422);
                 }
 
-                $directory = public_path("images/{$posid}/services");
+                $directory = public_path("images/{$POSID}/services");
 
                 if (!file_exists($directory)) {
                     mkdir($directory, 0755, true);
@@ -317,7 +317,7 @@ class ServiceController extends Controller
 
     public function update(Request $request, $id){
         try{
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             
             $request->validate([
                 'code' => [
@@ -326,7 +326,7 @@ class ServiceController extends Controller
                     'min:3',
                     'max:20',
                     Rule::unique('products', 'code')
-                        ->where('posid', $posid)
+                        ->where('POSID', $POSID)
                         ->ignore($id),   // ignore current service
                 ],
 
@@ -336,7 +336,7 @@ class ServiceController extends Controller
                     'min:3',
                     'max:200',
                     Rule::unique('products', 'name')
-                        ->where('posid', $posid)
+                        ->where('POSID', $POSID)
                         ->ignore($id),   // ignore current service
                 ],
 
@@ -344,7 +344,7 @@ class ServiceController extends Controller
                 'description' => 'nullable|string|min:3'
             ]);
 
-            $service = Product::with('sales_items')->where('posid', $posid)->where('type', 'Service')->where('id', $id)->first();
+            $service = Product::with('sales_items')->where('POSID', $POSID)->where('type', 'Service')->where('id', $id)->first();
 
             // Check if service has sales and prevent price change
             $hasSales = $service->sales_items()->count() > 0;
@@ -370,7 +370,7 @@ class ServiceController extends Controller
             $service->staff_id     = $request->staff_id ?: null;
             $service->updated_by        = auth()->id();
 
-            $posid = auth()->user()->posid;
+            $POSID = auth()->user()->POSID;
             if ($request->has('image')) {
                 $base64Image = $request->input('image');
 
@@ -392,7 +392,7 @@ class ServiceController extends Controller
                     return response()->json(['error' => 'base64_decode failed'], 422);
                 }
 
-                $directory = public_path("images/{$posid}/services");
+                $directory = public_path("images/{$POSID}/services");
 
                 if (!file_exists($directory)) {
                     mkdir($directory, 0755, true);
@@ -453,8 +453,8 @@ class ServiceController extends Controller
 
     public function destroy($id){
         try {
-            $posid = auth()->user()->posid;
-            $service = Product::where('posid', $posid)
+            $POSID = auth()->user()->POSID;
+            $service = Product::where('POSID', $POSID)
                 ->where('id', $id)->where('type', 'Service')
                 ->first();
 
@@ -473,7 +473,7 @@ class ServiceController extends Controller
 
                 //after delete we can delete the image
                 if($service->image){
-                    $filePath = public_path("images/{$posid}/services/{$service->image}");
+                    $filePath = public_path("images/{$POSID}/services/{$service->image}");
                     if(file_exists($filePath)){
                         unlink($filePath);
                     }

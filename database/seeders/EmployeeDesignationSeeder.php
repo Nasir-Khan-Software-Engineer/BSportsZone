@@ -33,14 +33,14 @@ class EmployeeDesignationSeeder extends Seeder
         ];
 
         // Get all unique posids
-        $posIds = Accountinfo::distinct()->pluck('posid');
+        $posIds = Accountinfo::distinct()->pluck('POSID');
 
         foreach ($posIds as $posId) {
             foreach ($designations as $designation) {
 
                 EmployeeDesignation::firstOrCreate(
                     [
-                        'posid' => $posId,
+                        'POSID' => $posId,
                         'name'  => $designation,
                     ],
                     [

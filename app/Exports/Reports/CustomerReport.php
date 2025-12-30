@@ -17,7 +17,7 @@ class CustomerReport implements FromArray, WithHeadings, WithEvents
         $this->to = $data['toDate'];
         $this->customerType = $data['customerType'] ?? 'all';
         $this->generatedAt = $data['reportGenerationDateTime'];
-        $this->posid = $data['posid'];
+        $this->POSID = $data['POSID'];
     }
 
     public function array(): array
@@ -46,7 +46,7 @@ class CustomerReport implements FromArray, WithHeadings, WithEvents
             [$this->companyName],
             [$this->rptName],
             [],
-            ['POSID: ', $this->posid],
+            ['POSID: ', $this->POSID],
             ['From:', $this->from, 'To:', $this->to],
         ];
 

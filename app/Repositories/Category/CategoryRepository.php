@@ -7,15 +7,15 @@ use Carbon;
 
 class CategoryRepository implements ICategoryRepository
 {
-    public function getAllCategories($posid)
+    public function getAllCategories($POSID)
     {
-        return Category::join('users', 'users.id', '=', 'category.created_by')->select("category.*", "users.id as userId", "users.name as userName")->where('category.posid', $posid)->get();
+        return Category::join('users', 'users.id', '=', 'category.created_by')->select("category.*", "users.id as userId", "users.name as userName")->where('category.POSID', $POSID)->get();
     }
 
     public function saveCategory($category)
     {
         return Category::insert([
-            'posid' => $category['posid'],
+            'POSID' => $category['POSID'],
             'name' =>$category['name'],
             'icon' =>$category['icon'],
             'created_by' => $category['created_by'],
@@ -27,7 +27,7 @@ class CategoryRepository implements ICategoryRepository
 
     public function updateCategory($category)
     {
-        return Category::where('posid', $category['posid'])->where('id', $category['id'])->update([
+        return Category::where('POSID', $category['POSID'])->where('id', $category['id'])->update([
             'name' =>$category['name'],
             'icon' =>$category['icon'],
             'updated_by' => $category['updated_by'],
@@ -35,7 +35,7 @@ class CategoryRepository implements ICategoryRepository
         ]);
     }
 
-    public function deleteCategory($posid, $id){
-        return Category::where('posid', '=', $posid)->where('id', '=', $id)->delete();
+    public function deleteCategory($POSID, $id){
+        return Category::where('POSID', '=', $POSID)->where('id', '=', $id)->delete();
     }
 }

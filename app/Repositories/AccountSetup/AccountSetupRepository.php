@@ -10,7 +10,7 @@ class AccountSetupRepository implements IAccountSetupRepository{
     }
 
     public function getAccountInfo($POSID){
-        $thisAccountInfo = AccountInfo::with('posSettings', 'loyaltySettings')->where('posid', $POSID)->first();
+        $thisAccountInfo = AccountInfo::with('posSettings', 'loyaltySettings')->where('POSID', $POSID)->first();
         return $thisAccountInfo;
     }
 

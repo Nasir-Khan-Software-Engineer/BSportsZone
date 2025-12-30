@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('product_stocks', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('posid')->default(1);
+            $table->bigInteger('POSID')->default(1);
             $table->foreignId('product_id')->constrained(table: 'products', indexName: 'product_stock_product')->onUpdate('cascade')->onDelete('cascade');
             $table->enum('change_type', ['IN', 'OUT']);
             $table->integer('quantity')->default(1);

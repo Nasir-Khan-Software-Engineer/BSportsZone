@@ -12,7 +12,7 @@ class LoyaltyService implements ILoyaltyService{
 
     public function getCustomerLoayltyStatus($posId, $customerId)
     {
-        $customer = Customer::with(['loyaltyCards.histories','sales'])->where('posid', $posId)->find($customerId);
+        $customer = Customer::with(['loyaltyCards.histories','sales'])->where('POSID', $posId)->find($customerId);
 
         $settings = session('loyaltySettings');
         $minSales = $settings['minimum_sales_amount'];
@@ -67,7 +67,7 @@ class LoyaltyService implements ILoyaltyService{
     {
         // Load all cards with their histories in one query
         $loyaltyCards = LoyaltyCard::with('histories')
-            ->where('posid', $posId)
+            ->where('POSID', $posId)
             ->where('customer_id', $customerId)
             ->get();
 
@@ -144,7 +144,7 @@ class LoyaltyService implements ILoyaltyService{
     {
         $history = LoyaltyHistory::with(['sale'])
             ->where('card_id', $cardId)
-            ->where('loyalty_histories.posid', $posId)
+            ->where('loyalty_histories.POSID', $posId)
             ->join('sales', 'loyalty_histories.sales_id', '=', 'Sales.id')
             ->orderBy('Sales.created_at', 'asc')
             ->select('loyalty_histories.*')
@@ -182,7 +182,7 @@ class LoyaltyService implements ILoyaltyService{
 
     public function getCustomerCardStatusByCardNumber($posId, $customerId, $cardNumber)
     {
-        $card = LoyaltyCard::where('posid', $posId)
+        $card = LoyaltyCard::where('POSID', $posId)
             ->where('customer_id', $customerId)
             ->where('card_number', $cardNumber)
             ->first();

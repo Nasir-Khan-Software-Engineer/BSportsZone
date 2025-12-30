@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('pos_feature', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('posid');
-            $table->foreign('posid')
+            $table->bigInteger('POSID');
+            $table->foreign('POSID')
                 ->references('POSID')
                 ->on('accountinfos')
                 ->onDelete('cascade');
@@ -28,7 +28,7 @@ return new class extends Migration
 
             $table->timestamps();
 
-            $table->unique(['posid', 'feature_id']);
+            $table->unique(['POSID', 'feature_id']);
         });
     }
 

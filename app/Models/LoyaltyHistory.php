@@ -10,7 +10,7 @@ class LoyaltyHistory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'card_id',
         'sales_id',
         'discount_type',
@@ -24,7 +24,7 @@ class LoyaltyHistory extends Model
 
     public function account()
     {
-        return $this->belongsTo(AccountInfo::class, 'posid');
+        return $this->belongsTo(AccountInfo::class, 'POSID');
     }
 
     public function card()

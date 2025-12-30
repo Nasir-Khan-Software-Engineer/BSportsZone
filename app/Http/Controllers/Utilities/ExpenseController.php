@@ -28,9 +28,9 @@ class ExpenseController extends Controller
 
     public function datatable(Request $request)
     {
-        $posid = auth()->user()->posid;
+        $POSID = auth()->user()->POSID;
 
-        $allExpense = $this->expenseService->getExpenseListWithPagination($request, $posid);
+        $allExpense = $this->expenseService->getExpenseListWithPagination($request, $POSID);
 
         return response()->json($allExpense);
     }
@@ -40,7 +40,7 @@ class ExpenseController extends Controller
      */
     public function create()
     {
-        $expenseCategories = ExpenseCategory::where('posid', '=', auth()->user()->posid)->get();
+        $expenseCategories = ExpenseCategory::where('POSID', '=', auth()->user()->POSID)->get();
         return view('utilities/expenses/create',['expenseCategories' => $expenseCategories]);
     }
 

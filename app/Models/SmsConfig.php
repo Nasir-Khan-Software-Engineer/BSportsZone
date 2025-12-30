@@ -12,7 +12,7 @@ class SmsConfig extends Model
     protected $table = 'sms_configs';
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'base_url',
         'username',
         'api_key',
@@ -30,7 +30,7 @@ class SmsConfig extends Model
     // Relation to POS/account
     public function account()
     {
-        return $this->belongsTo(Accountinfo::class, 'posid', 'POSID');
+        return $this->belongsTo(Accountinfo::class, 'POSID', 'POSID');
     }
 
     // Relation to user who created

@@ -12,7 +12,7 @@ class Employee extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'posid',
+        'POSID',
         'name',
         'phone',
         'date_of_birth',

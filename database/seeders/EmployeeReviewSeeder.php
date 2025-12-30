@@ -15,15 +15,15 @@ class EmployeeReviewSeeder extends Seeder
      */
     public function run(): void
     {
-        $posId = 1; // Default posid
+        $posId = 1; // Default POSID
         $createdBy = 1; // Default admin user ID
         
         // Remove all existing reviews
-        $deletedCount = EmployeeReview::where('posid', $posId)->delete();
+        $deletedCount = EmployeeReview::where('POSID', $posId)->delete();
         $this->command->info("Deleted {$deletedCount} existing reviews.");
         
         // Get first 5 employees
-        $employees = Employee::where('posid', $posId)
+        $employees = Employee::where('POSID', $posId)
             ->orderBy('id', 'asc')
             ->take(5)
             ->get();
@@ -74,7 +74,7 @@ class EmployeeReviewSeeder extends Seeder
                 $reviewDate = Carbon::now()->subDays($daysAgo);
                 
                 EmployeeReview::create([
-                    'posid' => $posId,
+                    'POSID' => $posId,
                     'employee_id' => $employee->id,
                     'review_date' => $reviewDate->format('Y-m-d'),
                     'title' => $template['title'],

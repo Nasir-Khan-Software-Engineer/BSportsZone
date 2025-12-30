@@ -12,14 +12,14 @@ class BrandService implements IBrandService
         $this->brandRepository = $iBrandRepository;
     }
 
-    public function getBrands($posid)
+    public function getBrands($POSID)
     {
-        return $this->brandRepository->getBrands($posid);
+        return $this->brandRepository->getBrands($POSID);
     }
 
-    public function getBrand($posid, $brandid)
+    public function getBrand($POSID, $brandid)
     {
-        return $this->brandRepository->getBrand($posid, $brandid);
+        return $this->brandRepository->getBrand($POSID, $brandid);
     }
 
     public function createBrand($brand): void
@@ -32,8 +32,8 @@ class BrandService implements IBrandService
         return $this->brandRepository->updateBrand($brand);
     }
 
-    public function deleteBrand($posid, $brandid)
+    public function deleteBrand($POSID, $brandid)
     {
-        return $this->brandRepository->deleteBrand($posid, $brandid);
+        return $this->brandRepository->deleteBrand($POSID, $brandid);
     }
 }

@@ -5,7 +5,7 @@ use App\Models\Expense;
 
 interface IExpenseService
 {
-    public function getExpenseListWithPagination(Request $request, $posid);
+    public function getExpenseListWithPagination(Request $request, $POSID);
     public function storeExpense(Request $request);
     public function getExpenseForEdit(Expense $expense);
     public function updateExpense(Request $request, Expense $expense);

@@ -45,21 +45,21 @@ WinPos.Pos = (function (Urls) {
         cartListener.forEach(fn => fn(cartObj));
     }
 
-    var addCartItem = function (product) {
-        const cartItem = cartObj.items.find((item) => item.id == product.id);
+    var addCartItem = function (service) {
+        const cartItem = cartObj.items.find((item) => item.id == service.id);
 
         if (cartItem) {
             cartItem.quantity++;
         } else {
-            // Get default beautician from product if available
-            const beauticianId = product.todays_beautician ? product.beautician_id : null;
-            const beauticianName = product.todays_beautician ? product.todays_beautician.name : null;
+            // Get default beautician from service if available
+            const beauticianId = service.todays_beautician ? service.beautician_id : null;
+            const beauticianName = service.todays_beautician ? service.todays_beautician.name : null;
             
             cartObj.items.push({ 
-                id: product.id, 
-                name: product.name, 
-                code: product.code, 
-                price: parseFloat(product.price), 
+                id: service.id, 
+                name: service.name, 
+                code: service.code, 
+                price: parseFloat(service.price), 
                 quantity: 1,
                 beautician_id: beauticianId,
                 beautician_name: beauticianName
@@ -70,19 +70,19 @@ WinPos.Pos = (function (Urls) {
         notify();
     }
 
-    var removeCartItem = function (productId) {
-        cartObj.items = cartObj.items.filter((item) => item.id != productId);
+    var removeCartItem = function (serviceId) {
+        cartObj.items = cartObj.items.filter((item) => item.id != serviceId);
 
         updateCartTotal();
         notify();
     }
 
-    var updateCartQuantity = function (productId, qty) {
-        const cartItem = cartObj.items.find((item) => item.id == productId);
+    var updateCartQuantity = function (serviceId, qty) {
+        const cartItem = cartObj.items.find((item) => item.id == serviceId);
         const quantity = parseInt(qty);
 
         if (cartItem == null || cartItem == undefined) {
-            toastr.error("Please insert valid product", "Invalid Product");
+            toastr.error("Please insert valid service", "Invalid Service");
             return;
         }
 
@@ -164,7 +164,7 @@ WinPos.Pos = (function (Urls) {
                 resolve(search.cache[cacheKey]);
             } else {
                 WinPos.Common.getAjaxCall(
-                    Urls.searchProduct + queryString,
+                    Urls.searchService + queryString,
                     (response) => {
                         search.cache[cacheKey] = response;
                         resolve(response);
@@ -181,7 +181,7 @@ WinPos.Pos = (function (Urls) {
         return new Promise((resolve, reject) => {
 
             const requestData = {
-                products: cartObj.items.map(item => ({ 
+                services: cartObj.items.map(item => ({ 
                     id: item.id, 
                     quantity: item.quantity,
                     beautician_id: item.beautician_id || null
@@ -284,11 +284,11 @@ WinPos.Pos = (function (Urls) {
         //console.log(dom);
     }
 
-    var RenderSearchProduct = function (products) {
+    var RenderSearchService = function (services) {
 
-        const searchResultCon = $('#searchProductContainer');
+        const searchResultCon = $('#searchServiceContainer');
 
-        if (products.length == 0) {
+        if (services.length == 0) {
             $(searchResultCon).html('')
             $(searchResultCon).html('<h3 class="text-center">No Result Found</h3>');
             return;
@@ -298,17 +298,17 @@ WinPos.Pos = (function (Urls) {
         const gridItems = "";
         const listItems = "";
 
-        const itemListDom = products.map((item) => {
+        const itemListDom = services.map((item) => {
             
             // populate the grid view items
             var imgCon = '';
             const girdDev = $('<div>');
-            girdDev.addClass('grid-item recent-product d-flex flex-column align-items-center p-2');
+            girdDev.addClass('grid-item recent-service d-flex flex-column align-items-center p-2');
             girdDev.attr('style', 'background-color: #ccc;');
 
             if (item.image && item.image.trim() !== '') {
                 imgCon = $('<img>');
-                imgCon.attr('src', `${publicUrl}images/${item.posid}/products/${item.image}`);
+                imgCon.attr('src', `${publicUrl}images/${item.posid}/services/${item.image}`);
                 imgCon.addClass('rounded');
                 imgCon.attr('style', 'width: 100px; height: 50px; object-fit: cover;');
             } else {
@@ -338,7 +338,7 @@ WinPos.Pos = (function (Urls) {
 
             // populate the list view items
             const listDiv = $('<div>');
-            listDiv.addClass('list-item recent-product list-group-item list-group-item-action d-none pos-page-font-size');
+            listDiv.addClass('list-item recent-service list-group-item list-group-item-action d-none pos-page-font-size');
             listDiv.attr('data-id', item.id);
             listDiv.text(`${item.code} | ${item.name}`);
 
@@ -472,7 +472,7 @@ WinPos.Pos = (function (Urls) {
     }
 
     return {
-        searchProduct: search,
+        searchService: search,
         cartObj: cartObj,
         cart: {
             addItem: addCartItem,
@@ -490,7 +490,7 @@ WinPos.Pos = (function (Urls) {
         saveSalesDetails: saveSalesDetails,
         printReceipt: printReceiptFunc,
         getImageAsBase64: getImageAsBase64,
-        RenderSearchProduct: RenderSearchProduct,
+        RenderSearchService: RenderSearchService,
         renderBeauticianCards: renderBeauticianCards,
         customer: {
             setTerminalCustomerForm: setTerminalCustomerForm,

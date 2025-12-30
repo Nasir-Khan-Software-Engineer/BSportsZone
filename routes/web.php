@@ -12,7 +12,7 @@ use App\Http\Controllers\Setup\CustomerController;
 use App\Http\Controllers\Setup\UnitController;
 use App\Http\Controllers\Utilities\ExpenseController;
 use App\Http\Controllers\Utilities\ExpenseCategoryController;
-use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Service\ServiceController;
 use App\Http\Controllers\Pos\PosController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SaleController;
@@ -154,7 +154,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::get('/sms/history/download', [SmsHistoryReportController::class, 'downloadSmsHistoryReport'])->name('sms.history.download')->middleware('permission');
     });
 
-    Route::prefix('product')->as('product.')->group(function () {
+    Route::prefix('service')->as('service.')->group(function () {
         Route::prefix('category')->controller(CategoryController::class)->group(function () {
             Route::get('/', 'index')->name('category.index')->middleware('permission');
             Route::get('/create', 'create')->name('category.create');
@@ -182,16 +182,16 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::delete('/{unit}', 'destroy')->name('unit.destroy')->middleware('permission');
         });
 
-        Route::controller(ProductController::class)->group(function () {
+        Route::controller(ServiceController::class)->group(function () {
             Route::get('/', 'index')->name('index')->middleware('permission');
             Route::get('/datatable', 'datatable')->name('datatable');
             Route::get('/create', 'create')->name('create');
-            Route::get('/{product}/copy', 'copy')->name('copy');
+            Route::get('/{service}/copy', 'copy')->name('copy');
             Route::post('/store', 'store')->name('store')->middleware('permission');
-            Route::get('/{product}', 'show')->name('show')->middleware('permission');
-            Route::get('/{product}/edit', 'edit')->name('edit')->middleware('permission');
-            Route::put('/{product}', 'update')->name('update')->middleware('permission');
-            Route::delete('/{product}', 'destroy')->name('destroy')->middleware('permission');
+            Route::get('/{service}', 'show')->name('show')->middleware('permission');
+            Route::get('/{service}/edit', 'edit')->name('edit')->middleware('permission');
+            Route::put('/{service}', 'update')->name('update')->middleware('permission');
+            Route::delete('/{service}', 'destroy')->name('destroy')->middleware('permission');
         });
     });
 
@@ -251,7 +251,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::controller(PosController::class)->group(function () {
             Route::get('/', 'index')->name('index')->middleware('permission');
             Route::get('/account', 'getAccountInfo')->name('account.get');
-            Route::get('/search/product', 'searchProduct')->name('search.product');
+            Route::get('/search/service', 'searchService')->name('search.service');
             Route::get('/beauticians', 'getBeauticians')->name('beauticians');
             Route::post('/sales/save', 'saveSales')->name('sales.save');
             Route::get('/customer/last-sales/{customerId}', 'getCustomerLastSales')->name('customer.lastSales');

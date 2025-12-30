@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Product;
+namespace App\Http\Controllers\Service;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -12,7 +12,6 @@ use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Supplier;
 use App\Models\Shop;
-use App\Models\ProductStock;
 use App\Models\Purchases;
 use App\Models\Employee;
 use App\Models\EmployeeDesignation;
@@ -20,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Exception;
 
 
-class ProductController extends Controller
+class ServiceController extends Controller
 {
     public function index(){
         $posid = auth()->user()->posid;
@@ -43,7 +42,7 @@ class ProductController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('product.index', [
+        return view('service.index', [
             'brands' => $brands,
             'categories' => $categories,
             'units' => $units,
@@ -60,12 +59,13 @@ class ProductController extends Controller
 
         $query = Product::where('products.posid', $posid)
             ->with('creator', 'beautician')
+            ->where('type', 'Service')
             ->where(function($query) use ($searchCriteria) {
                 $query->where('code', 'like', "%{$searchCriteria}%")
                       ->orWhere('name', 'like', "%{$searchCriteria}%");
             });
 
-        $totalRecord = Product::where('posid', $posid)->count();
+        $totalRecord = Product::where('posid', $posid)->where('type', 'Service')->count();
         $filteredRecord = $query->count();
 
         // Handle sorting
@@ -75,82 +75,82 @@ class ProductController extends Controller
         // Special handling for each column
         if ($orderColumn == 0) {
             // Order by ID
-            $products = (clone $query)->orderBy('id', $orderDir)
+            $services = (clone $query)->orderBy('id', $orderDir)
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
         } elseif ($orderColumn == 1) {
             // Order by code
-            $products = (clone $query)->orderBy('code', $orderDir)
+            $services = (clone $query)->orderBy('code', $orderDir)
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
         } elseif ($orderColumn == 3) {
             // Order by name
-            $products = (clone $query)->orderBy('name', $orderDir)
+            $services = (clone $query)->orderBy('name', $orderDir)
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
         } elseif ($orderColumn == 4) {
             // Order by price
-            $products = (clone $query)->orderBy('price', $orderDir)
+            $services = (clone $query)->orderBy('price', $orderDir)
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
         } else {
             // Default sorting by ID descending
-            $products = (clone $query)->orderBy('id', 'desc')
+            $services = (clone $query)->orderBy('id', 'desc')
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
         }
 
-        $products->transform(function($product) {
-            $product->formattedDate = formatDate($product->created_at);
-            $product->formattedTime = formatTime($product->created_at);
+        $services->transform(function($service) {
+            $service->formattedDate = formatDate($service->created_at);
+            $service->formattedTime = formatTime($service->created_at);
             
-            if ($product->created_by == null) {
-                $product->createdBy = 'CustomData';
+            if ($service->created_by == null) {
+                $service->createdBy = 'CustomData';
             } else {
-                $product->createdBy = $product->creator->name ?? 'N/A';
+                $service->createdBy = $service->creator->name ?? 'N/A';
             }
 
-            return $product;
+            return $service;
         });
 
         $result = [];
         $result["draw"] = $request->input('draw');
         $result["recordsTotal"] = $totalRecord;
         $result["recordsFiltered"] = $filteredRecord;
-        $result['data'] = $products->toArray();
+        $result['data'] = $services->toArray();
 
         return response()->json($result);
     }
 
     public function edit($id){
         $posid = auth()->user()->posid;
-        $product = Product::with('categories','sales_items', 'beautician')->where('posid', $posid)
-            ->where('id', $id)
+        $service = Product::with('categories','sales_items', 'beautician')->where('posid', $posid)
+            ->where('id', $id)->where('type', 'Service')
             ->first();
         
-        // Check if product has sales
-        $hasSales = $product->sales_items()->count() > 0;
+        // Check if service has sales
+        $hasSales = $service->sales_items()->count() > 0;
         
         return response()->json([
             'status'  => 'success',
-            'product' => $product,
-            'categories' => $product->categories,
+            'service' => $service,
+            'categories' => $service->categories,
             'hasSales' => $hasSales
         ]);
     }
 
     public function copy($id){
         $posid = auth()->user()->posid;
-        $product = Product::with('categories')->where('posid', $posid)
-            ->where('id', $id)
+        $service = Product::with('categories')->where('posid', $posid)
+            ->where('id', $id)->where('type', 'Service')
             ->first();
         
-        if (!$product) {
+        if (!$service) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Service not found.'
@@ -159,40 +159,40 @@ class ProductController extends Controller
         
         return response()->json([
             'status'  => 'success',
-            'product' => [
-                'name' => $product->name,
-                'price' => $product->price,
-                'description' => $product->description,
+            'service' => [
+                'name' => $service->name,
+                'price' => $service->price,
+                'description' => $service->description,
             ],
-            'categories' => $product->categories
+            'categories' => $service->categories
         ]);
     }
 
     public function show($id){
         $posid = auth()->user()->posid;
-        $product = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'sales_items', 'beautician')
-            ->where('posid', $posid)
+        $service = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'sales_items', 'beautician')
+            ->where('posid', $posid)->where('type', 'Service')
             ->where('id', $id)
             ->first();
 
         // Created/Updated By
-        $product->createdBy = $product->creator->name ?? 'CustomData';
-        $product->updatedBy = $product->updater->name ?? '';
+        $service->createdBy = $service->creator->name ?? 'CustomData';
+        $service->updatedBy = $service->updater->name ?? '';
 
         // Get the latest sale
-        $lastSale = $product->sales_items()->latest()->first();
+        $lastSale = $service->sales_items()->latest()->first();
 
-        $product->lastSaleAt = $lastSale ? formatDateAndTime($lastSale->created_at) : null;
+        $service->lastSaleAt = $lastSale ? formatDateAndTime($lastSale->created_at) : null;
 
         // Total number of sales
-        $product->totalSalesCount = $product->sales_items()->count();
+        $service->totalSalesCount = $service->sales_items()->count();
 
         // Total amount of sales
-        $product->totalSalesAmount = $product->sales_items->sum(function($item) {
+        $service->totalSalesAmount = $service->sales_items->sum(function($item) {
             return ($item->selling_price - $item->discount) * $item->quantity;
         });
 
-        // Fetch related purchases (sales) for this product
+        // Fetch related purchases (sales) for this service
         $sales = Purchases::where('posid', $posid)
             ->whereHas('items', function($query) use ($id) {
                 $query->where('product_id', $id);
@@ -203,7 +203,7 @@ class ProductController extends Controller
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function($purchase) use ($id) {
-                // Get the quantity of this product in this purchase
+                // Get the quantity of this service in this purchase
                 $item = $purchase->items->first();
                 $purchase->product_quantity = $item ? $item->quantity : 0;
                 $purchase->formatted_date = formatDate($purchase->created_at);
@@ -212,7 +212,7 @@ class ProductController extends Controller
                 return $purchase;
             });
 
-        return view('product.show', compact('product', 'sales'));
+        return view('service.show', compact('service', 'sales'));
     }
 
 
@@ -242,14 +242,14 @@ class ProductController extends Controller
                 'description' => 'nullable|string|min:3'
             ]);
 
-            $product = new Product();
-            $product->posid         = $posid;
-            $product->code          = (session('accountInfo.productCodePrefix') ?? 'AU').'-'.$request->code;
-            $product->name          = $request->name;
-            $product->price             = (float)$request->price;
-            $product->description       = $request->description;
-            $product->beautician_id     = $request->beautician_id ?: null;
-            $product->created_by        = auth()->user()->id;
+            $service = new Product();
+            $service->posid         = $posid;
+            $service->code          = (session('accountInfo.serviceCodePrefix') ?? 'AU').'-'.$request->code;
+            $service->name          = $request->name;
+            $service->price             = (float)$request->price;
+            $service->description       = $request->description;
+            $service->beautician_id     = $request->beautician_id ?: null;
+            $service->created_by        = auth()->user()->id;
 
             $posid = auth()->user()->posid;
             if ($request->has('image')) {
@@ -273,7 +273,7 @@ class ProductController extends Controller
                     return response()->json(['error' => 'base64_decode failed'], 422);
                 }
 
-                $directory = public_path("images/{$posid}/products");
+                $directory = public_path("images/{$posid}/services");
 
                 if (!file_exists($directory)) {
                     mkdir($directory, 0755, true);
@@ -283,21 +283,21 @@ class ProductController extends Controller
                 $filePath = $directory . '/' . $fileName;
                 file_put_contents($filePath, $imageData);
 
-                $product->image = $fileName;
+                $service->image = $fileName;
             }
 
-            $product->save();
-            $product->categories()->attach($request->category_id);
+            $service->save();
+            $service->categories()->attach($request->category_id);
             
-            $product->formattedDate = formatDate($product->created_at);
-            $product->formattedTime = formatTime($product->created_at);
-            $product->createdBy = auth()->user()->name;
+            $service->formattedDate = formatDate($service->created_at);
+            $service->formattedTime = formatTime($service->created_at);
+            $service->createdBy = auth()->user()->name;
             
 
             return response()->json([
                 'status'    => 'success',
                 'message'   => 'Service Created Successfully.',
-                'product'  => $product
+                'service'  => $service
             ]);
         
             
@@ -327,7 +327,7 @@ class ProductController extends Controller
                     'max:20',
                     Rule::unique('products', 'code')
                         ->where('posid', $posid)
-                        ->ignore($id),   // ignore current product
+                        ->ignore($id),   // ignore current service
                 ],
 
                 'name' => [
@@ -337,18 +337,18 @@ class ProductController extends Controller
                     'max:200',
                     Rule::unique('products', 'name')
                         ->where('posid', $posid)
-                        ->ignore($id),   // ignore current product
+                        ->ignore($id),   // ignore current service
                 ],
 
                 'category' => 'required',
                 'description' => 'nullable|string|min:3'
             ]);
 
-            $product = Product::with('sales_items')->where('posid', $posid)->where('id', $id)->first();
+            $service = Product::with('sales_items')->where('posid', $posid)->where('type', 'Service')->where('id', $id)->first();
 
-            // Check if product has sales and prevent price change
-            $hasSales = $product->sales_items()->count() > 0;
-            if ($hasSales && $product->price != (float)$request->price) {
+            // Check if service has sales and prevent price change
+            $hasSales = $service->sales_items()->count() > 0;
+            if ($hasSales && $service->price != (float)$request->price) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'This service already has sales, so the price cannot be changed.',
@@ -364,11 +364,11 @@ class ProductController extends Controller
                 
             }
 
-            $product->name          = $request->name;
-            $product->price             = (float)$request->price;
-            $product->description       = $request->description;
-            $product->beautician_id     = $request->beautician_id ?: null;
-            $product->updated_by        = auth()->id();
+            $service->name          = $request->name;
+            $service->price             = (float)$request->price;
+            $service->description       = $request->description;
+            $service->beautician_id     = $request->beautician_id ?: null;
+            $service->updated_by        = auth()->id();
 
             $posid = auth()->user()->posid;
             if ($request->has('image')) {
@@ -392,14 +392,14 @@ class ProductController extends Controller
                     return response()->json(['error' => 'base64_decode failed'], 422);
                 }
 
-                $directory = public_path("images/{$posid}/products");
+                $directory = public_path("images/{$posid}/services");
 
                 if (!file_exists($directory)) {
                     mkdir($directory, 0755, true);
                 }
 
-                if ($product->image) {
-                    $existingFile = $directory . '/' . $product->image;
+                if ($service->image) {
+                    $existingFile = $directory . '/' . $service->image;
                     if (file_exists($existingFile)) {
                         unlink($existingFile);
                     }
@@ -409,32 +409,32 @@ class ProductController extends Controller
                 $filePath = $directory . '/' . $fileName;
                 file_put_contents($filePath, $imageData);
 
-                $product->image = $fileName;
+                $service->image = $fileName;
             }
 
-            $product->save();
+            $service->save();
           
             if ($request->has('category')) {
                 $categories = is_array($request->category)
                     ? $request->category
                     : [$request->category];
 
-                $product->categories()->sync($categories);
+                $service->categories()->sync($categories);
             }
 
-            $product->formattedDate = formatDate($product->created_at);
-            $product->formattedTime = formatTime($product->created_at);
+            $service->formattedDate = formatDate($service->created_at);
+            $service->formattedTime = formatTime($service->created_at);
 
-            if ($product->created_by == null) {
-                $product->createdBy = 'CustomData';
+            if ($service->created_by == null) {
+                $service->createdBy = 'CustomData';
             }else{
-                $product->createdBy = $product->creator->name;
+                $service->createdBy = $service->creator->name;
             }
             
             return response()->json([
                 'status'    => 'success',
                 'message'   => 'Service Updated Successfully.',
-                'product'  => $product
+                'service'  => $service
             ]);
             
         }catch(ValidationException $exception){
@@ -454,11 +454,11 @@ class ProductController extends Controller
     public function destroy($id){
         try {
             $posid = auth()->user()->posid;
-            $product = Product::where('posid', $posid)
-                ->where('id', $id)
+            $service = Product::where('posid', $posid)
+                ->where('id', $id)->where('type', 'Service')
                 ->first();
 
-            if($product->sales_items()->count() > 0){
+            if($service->sales_items()->count() > 0){
                 return response()->json([
                     'status' => 'error',
                     'errors' => [
@@ -468,12 +468,12 @@ class ProductController extends Controller
 
             }else{
                 // we can introduce a soft delete here
-                // but now we can delete a product as it has no dependencies
-                $product->delete();
+                // but now we can delete a service as it has no dependencies
+                $service->delete();
 
                 //after delete we can delete the image
-                if($product->image){
-                    $filePath = public_path("images/{$posid}/products/{$product->image}");
+                if($service->image){
+                    $filePath = public_path("images/{$posid}/services/{$service->image}");
                     if(file_exists($filePath)){
                         unlink($filePath);
                     }

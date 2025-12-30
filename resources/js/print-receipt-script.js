@@ -170,11 +170,11 @@ WinPos.PrintReceipt.algoTypes.salesDetails = {
         dom.push('<table style="width: 100%;">');
 
         data.cartInfo.items.forEach(function(item){
-            let shortProductName = (item.name.length > 20 ? (item.name).slice(0,20) : item.name);
+            let shortServiceName = (item.name.length > 20 ? (item.name).slice(0,20) : item.name);
             let beauticianName = item.beautician_name || 'None';
 
             dom.push('<tr>');
-                dom.push('<td style="text-align: left;">' + shortProductName + '</td>');
+                dom.push('<td style="text-align: left;">' + shortServiceName + '</td>');
                 dom.push('<td style="width: 50px; text-align: right;">'+ item.quantity +'</td>');
                 dom.push('<td style="width: 50px; text-align: right;">'+ (item.price) +'</td>');
                 dom.push('<td style="width: 50px; text-align: right;">'+ ((item.price) * item.quantity) +'</td>');

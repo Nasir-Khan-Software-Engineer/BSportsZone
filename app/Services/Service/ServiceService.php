@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Services\Product;
+namespace App\Services\Service;
 
 use App\Models\Product;
 use App\Models\Purchase_items;
 use DB;
 
-class ProductService implements IProductService {
+class ServiceService implements IServiceService {
 
     public function __construct(){
     }
 
-    public function getProductByIds($productIds)
+    public function getServiceByIds($serviceIds)
     {
         return Product::select(
                 'products.id',
@@ -25,24 +25,25 @@ class ProductService implements IProductService {
             ->with([
                 'TodaysBeautician:id,name'
             ])
-            ->whereIn('products.id', $productIds)
-            ->orderByRaw('FIELD(products.id, ' . implode(',', $productIds) . ')')
+            ->where('type', 'Service')
+            ->whereIn('products.id', $serviceIds)
+            ->orderByRaw('FIELD(products.id, ' . implode(',', $serviceIds) . ')')
             ->get();
     }
 
 
-    public function getTopSellingProductIds($posId){
-        $productGroupBy = Purchase_items::select('product_id as id', DB::raw('COUNT(product_id) as qty'))
+    public function getTopSellingServiceIds($posId){
+        $serviceGroupBy = Purchase_items::select('product_id as id', DB::raw('COUNT(product_id) as qty'))
         ->where('posid', $posId)
         ->groupBy('product_id')
         ->orderByDesc('qty')
         ->limit(32)
         ->get();
 
-        return $productGroupBy->pluck('id')->toArray();
+        return $serviceGroupBy->pluck('id')->toArray();
     }
 
-    public function getRecentProducts($posId, $shopId, $categoryId, $brandId)
+    public function getRecentServices($posId, $shopId, $categoryId, $brandId)
     {
         return Product::select(
                 'products.id',
@@ -56,6 +57,7 @@ class ProductService implements IProductService {
             ->with([
                 'TodaysBeautician:id,name'
             ])
+            ->where('type', 'Service')
             ->where('products.posid', $posId)
             ->orderBy('products.updated_at', 'desc')
             ->limit(30)

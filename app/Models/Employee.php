@@ -67,9 +67,16 @@ class Employee extends Model
         return $this->hasMany(EmployeeReview::class, 'employee_id');
     }
 
+    public function services()
+    {
+        return $this->hasMany(Product::class, 'beautician_id')
+                    ->where('type', 'Service');
+    }
+
     public function products()
     {
-        return $this->hasMany(Product::class, 'beautician_id');
+        return $this->hasMany(Product::class, 'beautician_id')
+                    ->where('type', 'Product');
     }
 
     public function todayAttendance()

@@ -284,9 +284,9 @@ WinPos.Customer = (function (Urls){
                 const row = `
                     <tr>
                         <td>${index + 1}</td>
-                        <td>${item.product ? item.product.name : '-'}</td>
+                        <td>${item.service ? item.service.name : '-'}</td>
                         <td class="text-center">${item.quantity}</td>
-                        <td class="text-right">${Number(item.product_price).toFixed(2)} Tk.</td>
+                        <td class="text-right">${Number(item.service_price).toFixed(2)} Tk.</td>
                     </tr>
                 `;
                 tbody.append(row);

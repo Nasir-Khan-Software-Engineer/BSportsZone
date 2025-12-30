@@ -165,7 +165,7 @@ class CustomerController extends Controller
             });
         }
 
-        // Get service summary data - aggregate services by product name
+        // Get service summary data - aggregate services by service name
         $serviceSummary = [];
         if ($customer->purchases->count()) {
             $serviceData = [];
@@ -173,12 +173,12 @@ class CustomerController extends Controller
             // Collect all service items from all purchases
             foreach ($customer->purchases as $purchase) {
                 foreach ($purchase->items as $item) {
-                    if ($item->product) {
-                        $productName = $item->product->name;
-                        if (!isset($serviceData[$productName])) {
-                            $serviceData[$productName] = 0;
+                    if ($item->service) {
+                        $serviceName = $item->service->name;
+                        if (!isset($serviceData[$serviceName])) {
+                            $serviceData[$serviceName] = 0;
                         }
-                        $serviceData[$productName] += $item->quantity;
+                        $serviceData[$serviceName] += $item->quantity;
                     }
                 }
             }

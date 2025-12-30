@@ -53,20 +53,20 @@
 </div>
 
 <div id="createCategoryModalContainer">
-    @include('product/category/create')
+    @include('service/category/create')
 </div>
 
 @endsection
 @section('script')
-@vite(['resources/js/product/category-script.js'])
+@vite(['resources/js/service/category-script.js'])
 <script>
 let CategoryUrls = {
-    'getCategories': "{{ route('product.category.index') }}",
-    'saveCategory': "{{ route('product.category.store') }}",
-    'createCategory': "{{ route('product.category.create') }}",
-    'updateCategory': "{{ route('product.category.update', ['category' => 'categoryid']) }}",
-    'deleteCategory': "{{ route('product.category.destroy', ['category' => 'categoryid']) }}",
-    'editCategory': "{{ route('product.category.edit', ['category' => 'categoryid']) }}"
+    'getCategories': "{{ route('service.category.index') }}",
+    'saveCategory': "{{ route('service.category.store') }}",
+    'createCategory': "{{ route('service.category.create') }}",
+    'updateCategory': "{{ route('service.category.update', ['category' => 'categoryid']) }}",
+    'deleteCategory': "{{ route('service.category.destroy', ['category' => 'categoryid']) }}",
+    'editCategory': "{{ route('service.category.edit', ['category' => 'categoryid']) }}"
 }
 
 $(document).ready(function() {

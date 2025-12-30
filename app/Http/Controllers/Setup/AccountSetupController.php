@@ -153,7 +153,7 @@ class AccountSetupController extends Controller
             $validated = $request->validate(
                 [
                     // Existing fields
-                    'productCodePrefix' => 'required|string|min:3|max:5',
+                    'serviceCodePrefix' => 'required|string|min:3|max:5',
                     'invoiceNumberPrefix' => 'required|string|min:3|max:5',
 
                     // POS Adjustment fields (conditionally required)
@@ -163,7 +163,7 @@ class AccountSetupController extends Controller
                 [], // Custom messages (optional)
                 [
                     // Friendly attribute names
-                    'productCodePrefix' => 'Product Code Prefix',
+                    'serviceCodePrefix' => 'Service Code Prefix',
                     'invoiceNumberPrefix' => 'Invoice Number Prefix',
                     'adjustment_min' => 'Minimum Adjustment',
                     'adjustment_max' => 'Maximum Adjustment',
@@ -190,7 +190,7 @@ class AccountSetupController extends Controller
                 ], 404);
             }
 
-            $accountInfo->productCodePrefix = $validated['productCodePrefix'];
+            $accountInfo->productCodePrefix = $validated['serviceCodePrefix'];
             $accountInfo->invoiceNumberPrefix = $validated['invoiceNumberPrefix'];
             $accountInfo->updated_by = auth()->user()->id;
             $accountInfo->save();

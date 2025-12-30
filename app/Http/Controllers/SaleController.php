@@ -90,7 +90,7 @@ class SaleController extends Controller
         try {
             $sale = Purchases::where('posid', $posid)
             ->with([
-                'items.product',
+                'items.service',
                 'items.beautician',
                 'createdByUser',
                 'updatedByUser',
@@ -134,7 +134,7 @@ class SaleController extends Controller
         try {
             $sale = Purchases::where('posid', $posid)
                 ->with([
-                    'items.product',
+                    'items.service',
                     'items.beautician',
                     'createdByUser',
                     'updatedByUser',

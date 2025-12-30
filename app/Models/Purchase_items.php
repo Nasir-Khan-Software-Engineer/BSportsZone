@@ -22,9 +22,9 @@ class Purchase_items extends Model
         return $this->hasMany(Purchase_items::class, 'purchase_id');
     }
 
-    public function product()
+    public function service()
     {
-        return $this->belongsTo(Product::class, 'product_id');
+        return $this->belongsTo(Product::class, 'product_id')->where('type', 'Service');
     }
 
     public function beautician()

@@ -41,23 +41,22 @@ class PosController extends Controller
         $categories = $this->categoryService->getAllCategories(auth()->user()->posid);
         $brands = $this->brandService->getBrands(auth()->user()->posid);
 
-        //$recentProducts = $this->posService->recentProducts(auth()->user()->posid, 1, 0, 0);
-        $topSellingProducts = $this->posService->getPosPageProducts(auth()->user()->posid);
+        $topSellingServices = $this->posService->getPosPageServices(auth()->user()->posid);
 
         return view('pos/index',[
-            'recentProducts' => $topSellingProducts,
+            'recentServices' => $topSellingServices,
             'categories' => $categories,
             'brands' => $brands]);
     }
 
-    public function searchProduct(Request $request)
+    public function searchService(Request $request)
     {
-        $productName = $request->input('searchCriteria');
+        $serviceName = $request->input('searchCriteria');
         $categoryId  = $request->input('categoryId');
         $brandId     = $request->input('brandId');
         $posId       = auth()->user()->posid;
 
-        $products = Product::select(
+        $services = Product::select(
                 'products.id',
                 'products.name',
                 'products.posid',
@@ -68,12 +67,12 @@ class PosController extends Controller
             )
             ->with('TodaysBeautician:id,name')
             ->where('products.posid', $posId)
-
+            ->where('type', 'Service')
             // search by name or code
-            ->when($productName, function ($query, $productName) {
-                $query->where(function ($q) use ($productName) {
-                    $q->where('products.name', 'like', "%{$productName}%")
-                    ->orWhere('code', 'like', "%{$productName}%");
+            ->when($serviceName, function ($query, $serviceName) {
+                $query->where(function ($q) use ($serviceName) {
+                    $q->where('products.name', 'like', "%{$serviceName}%")
+                    ->orWhere('code', 'like', "%{$serviceName}%");
                 });
             })
 
@@ -93,7 +92,7 @@ class PosController extends Controller
             ->limit(30)
             ->get();
 
-        return response()->json($products);
+        return response()->json($services);
     }
 
     public function saveSales(Request $request){
@@ -119,16 +118,17 @@ class PosController extends Controller
             ],500);
         }
 
-        $productIds = array_column($request->products, 'id');
+        $serviceIds = array_column($request->services, 'id');
         $posid = auth()->user()->posid;
 
-        $products = Product::select('products.id', 'products.price')
+        $services = Product::select('products.id', 'products.price')
             ->where('products.posid', $posid)
-            ->whereIn('products.id', $productIds)
+            ->where('type', 'Service')
+            ->whereIn('products.id', $serviceIds)
             ->get();
 
-        $totalAmount = $products->sum(function ($item) use($request) {
-            $qty = array_filter($request->products, function($prod) use($item){
+        $totalAmount = $services->sum(function ($item) use($request) {
+            $qty = array_filter($request->services, function($prod) use($item){
                 return (int) $prod['id'] == $item->id;
             });
             return ($item->price ?? 0)  * reset($qty)['quantity'];
@@ -160,25 +160,25 @@ class PosController extends Controller
         $purchaseItems = [];
         $now = now();
         
-        foreach($products as $product){
+        foreach($services as $service){
             $purchaseItemObj = [];
 
-            $qty = array_filter($request->products, function($item) use($product){
-                return (int) $item['id'] == $product->id;
+            $qty = array_filter($request->services, function($item) use($service){
+                return (int) $item['id'] == $service->id;
             });
 
-            $productData = reset($qty);
-            $beauticianId = isset($productData['beautician_id']) && !empty($productData['beautician_id']) 
-                ? (int)$productData['beautician_id'] 
+            $serviceData = reset($qty);
+            $beauticianId = isset($serviceData['beautician_id']) && !empty($serviceData['beautician_id']) 
+                ? (int)$serviceData['beautician_id'] 
                 : null;
 
             $purchaseItemObj['posid'] = $posid;
             $purchaseItemObj['purchase_id'] = $purchase->id;
-            $purchaseItemObj['product_id'] = $product->id;
+            $purchaseItemObj['product_id'] = $service->id;
             $purchaseItemObj['beautician_id'] = $beauticianId;
-            $purchaseItemObj['product_price'] = $product->price;
-            $purchaseItemObj['selling_price'] = $product->price;
-            $purchaseItemObj['quantity'] = $productData['quantity'];
+            $purchaseItemObj['product_price'] = $service->price;
+            $purchaseItemObj['selling_price'] = $service->price;
+            $purchaseItemObj['quantity'] = $serviceData['quantity'];
             $purchaseItemObj['created_at'] = $now;
             $purchaseItemObj['updated_at'] = $now;
 
@@ -283,7 +283,7 @@ class PosController extends Controller
             $lastSale = Purchases::where('posid', $posid)
                 ->where('customerId', $customerId)
                 ->with([
-                    'items.product',
+                    'items.service',
                     'payments',
                     'customer',
                     'createdByUser'

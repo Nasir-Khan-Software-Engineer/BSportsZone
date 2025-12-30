@@ -3,8 +3,8 @@ namespace App\Repositories\Pos;
 
 interface IPosRepository{
 
-    public function recentProducts($posId, $shopId, $categoryId, $brandId);
-    public function getTopSellingProduct($posId);
+    public function recentServices($posId, $shopId, $categoryId, $brandId);
+    public function getTopSellingServices($posId);
 }
 
 ?>

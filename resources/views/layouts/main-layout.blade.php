@@ -137,17 +137,17 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('product.*') ? 'not-collapsed' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#productDropdown" aria-expanded="true"
-                    aria-controls="productDropdown">
+                <a class="nav-link {{ request()->routeIs('service.*') ? 'not-collapsed' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#serviceDropdown" aria-expanded="true"
+                    aria-controls="serviceDropdown">
                     <i class="fa-solid fa-spa"></i>
                     <span>Service</span>
                 </a>
-                <div id="productDropdown" class="collapse {{ request()->routeIs('product.*') ? 'show' : '' }}" aria-labelledby="headingproductDropdown" data-parent="#accordionSidebar">
+                <div id="serviceDropdown" class="collapse {{ request()->routeIs('service.*') ? 'show' : '' }}" aria-labelledby="headingserviceDropdown" data-parent="#accordionSidebar">
 
                     <div class="bg-white py-2 collapse-inner rounded">
 
-                        @if(hasAccess('product.index'))
-                        <a class="collapse-item {{ request()->routeIs('product.index') || request()->routeIs('product.show') ? 'active' : '' }}" href="{{ route('product.index') }}">
+                        @if(hasAccess('service.index'))
+                        <a class="collapse-item {{ request()->routeIs('service.index') || request()->routeIs('service.show') ? 'active' : '' }}" href="{{ route('service.index') }}">
                             <i class="fa-solid fa-magic"></i> Service
                         </a>
                         @else
@@ -156,8 +156,8 @@
                         </a>
                         @endif
 
-                        @if(hasAccess('product.category.index'))
-                        <a class="collapse-item {{ request()->routeIs('product.category.*') ? 'active' : '' }}" href="{{ route('product.category.index') }}">
+                        @if(hasAccess('service.category.index'))
+                        <a class="collapse-item {{ request()->routeIs('service.category.*') ? 'active' : '' }}" href="{{ route('service.category.index') }}">
                             <i class="fa-solid fa-tags"></i> Category
                         </a>
                         @else
@@ -166,8 +166,8 @@
                         </a>
                         @endif
 
-                        @if(hasAccess('product.brand.index'))
-                        <a class="collapse-item {{ request()->routeIs('product.brand.*') ? 'active' : '' }}" href="{{ route('product.brand.index') }}">
+                        @if(hasAccess('service.brand.index'))
+                        <a class="collapse-item {{ request()->routeIs('service.brand.*') ? 'active' : '' }}" href="{{ route('service.brand.index') }}">
                             <i class="fa-solid fa-layer-group"></i> Brand
                         </a>
                         @else
@@ -176,8 +176,8 @@
                         </a>
                         @endif
 
-                        @if(hasAccess('product.unit.index'))
-                        <a class="collapse-item {{ request()->routeIs('product.unit.*') ? 'active' : '' }}" href="{{ route('product.unit.index') }}">
+                        @if(hasAccess('service.unit.index'))
+                        <a class="collapse-item {{ request()->routeIs('service.unit.*') ? 'active' : '' }}" href="{{ route('service.unit.index') }}">
                             <i class="fa-solid fa-ruler-horizontal"></i> Unit
                         </a>
                         @else

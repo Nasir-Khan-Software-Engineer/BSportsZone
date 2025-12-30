@@ -8,13 +8,13 @@ textarea {
 }
 </style>
 
-@vite(['resources/css/product/product-style.css'])
+@vite(['resources/css/service/service-style.css'])
 
 @endsection
 
 @php
 $posid = auth()->user()->posid;
-$imagePath = "/images/{$posid}/products/";
+$imagePath = "/images/{$posid}/services/";
 @endphp
 
 @section('content')
@@ -29,13 +29,13 @@ $imagePath = "/images/{$posid}/products/";
                 <input type="text" class="form-control data-table-search" id="searchService" placeholder="Search Service">
                 <div class="vr mx-1"></div>
                 <div class="text-right">
-                    <button type="button" id="createNewProduct" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-plus"></i> New Service</button>
+                    <button type="button" id="createNewService" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-plus"></i> New Service</button>
 
                 </div>
             </div>
         </div>
         <div class="card-body p-1">
-            <table class="table table-bordered" id="productTable">
+            <table class="table table-bordered" id="serviceTable">
                 <thead>
                     <tr>
                         <th class="text-center align-middle" style="width: 5%;" scope="col">ID</th>
@@ -56,65 +56,66 @@ $imagePath = "/images/{$posid}/products/";
     </div>
 </div>
 
-@include('product.add')
-@include('product.edit')
+@include('service.add')
+@include('service.edit')
 
 @endsection
 
 
 
 @section('script')
-@vite(['resources/js/product/product-script.js'])
+@vite(['resources/js/service/service-script.js'])
 <script>
-let productUrls = {
-    'saveProduct': "{{ route('product.store') }}",
-    'showProduct': "{{ route('product.show',['product' => 'productID']) }}",
-    'editProduct': "{{ route('product.edit',['product' => 'productID']) }}",
-    'updateProduct': "{{ route('product.update',['product' => 'productID']) }}",
-    'deleteProduct': "{{ route('product.destroy',['product' => 'productID']) }}",
-    'copyProduct': "{{ route('product.copy',['product' => 'productID']) }}",
-    'productImagePath': "{{ asset($imagePath) }}",
-    'defaultProductImagePath': "{{ asset('images/default_product_img.png') }}",
-    'datatable': "{{ route('product.datatable') }}"
+let serviceUrls = {
+    'saveService': "{{ route('service.store') }}",
+    'showService': "{{ route('service.show',['service' => 'serviceID']) }}",
+    'editService': "{{ route('service.edit',['service' => 'serviceID']) }}",
+    'updateService': "{{ route('service.update',['service' => 'serviceID']) }}",
+    'deleteService': "{{ route('service.destroy',['service' => 'serviceID']) }}",
+    'copyService': "{{ route('service.copy',['service' => 'serviceID']) }}",
+    'serviceImagePath': "{{ asset($imagePath) }}",
+    'defaultServiceImagePath': "{{ asset('images/default_service_img.png') }}",
+    'datatable': "{{ route('service.datatable') }}"
 };
 
 $(document).ready(function() {
-    WinPos.Datatable.initDataTable("#productTable", WinPos.Product.datatableConfiguration());
+    WinPos.Datatable.initDataTable("#serviceTable", WinPos.Service.datatableConfiguration());
 
 
     $("#searchService").on("keyup search input paste cut", function() {
         WinPos.Datatable.filter($(this).val());
     })
 
-    $("#saveProduct").click(async function(event) {
+    $("#saveService").click(async function(event) {
         event.preventDefault();
 
-        let productInfo = WinPos.Common.getFormData('#productAddForm');
+        let serviceInfo = WinPos.Common.getFormData('#serviceAddForm');
 
-        if (productInfo.image instanceof File) {
-            productInfo.image = await fileToBase64(productInfo.image);
+        if (serviceInfo.image instanceof File) {
+            serviceInfo.image = await fileToBase64(serviceInfo.image);
         }
 
-        WinPos.Product.saveProduct(productInfo);
+        WinPos.Service.saveService(serviceInfo);
     });
 
-    $("#createNewProduct").click(function() {
-        $("#productAddForm")[0].reset();
+    $("#createNewService").click(function() {
+        debugger;
+        $("#serviceAddForm")[0].reset();
         $('#imagePreview').css('background-image', '');
-        $("#productBasicInfoTab").click();
-        WinPos.Common.showBootstrapModal("productAddModal");
+        $("#serviceBasicInfoTab").click();
+        WinPos.Common.showBootstrapModal("serviceAddModal");
     })
 
-    $("#updateProduct").click(async function(event) {
+    $("#updateService").click(async function(event) {
         event.preventDefault();
-        let productInfo = WinPos.Common.getFormData('#productEditForm');
-        let productID = $("#hiddenProductID").val();
+        let serviceInfo = WinPos.Common.getFormData('#serviceEditForm');
+        let serviceID = $("#hiddenServiceID").val();
 
-        if (productInfo.image instanceof File) {
-            productInfo.image = await fileToBase64(productInfo.image);
+        if (serviceInfo.image instanceof File) {
+            serviceInfo.image = await fileToBase64(serviceInfo.image);
         }
 
-        WinPos.Product.updateProduct(productInfo, productID);
+        WinPos.Service.updateService(serviceInfo, serviceID);
     });
 
     $("#image").change(function() {
@@ -128,23 +129,23 @@ $(document).on('change', '#editImage', function() {
     WinPos.Common.previewImage('#imagePreviewEdit', this);
 })
 
-$(document).on('click', '.edit-product', function() {
+$(document).on('click', '.edit-service', function() {
     WinPos.Datatable.selectRow(this);
-    let productID = $(this).data('productid');
-    WinPos.Product.editProduct(productID);
+    let serviceID = $(this).data('serviceid');
+    WinPos.Service.editService(serviceID);
 })
 
-$(document).on('click', '.copy-product', function() {
+$(document).on('click', '.copy-service', function() {
     WinPos.Datatable.selectRow(this);
-    let productID = $(this).data('productid');
-    WinPos.Product.copyProduct(productID);
+    let serviceID = $(this).data('serviceid');
+    WinPos.Service.copyService(serviceID);
 })
 
-$(document).on('click', '.delete-product', function(event) {
+$(document).on('click', '.delete-service', function(event) {
     WinPos.Datatable.selectRow(this);
     if (confirm("Are you sure you want to delete this user?\nClick OK to continue or Cancel.")) {
-        let productID = $(this).data('productid');
-        WinPos.Product.deleteProduct(productID);
+        let serviceID = $(this).data('serviceid');
+        WinPos.Service.deleteService(serviceID);
     }
 });
 

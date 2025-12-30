@@ -4,7 +4,7 @@
 
 </style>
 
-@vite(['resources/css/product/product-style.css'])
+@vite(['resources/css/service/service-style.css'])
 @endsection
 
 
@@ -23,12 +23,12 @@
         <div class="card-body p-1">
 
 
-            <div class="card border mb-3" id="productCard">
+            <div class="card border mb-3" id="serviceCard">
                 <div class="card-body d-flex flex-wrap justify-content-between p-1">
-                    <!-- Section 1: Product Image -->
-                    <div class="product-image mr-3">
-                        @if($product->image)
-                        <img src="{{ asset('image/' . $product->image) }}" alt="{{ $product->name }}" class="img-fluid rounded" style="max-width:120px; max-height:120px;">
+                    <!-- Section 1: service Image -->
+                    <div class="service-image mr-3">
+                        @if($service->image)
+                        <img src="{{ asset('image/' . $service->image) }}" alt="{{ $service->name }}" class="img-fluid rounded" style="max-width:120px; max-height:120px;">
                         @else
                         <div class="bg-light d-flex align-items-center justify-content-center" style="width:120px; height:90px;">
                             No Image
@@ -37,49 +37,49 @@
                     </div>
 
                     <!-- Section 2: Basic Info -->
-                    <div class="product-info mr-2 flex-grow-1">
-                        <p class="mb-1"><strong>Code:</strong> {{ $product->code }}</p>
-                        <p class="mb-1"><strong>Name:</strong> {{ $product->name }}</p>
-                        <p class="mb-1"><strong>Price:</strong> TK {{ number_format($product->price, 2) }}</p>
+                    <div class="service-info mr-2 flex-grow-1">
+                        <p class="mb-1"><strong>Code:</strong> {{ $service->code }}</p>
+                        <p class="mb-1"><strong>Name:</strong> {{ $service->name }}</p>
+                        <p class="mb-1"><strong>Price:</strong> TK {{ number_format($service->price, 2) }}</p>
                     </div>
 
                     <!-- Section 2: Basic Info -->
-                    <div class="product-info mr-2 flex-grow-1">
-                        <p class="mb-1"><strong>Brand:</strong> {{ $product->brand->name ?? '-' }}</p>
-                        <p class="mb-1"><strong>Unit:</strong> {{ $product->unit->name ?? '-' }}</p>
-                        <p class="mb-1"><strong>Categories:</strong> {{ $product->categories->pluck('name')->join(', ') ?: '-' }}</p>
-                        <p class="mb-1"><strong>Default Beautician:</strong> {{ $product->beautician->name ?? '-' }}</p>
+                    <div class="service-info mr-2 flex-grow-1">
+                        <p class="mb-1"><strong>Brand:</strong> {{ $service->brand->name ?? '-' }}</p>
+                        <p class="mb-1"><strong>Unit:</strong> {{ $service->unit->name ?? '-' }}</p>
+                        <p class="mb-1"><strong>Categories:</strong> {{ $service->categories->pluck('name')->join(', ') ?: '-' }}</p>
+                        <p class="mb-1"><strong>Default Beautician:</strong> {{ $service->beautician->name ?? '-' }}</p>
                     </div>
 
                     <!-- Section 4: Sales Info -->
-                    <div class="product-sales mr-2 flex-grow-1">
-                        <p class="mb-1"><strong>Last Sale At:</strong> {{ $product->lastSaleAt ? $product->lastSaleAt : '-' }}</p>
-                        <p class="mb-1"><strong>Total Number of Sales:</strong> {{ $product->totalSalesCount ?? 0 }}</p>
-                        <p class="mb-1"><strong>Total Amount of Sales:</strong> TK {{ number_format($product->totalSalesAmount ?? 0, 2) }}</p>
+                    <div class="service-sales mr-2 flex-grow-1">
+                        <p class="mb-1"><strong>Last Sale At:</strong> {{ $service->lastSaleAt ? $service->lastSaleAt : '-' }}</p>
+                        <p class="mb-1"><strong>Total Number of Sales:</strong> {{ $service->totalSalesCount ?? 0 }}</p>
+                        <p class="mb-1"><strong>Total Amount of Sales:</strong> TK {{ number_format($service->totalSalesAmount ?? 0, 2) }}</p>
                     </div>
 
 
                     <!-- Section 3: Additional Info -->
-                    <div class="product-meta">
-                        <p class="mb-1"><strong>Created By:</strong> {{ $product->createdBy ?? '-' }}</p>
-                        <p class="mb-1"><strong>Updated By:</strong> {{ $product->updatedBy ?? '-' }}</p>
-                        <p class="mb-1"><strong>Created At:</strong> {{ $product->created_at->format('d M, Y') }}</p>
-                        <p class="mb-1"><strong>Updated At:</strong> {{ $product->updated_at->format('d M, Y') }}</p>
+                    <div class="service-meta">
+                        <p class="mb-1"><strong>Created By:</strong> {{ $service->createdBy ?? '-' }}</p>
+                        <p class="mb-1"><strong>Updated By:</strong> {{ $service->updatedBy ?? '-' }}</p>
+                        <p class="mb-1"><strong>Created At:</strong> {{ $service->created_at->format('d M, Y') }}</p>
+                        <p class="mb-1"><strong>Updated At:</strong> {{ $service->updated_at->format('d M, Y') }}</p>
                     </div>
                 </div>
             </div>
 
-            @if(!empty($product->description))
-            <div class="accordion mb-3" id="productDescriptionAccordion">
+            @if(!empty($service->description))
+            <div class="accordion mb-3" id="serviceDescriptionAccordion">
                 <div class="accordion-item">
                     <h2 class="accordion-header" id="headingDescription">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseDescription" aria-expanded="false" aria-controls="collapseDescription">
                             View Description
                         </button>
                     </h2>
-                    <div id="collapseDescription" class="accordion-collapse collapse" aria-labelledby="headingDescription" data-bs-parent="#productDescriptionAccordion">
+                    <div id="collapseDescription" class="accordion-collapse collapse" aria-labelledby="headingDescription" data-bs-parent="#serviceDescriptionAccordion">
                         <div class="accordion-body">
-                            {!! nl2br(e($product->description)) !!}
+                            {!! nl2br(e($service->description)) !!}
                         </div>
                     </div>
                 </div>
@@ -120,7 +120,7 @@
                                     {{ $sale->customer_name }}
                                     @endif
                                 </td>
-                                <td class="text-center align-middle">{{ $sale->product_quantity }}</td>
+                                <td class="text-center align-middle">{{ $sale->service_quantity }}</td>
                                 <td class="text-center align-middle">
                                     <a href="{{ route('sales.sale.show', $sale->id) }}" class="btn btn-sm thm-btn-bg thm-btn-text-color">
                                      <i class="fa-solid fa-eye"></i> View Details
@@ -145,8 +145,20 @@
 @endsection
 
 @section('script')
-@vite(['resources/js/product/product-script.js'])
+@vite(['resources/js/service/service-script.js'])
 <script>
+
+let serviceUrls = {
+    'saveService': "{{ route('service.store') }}",
+    'showService': "{{ route('service.show',['service' => 'serviceID']) }}",
+    'editService': "{{ route('service.edit',['service' => 'serviceID']) }}",
+    'updateService': "{{ route('service.update',['service' => 'serviceID']) }}",
+    'deleteService': "{{ route('service.destroy',['service' => 'serviceID']) }}",
+    'copyService': "{{ route('service.copy',['service' => 'serviceID']) }}",
+    'defaultServiceImagePath': "{{ asset('images/default_service_img.png') }}",
+    'datatable': "{{ route('service.datatable') }}"
+};
+
 @if($sales->count() > 0)
 $(document).ready(function() {
     WinPos.Datatable.initDataTable('#salesTable', {

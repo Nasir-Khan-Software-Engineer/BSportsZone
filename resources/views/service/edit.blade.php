@@ -1,34 +1,34 @@
-<!-- product Add, Edit Modal -->
-<div class="modal fade" id="productEditModal" tabindex="-1" role="dialog" aria-labelledby="productEditModalLabel" aria-hidden="true">
+<!-- pervice Add, Edit Modal -->
+<div class="modal fade" id="serviceEditModal" tabindex="-1" role="dialog" aria-labelledby="perviceEditModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content rounded">
             <div class="modal-header rounded">
-                <h5 class="modal-title" id="productEditModalLabel">Update Service<span id="editProductID"></span></h5>
+                <h5 class="modal-title" id="perviceEditModalLabel">Update Service<span id="editServiceID"></span></h5>
                 <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 
-                <ul class="nav nav-tabs" id="productEditMenuTab" role="tablist">
+                <ul class="nav nav-tabs" id="perviceEditMenuTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="editProductBasicInfoTab" data-bs-toggle="tab" data-bs-target="#eidtProductBasicInfoPane" 
-                            type="button" role="tab" aria-controls="eidtProductBasicInfoPane" aria-selected="true">Basic Info</button>
+                        <button class="nav-link active" id="editServiceBasicInfoTab" data-bs-toggle="tab" data-bs-target="#eidtServiceBasicInfoPane" 
+                            type="button" role="tab" aria-controls="eidtServiceBasicInfoPane" aria-selected="true">Basic Info</button>
                     </li>
 
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="eidtProductDetailsTab" data-bs-toggle="tab" data-bs-target="#editProductDetailsPane" type="button" 
-                            role="tab" aria-controls="editProductDetailsPane" aria-selected="false">Details</button>
+                        <button class="nav-link" id="eidtServiceDetailsTab" data-bs-toggle="tab" data-bs-target="#editServiceDetailsPane" type="button" 
+                            role="tab" aria-controls="editServiceDetailsPane" aria-selected="false">Details</button>
                     </li>
                 </ul>
 
-                <form id="productEditForm">
-                    <div class="tab-content" id="productEditMenuTabContent">
-                        <div class="tab-pane fade show active" id="eidtProductBasicInfoPane" role="tabpanel" aria-labelledby="editProductBasicInfoTab" tabindex="0">
+                <form id="serviceEditForm">
+                    <div class="tab-content" id="perviceEditMenuTabContent">
+                        <div class="tab-pane fade show active" id="eidtServiceBasicInfoPane" role="tabpanel" aria-labelledby="editServiceBasicInfoTab" tabindex="0">
                             <div class="row mt-2">
                                 <div class="col-12 col-lg-3 form-group">
-                                    <input type="hidden" id="hiddenProductID" name="editID">
-                                    <label for="editCode">Code* <small>(Will Start With {{ (session('accountInfo.productCodePrefix') ?? 'AU').'-' }})</small></label>
+                                    <input type="hidden" id="hiddenServiceID" name="editID">
+                                    <label for="editCode">Code* <small>(Will Start With {{ (session('accountInfo.perviceCodePrefix') ?? 'AU').'-' }})</small></label>
                                     <input required readonly type="text" class="form-control rounded" name="code" id="editCode" placeholder="Service Code">
                                 </div>
 
@@ -74,7 +74,7 @@
                                                         <input type='file' id="editImage" name="image" accept=".png, .jpg, .jpeg" />
                                                         <label for="editImage"></label>
                                                     </div>
-                                                    <div id="productImagePreviewEdit" class="avatar-preview">
+                                                    <div id="perviceImagePreviewEdit" class="avatar-preview">
                                                         <div id="imagePreviewEdit" style="background-image: url();"></div>
                                                     </div>
                                                 </div>
@@ -84,7 +84,7 @@
                             </div>
                         </div>
                         
-                        <div class="tab-pane fade hide" id="editProductDetailsPane" role="tabpanel" aria-labelledby="editProductDetailsTab" tabindex="1">
+                        <div class="tab-pane fade hide" id="editServiceDetailsPane" role="tabpanel" aria-labelledby="editServiceDetailsTab" tabindex="1">
                             <div class="row mt-2">
                                 <div class="col-12 form-group">
                                     <label for="editDetails">Details</label>
@@ -97,7 +97,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Close</button>
-                <button type="button" id="updateProduct" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Update</button>
+                <button type="button" id="updateService" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Update</button>
             </div>
         </div>
     </div>

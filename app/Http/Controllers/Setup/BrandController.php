@@ -32,12 +32,12 @@ class BrandController extends Controller
             }
         }
 
-        return view("product/brand/index", ['brands' => $brands]);
+        return view("service/brand/index", ['brands' => $brands]);
     }
 
     public function create()
     {
-        return view('product/brand/create');
+        return view('service/brand/create');
     }
 
     public function store(Request $request)
@@ -94,7 +94,7 @@ class BrandController extends Controller
 
     public function edit(Brand $brand)
     {
-        return view('product/brand/create',['brand' => $brand]);
+        return view('service/brand/create',['brand' => $brand]);
     }
 
     public function update(Request $request, $id)
@@ -150,7 +150,7 @@ class BrandController extends Controller
     {
         try{
 
-            if($brand->products()->count() > 0){
+            if($brand->services()->count() > 0){
                 return response()->json([
                     'status' => 'error',
                     'errors' => [

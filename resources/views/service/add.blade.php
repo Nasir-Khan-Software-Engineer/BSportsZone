@@ -1,33 +1,33 @@
-<!-- product Add, Edit Modal -->
-<div class="modal fade" id="productAddModal" tabindex="-1" role="dialog" aria-labelledby="productAddModalLabel" aria-hidden="true">
+<!-- pervice Add, Edit Modal -->
+<div class="modal fade" id="serviceAddModal" tabindex="-1" role="dialog" aria-labelledby="perviceAddModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content rounded">
             <div class="modal-header rounded">
-                <h5 class="modal-title" id="productAddModalLabel">Create New Service<span id="productID"></span></h5>
+                <h5 class="modal-title" id="perviceAddModalLabel">Create New Service<span id="perviceID"></span></h5>
                 <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 
-                <ul class="nav nav-tabs" id="productSetupTab" role="tablist">
+                <ul class="nav nav-tabs" id="perviceSetupTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="productBasicInfoTab" data-bs-toggle="tab" data-bs-target="#productBasicInfoPane" 
-                            type="button" role="tab" aria-controls="productBasicInfoPane" aria-selected="true">Basic Info</button>
+                        <button class="nav-link active" id="perviceBasicInfoTab" data-bs-toggle="tab" data-bs-target="#perviceBasicInfoPane" 
+                            type="button" role="tab" aria-controls="perviceBasicInfoPane" aria-selected="true">Basic Info</button>
                     </li>
 
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="productDetailsTab" data-bs-toggle="tab" data-bs-target="#productDetailsPane" type="button" 
-                            role="tab" aria-controls="productDetailsPane" aria-selected="false">Details</button>
+                        <button class="nav-link" id="perviceDetailsTab" data-bs-toggle="tab" data-bs-target="#perviceDetailsPane" type="button" 
+                            role="tab" aria-controls="perviceDetailsPane" aria-selected="false">Details</button>
                     </li>
                 </ul>
 
-                <form id="productAddForm">
-                    <div class="tab-content" id="productSetupTabContent">
-                        <div class="tab-pane fade show active" id="productBasicInfoPane" role="tabpanel" aria-labelledby="productBasicInfoTab" tabindex="0">
+                <form id="serviceAddForm">
+                    <div class="tab-content" id="perviceSetupTabContent">
+                        <div class="tab-pane fade show active" id="perviceBasicInfoPane" role="tabpanel" aria-labelledby="perviceBasicInfoTab" tabindex="0">
                             <div class="row mt-2">
                                 <div class="col-12 col-lg-3 form-group">
-                                   <label for="code">Code* <small>(Will Start With {{ (session('accountInfo.productCodePrefix') ?? 'AU').'-' }})</small></label>
+                                   <label for="code">Code* <small>(Will Start With {{ (session('accountInfo.perviceCodePrefix') ?? 'AU').'-' }})</small></label>
                                     <input required type="text" class="form-control rounded" name="code" id="code" placeholder="Service Code">
                                 </div>
 
@@ -84,7 +84,7 @@
                             </div>
                         </div>
                         
-                        <div class="tab-pane fade hide" id="productDetailsPane" role="tabpanel" aria-labelledby="productDetailsTab" tabindex="1">
+                        <div class="tab-pane fade hide" id="perviceDetailsPane" role="tabpanel" aria-labelledby="perviceDetailsTab" tabindex="1">
                             <div class="row mt-2">
                                 <div class="col-12 form-group">
                                     <label for="details">Note</label>
@@ -97,7 +97,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Close</button>
-                <button type="button" id="saveProduct" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+                <button type="button" id="saveService" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Save</button>
             </div>
         </div>
     </div>

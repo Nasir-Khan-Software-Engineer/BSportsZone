@@ -26,115 +26,115 @@ class AccessRightSeeder extends Seeder
             // Services
             [
                 'title' => 'Service-> View Service List',
-                'route_name' => 'product.index',
+                'route_name' => 'service.index',
                 'short_id' => 'service_view',
                 'description' => 'Allows viewing service list',
             ],
             [
                 'title' => 'Service-> View Service Details',
-                'route_name' => 'product.show',
+                'route_name' => 'service.show',
                 'short_id' => 'service_show',
                 'description' => 'Allows viewing service details',
             ],
             [
                 'title' => 'Service-> Store Service',
-                'route_name' => 'product.store',
+                'route_name' => 'service.store',
                 'short_id' => 'service_store',
                 'description' => 'Allows storing new service',
             ],
             [
                 'title' => 'Service-> Edit Service',
-                'route_name' => 'product.edit',
+                'route_name' => 'service.edit',
                 'short_id' => 'service_edit',
                 'description' => 'Allows editing service',
             ],
             [
                 'title' => 'Service-> Update Service',
-                'route_name' => 'product.update',
+                'route_name' => 'service.update',
                 'short_id' => 'service_update',
                 'description' => 'Allows updating service',
             ],
             [
                 'title' => 'Service-> Delete Service',
-                'route_name' => 'product.destroy',
+                'route_name' => 'service.destroy',
                 'short_id' => 'service_delete',
                 'description' => 'Allows deleting service',
             ],
 
-            // Product Brands
+            // Service Brands
             [
                 'title' => 'Services->Brands-> View Brands List',
-                'route_name' => 'product.brand.index',
+                'route_name' => 'service.brand.index',
                 'short_id' => 'brand_view',
                 'description' => 'Allows viewing brands list',
             ],
             [
                 'title' => 'Services->Brands-> Store Brand',
-                'route_name' => 'product.brand.store',
+                'route_name' => 'service.brand.store',
                 'short_id' => 'brand_store',
                 'description' => 'Allows storing new brand',
             ],
             [
                 'title' => 'Services->Brands-> Update Brand',
-                'route_name' => 'product.brand.update',
+                'route_name' => 'service.brand.update',
                 'short_id' => 'brand_update',
                 'description' => 'Allows updating brand',
             ],
             [
                 'title' => 'Services->Brands-> Delete Brand',
-                'route_name' => 'product.brand.destroy',
+                'route_name' => 'service.brand.destroy',
                 'short_id' => 'brand_delete',
                 'description' => 'Allows deleting brand',
             ],
 
-            // Product Categories
+            // Service Categories
             [
                 'title' => 'Services->Categories-> View Categories List',
-                'route_name' => 'product.category.index',
+                'route_name' => 'service.category.index',
                 'short_id' => 'category_view',
                 'description' => 'Allows viewing category list',
             ],
             [
                 'title' => 'Services->Categories-> Store New Category',
-                'route_name' => 'product.category.store',
+                'route_name' => 'service.category.store',
                 'short_id' => 'category_store',
                 'description' => 'Allows storing new categories',
             ],
             [
                 'title' => 'Services->Categories-> Update Category',
-                'route_name' => 'product.category.update',
+                'route_name' => 'service.category.update',
                 'short_id' => 'category_update',
                 'description' => 'Allows updating categories',
             ],
             [
                 'title' => 'Services->Categories-> Delete Category',
-                'route_name' => 'product.category.destroy',
+                'route_name' => 'service.category.destroy',
                 'short_id' => 'category_delete',
                 'description' => 'Allows deleting categories',
             ],
 
-            // Product Units
+            // Service Units
             [
                 'title' => 'Services->Units-> View Units List',
-                'route_name' => 'product.unit.index',
+                'route_name' => 'service.unit.index',
                 'short_id' => 'unit_view',
-                'description' => 'Allows viewing product units',
+                'description' => 'Allows viewing service units',
             ],
             [
                 'title' => 'Services->Units-> Store New Unit',
-                'route_name' => 'product.unit.store',
+                'route_name' => 'service.unit.store',
                 'short_id' => 'unit_store',
                 'description' => 'Allows storing new unit',
             ],
             [
                 'title' => 'Services->Units-> Update Unit',
-                'route_name' => 'product.unit.update',
+                'route_name' => 'service.unit.update',
                 'short_id' => 'unit_update',
                 'description' => 'Allows updating unit',
             ],
             [
                 'title' => 'Services->Units-> Delete Unit',
-                'route_name' => 'product.unit.destroy',
+                'route_name' => 'service.unit.destroy',
                 'short_id' => 'unit_delete',
                 'description' => 'Allows deleting unit',
             ],

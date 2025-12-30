@@ -25,7 +25,7 @@ class CategoryController extends Controller
             $category->formattedTime = formatTime($category->created_at);
         }
 
-        return view("product/category/index", ['categories' => $categories]);
+        return view("service/category/index", ['categories' => $categories]);
     }
 
     public function store(Request $request)
@@ -133,7 +133,7 @@ class CategoryController extends Controller
 
             $category = Category::Where('posid', auth()->user()->posid)->where('id', $id)->first();
 
-            if ($category->products()->count() > 0) {
+            if ($category->services()->count() > 0) {
                 return response()->json([
                     'status' => 'error',
                     'errors' => [

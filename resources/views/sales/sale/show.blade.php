@@ -95,8 +95,8 @@
                         <tbody>
                             @foreach ($sale->items as $item)
                             <tr>
-                                <td>{{ $item->product->code }}</td>
-                                <td>{{ $item->product->name }}</td>
+                                <td>{{ $item->service->code }}</td>
+                                <td>{{ $item->service->name }}</td>
                                 <td class="text-center">{{ $item->beautician->name ?? 'None' }}</td>
                                 <td class="text-center">{{ $item->quantity }}</td>
                                 <td class="text-end">{{ number_format($item->selling_price,2) }} Tk</td>

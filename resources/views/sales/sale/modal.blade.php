@@ -1,4 +1,4 @@
-<!-- product Add, Edit Modal -->
+<!-- service Add, Edit Modal -->
 <div class="modal fade" id="showSaleModal" tabindex="-1" role="dialog" aria-labelledby="showSaleModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
         <div class="modal-content rounded">
@@ -16,7 +16,7 @@
                     </li>
 
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="showSaleProductTab" data-bs-toggle="tab" data-bs-target="#showSaleProductPane" type="button" role="tab" aria-controls="showSaleProductPane" aria-selected="false">Service</button>
+                        <button class="nav-link" id="showSaleServiceTab" data-bs-toggle="tab" data-bs-target="#showSaleServicePane" type="button" role="tab" aria-controls="showSaleServicePane" aria-selected="false">Service</button>
                     </li>
 
                     <li class="nav-item" role="presentation">
@@ -69,7 +69,7 @@
                         </div>
                     </div>
 
-                    <div class="tab-pane fade hide" id="showSaleProductPane" role="tabpanel" aria-labelledby="showSaleProductTab" tabindex="1">
+                    <div class="tab-pane fade hide" id="showSaleServicePane" role="tabpanel" aria-labelledby="showSaleServiceTab" tabindex="1">
                         <table class="table table-bordered mt-2" id="itemsTable">
                             <thead class="table-light">
                                 <tr>

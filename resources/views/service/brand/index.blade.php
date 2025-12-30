@@ -55,15 +55,15 @@
 
 @endsection
 @section('script')
-@vite(['resources/js/product/brand-script.js'])
+@vite(['resources/js/service/brand-script.js'])
 <script>
 let BrandUrls = {
-    'getBrands': "{{ route('product.brand.index') }}",
-    'saveBrand': "{{ route('product.brand.store') }}",
-    'createBrand': "{{ route('product.brand.create') }}",
-    'updateBrand': "{{ route('product.brand.update', ['brand' => 'brandid']) }}",
-    'deleteBrand': "{{ route('product.brand.destroy', ['brand' => 'brandid']) }}",
-    'editBrand': "{{ route('product.brand.edit', ['brand' => 'brandid']) }}"
+    'getBrands': "{{ route('service.brand.index') }}",
+    'saveBrand': "{{ route('service.brand.store') }}",
+    'createBrand': "{{ route('service.brand.create') }}",
+    'updateBrand': "{{ route('service.brand.update', ['brand' => 'brandid']) }}",
+    'deleteBrand': "{{ route('service.brand.destroy', ['brand' => 'brandid']) }}",
+    'editBrand': "{{ route('service.brand.edit', ['brand' => 'brandid']) }}"
 }
 
 $(document).ready(function() {

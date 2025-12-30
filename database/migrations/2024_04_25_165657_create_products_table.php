@@ -16,6 +16,7 @@ return new class extends Migration
             $table->integer('posid');
             $table->string('code');
             $table->string('name'); 
+            $table->string('type')->default('Service');
             $table->integer('unit_id')->nullable();
             $table->integer('brand_id')->nullable();
             $table->double('price');

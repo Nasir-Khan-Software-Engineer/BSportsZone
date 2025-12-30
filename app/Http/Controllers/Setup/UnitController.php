@@ -26,7 +26,7 @@ class UnitController extends Controller
             }
         }
 
-        return view('product.unit.index', ['units' => $units]);
+        return view('service.unit.index', ['units' => $units]);
     }
 
     public function edit($id){
@@ -138,7 +138,7 @@ class UnitController extends Controller
             ->where('id', $id)
             ->first();
 
-         if($unit->products()->count() > 0){
+         if($unit->services()->count() > 0){
             return response()->json([
                 'status' => 'error',
                 'errors' => [

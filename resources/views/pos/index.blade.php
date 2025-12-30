@@ -105,9 +105,9 @@
 
                     @include('pos.pos-terminal-customer-ribbon')
 
-                    <!-- Product Table -->
+                    <!-- Service Table -->
                     <div class="full-height">
-                        <table class="table table-bordered pos-page-font-size" id="product-table">
+                        <table class="table table-bordered pos-page-font-size" id="service-table">
                             <thead class="table-light">
                                 <tr>
                                     <th style="width: 50%;">Service</th>
@@ -179,7 +179,7 @@
         </div>
     </div>
 
-    <!-- Product Grid and Recent Transactions -->
+    <!-- Service Grid and Recent Transactions -->
     <div class="col-md-4">
         <div class="mb-3">
             <div class="row">
@@ -206,14 +206,14 @@
                 </button>
             </div>
 
-            <div class="row show" id="collapseProduct">
+            <div class="row show" id="collapseService">
                 <div class="col" style="overflow-y: auto; overflow-x: hidden; height: 80vh;">
-                    <div id="searchProductContainer" class="grid-view">
-                        @foreach($recentProducts as $recProd)
-                        <div data-toggle="tooltip" data-placement="top" title="{{ $recProd->name }}" class="grid-item recent-product d-flex flex-column align-items-center p-2"
+                    <div id="searchServiceContainer" class="grid-view">
+                        @foreach($recentServices as $recProd)
+                        <div data-toggle="tooltip" data-placement="top" title="{{ $recProd->name }}" class="grid-item recent-service d-flex flex-column align-items-center p-2"
                             style="background-color: #ccc;" data-id="{{ $recProd->id }}">
                             @if(!empty($recProd->image))
-                            <img src="{{ asset("images/{$recProd->posid}/products/{$recProd->image}") }}" class="rounded" style="width: 100px; height: 50px; object-fit: cover;">
+                            <img src="{{ asset("images/{$recProd->posid}/services/{$recProd->image}") }}" class="rounded" style="width: 100px; height: 50px; object-fit: cover;">
                             @else
                             <div class="rounded" style="background-color: #fff; width: 100px; height: 50px;"></div>
                             @endif
@@ -224,7 +224,7 @@
                             <p style="font-size: 12px;" class="m-0">({{ $recProd->code }})</p>
                         </div>
 
-                        <div class="list-item recent-product list-group-item list-group-item-action d-none pos-page-font-size" data-id="{{ $recProd->id }}">
+                        <div class="list-item recent-service list-group-item list-group-item-action d-none pos-page-font-size" data-id="{{ $recProd->id }}">
                             {{ $recProd->code }} | {{ $recProd->name }}
                         </div>
                         @endforeach
@@ -259,7 +259,7 @@ $js[] = 'resources/js/loyalty/loyalty-script.js';
 <script>
 let posUrls = {
     'getBeauticians': "{{ route('pos.beauticians') }}",
-    'searchProduct': "{{ route('pos.search.product') }}",
+    'searchService': "{{ route('pos.search.service') }}",
     'saveSales': "{{ route('pos.sales.save')}}",
     'searchCustomer': "{{ route('pos.customer.search')}}",
     'getAccountInfo': "{{ route('pos.account.get')}}",
@@ -289,7 +289,7 @@ let cashier = {
     name: "{{ auth()->user()->name }}"
 }
 
-const recentProducts = @JSON($recentProducts);
+const recentServices = @JSON($recentServices);
 
 $(document).ready(function() {
 
@@ -316,7 +316,7 @@ $(document).ready(function() {
 
     WinPos.Pos.cart.setCashier(cashier);
 
-    $(document).on('click', '.remove-cart-product', function() {
+    $(document).on('click', '.remove-cart-service', function() {
         const prodId = $(this).attr('data-id');
         WinPos.Pos.cart.remove(prodId);
     });
@@ -328,8 +328,8 @@ $(document).ready(function() {
         WinPos.Pos.cart.updateQuantity(prodId, qty);
     });
 
-    $(document).on('click', '.recent-product', function() {
-        const prod = recentProducts.find((item) => item.id == $(this).attr('data-id'));
+    $(document).on('click', '.recent-service', function() {
+        const prod = recentServices.find((item) => item.id == $(this).attr('data-id'));
 
         if (prod) {
             WinPos.Pos.cart.addItem(prod);
@@ -409,15 +409,15 @@ $(document).ready(function() {
     });
 
     $(document).on('keyup', '#posSearchInput', function() {
-        runProductSearch();
+        runServiceSearch();
     });
 
     $(document).on('change', '#posSearchCategory', function() {
-        runProductSearch();
+        runServiceSearch();
     });
 
     $(document).on('change', '#posSearchBrand', function() {
-        runProductSearch();
+        runServiceSearch();
     });
 
     $('#posSearchCategory').select2({
@@ -665,12 +665,12 @@ function renderCart(cart) {
         dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '"></td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + item.price.toFixed(2) + ' Tk.</td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + ((item.price) * item.quantity).toFixed(2) + ' Tk.</td>');
-        dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><button type="button" class="btn thm-btn-bg thm-btn-text-color btn-sm remove-cart-product pos-page-font-size" data-id="' +
+        dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><button type="button" class="btn thm-btn-bg thm-btn-text-color btn-sm remove-cart-service pos-page-font-size" data-id="' +
             item.id + '"><i class="fa fa-solid fa-times"></i></button></td>')
         dom.push('</tr>');
     });
 
-    $('#product-table tbody').html(dom.join(''));
+    $('#service-table tbody').html(dom.join(''));
 
     const totalAmount = cart.total;
     const discountAmount = (cart.discountType == 'fixed') ? cart.discount : (totalAmount * cart.discount) / 100;
@@ -708,7 +708,7 @@ function renderCart(cart) {
     });
 }
 
-function runProductSearch() {
+function runServiceSearch() {
     let searchInput = $('#posSearchInput').val();
     let searchCategory = $('#posSearchCategory').val();
     let searchBrand = $('#posSearchBrand').val();
@@ -717,9 +717,9 @@ function runProductSearch() {
         return;
     }
 
-    WinPos.Pos.searchProduct(searchInput, searchCategory, searchBrand)
+    WinPos.Pos.searchService(searchInput, searchCategory, searchBrand)
         .then((searchResult) => {
-            WinPos.Pos.RenderSearchProduct(searchResult);
+            WinPos.Pos.RenderSearchService(searchResult);
         })
         .catch((error) => {
             console.log(error);
@@ -742,7 +742,7 @@ $(document).on('input change', '#adjustmentAmtInput', function() {
 
 
 $(document).on('click', '#toggleViewBtn', function() {
-    let container = $('#searchProductContainer');
+    let container = $('#searchServiceContainer');
     let icon = $(this).find('i');
 
     if (container.hasClass('grid-view')) {

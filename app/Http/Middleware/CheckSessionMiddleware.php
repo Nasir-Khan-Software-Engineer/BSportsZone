@@ -100,7 +100,7 @@ class CheckSessionMiddleware
                         'primaryEmail'        => $accountInfo->primaryEmail,
                         'primaryPhone'        => $accountInfo->primaryPhone,
                         'address'             => $accountInfo->address,
-                        'productCodePrefix'   => $accountInfo->productCodePrefix,
+                        'serviceCodePrefix'   => $accountInfo->productCodePrefix,
                         'invoiceNumberPrefix' => $accountInfo->invoiceNumberPrefix,
                         'timezone'            => 'Asia/Dhaka',
                         'currency'            => 'BDT',

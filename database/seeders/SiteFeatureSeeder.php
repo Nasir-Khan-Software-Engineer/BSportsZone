@@ -16,8 +16,8 @@ class SiteFeatureSeeder extends Seeder
     {
         $features = [
             [
-                'feature_name' => 'SEPERATED_PRODUCT_AND_SERVICE',
-                'description' => 'Enable separate products and services',
+                'feature_name' => 'SEPERATED_SERVICE_AND_SERVICE',
+                'description' => 'Enable separate services and services',
                 'is_active_global' => true,
             ],
             [

@@ -9,9 +9,9 @@ class Unit extends Model
 {
     use HasFactory;
 
-    public function products()
+    public function services()
     {
-        return $this->hasMany(Product::class, 'unit_id');
+        return $this->hasMany(Product::class, 'unit_id')->where('type', 'Service');
     }
 
     public function creator()

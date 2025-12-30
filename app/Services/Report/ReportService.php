@@ -209,7 +209,7 @@ class ReportService implements IReportService{
             $query->whereDate('created_at', '<=', $to);
         }
 
-        $query->with(['items.product', 'payments']);
+        $query->with(['items.service', 'payments']);
 
         // Get all purchases in the date range
         $purchases = $query->get();
@@ -223,38 +223,38 @@ class ReportService implements IReportService{
         // Calculate average sale value
         $averageSaleValue = $numberOfSales > 0 ? $totalRevenue / $numberOfSales : 0;
 
-        // Group purchase items by product to calculate service/product revenue
+        // Group purchase items by service to calculate service/service revenue
         // Revenue per item = selling_price * quantity
-        $productRevenueData = [];
+        $serviceRevenueData = [];
         
         foreach ($purchases as $purchase) {
             foreach ($purchase->items as $item) {
-                $productId = $item->product_id;
+                $serviceId = $item->product_id;
                 
                 // Calculate revenue for this item: selling_price * quantity
                 $itemRevenue = ($item->selling_price ?? 0) * ($item->quantity ?? 0);
                 
-                if (!isset($productRevenueData[$productId])) {
-                    $productRevenueData[$productId] = [
-                        'product_id' => $productId,
-                        'code' => $item->product->code ?? '',
-                        'name' => $item->product->name ?? '',
+                if (!isset($serviceRevenueData[$serviceId])) {
+                    $serviceRevenueData[$serviceId] = [
+                        'product_id' => $serviceId,
+                        'code' => $item->service->code ?? '',
+                        'name' => $item->service->name ?? '',
                         'price' => $item->selling_price ?? 0,
                         'quantity_sold' => 0,
                         'revenue' => 0,
                     ];
                 }
                 
-                $productRevenueData[$productId]['quantity_sold'] += $item->quantity;
-                $productRevenueData[$productId]['revenue'] += $itemRevenue;
+                $serviceRevenueData[$serviceId]['quantity_sold'] += $item->quantity;
+                $serviceRevenueData[$serviceId]['revenue'] += $itemRevenue;
             }
         }
 
         // Calculate totals before formatting
-        $totalQuantity = array_sum(array_column($productRevenueData, 'quantity_sold'));
+        $totalQuantity = array_sum(array_column($serviceRevenueData, 'quantity_sold'));
 
         // Convert to collection and format
-        $revenueData = collect($productRevenueData)->map(function($item) {
+        $revenueData = collect($serviceRevenueData)->map(function($item) {
             $item['revenue'] = str_replace('BDT', 'Tk.', Number::currency($item['revenue'], 'BDT'));
             $item['price'] = str_replace('BDT', 'Tk.', Number::currency($item['price'], 'BDT'));
             return $item;
@@ -271,7 +271,7 @@ class ReportService implements IReportService{
 
         // Calculate service revenue (for now, all items are treated as services)
         $serviceRevenue = $totalRevenue; // All revenue is service revenue in this system
-        $productRevenue = 0; // Can be separated later if needed
+        $serviceRevenue = 0; // Can be separated later if needed
 
         $summaryData = null;
 
@@ -291,7 +291,7 @@ class ReportService implements IReportService{
             'summary' => [
                 'totalRevenue' => str_replace('BDT', 'Tk.', Number::currency($totalRevenue, 'BDT')),
                 'serviceRevenue' => str_replace('BDT', 'Tk.', Number::currency($serviceRevenue, 'BDT')),
-                'productRevenue' => str_replace('BDT', 'Tk.', Number::currency($productRevenue, 'BDT')),
+                'serviceRevenue' => str_replace('BDT', 'Tk.', Number::currency($serviceRevenue, 'BDT')),
                 'averageSaleValue' => str_replace('BDT', 'Tk.', Number::currency($averageSaleValue, 'BDT')),
             ],
             'totals' => [

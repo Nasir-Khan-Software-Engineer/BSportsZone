@@ -33,12 +33,12 @@ WinPos.sale = (function (Urls){
                 $('#sale_note').text(sale.note || '-');
 
                 // Items table
-                const productTableBody = $("#itemsTable tbody");
-                productTableBody.html('');
+                const serviceTableBody = $("#itemsTable tbody");
+                serviceTableBody.html('');
 
                 sale.items.forEach(function (item) {
-                    let code = item.product ? item.product.code : '';
-                    let name = item.product ? item.product.name : '';
+                    let code = item.service ? item.service.code : '';
+                    let name = item.service ? item.service.name : '';
                     let qty = item.quantity ?? 0;
                     let price = item.selling_price ?? 0;
                     let beauticianName = item.beautician ? item.beautician.name : 'None';
@@ -52,7 +52,7 @@ WinPos.sale = (function (Urls){
                             <td class="text-right">${parseFloat(price).toFixed(2)} Tk.</td>
                         </tr>
                     `;
-                    productTableBody.append(row);
+                    serviceTableBody.append(row);
                 });
 
                 // Payments table
@@ -145,12 +145,12 @@ WinPos.sale = (function (Urls){
 
         const items = currentSalesDetails.sale.items.map((item) => {
             return {
-                id: item.product.id,
-                name: item.product.name,
-                code: item.product.code,
-                price: parseFloat(item.product.price),
+                id: item.service.id,
+                name: item.service.name,
+                code: item.service.code,
+                price: parseFloat(item.service.price),
                 quantity: parseInt(item.quantity),
-                discount: parseFloat(item.product.discount_value||0),
+                discount: parseFloat(item.service.discount_value||0),
                 beautician_name: item.beautician ? item.beautician.name : null
             };
         });

@@ -10,10 +10,10 @@
                         <form id="POSInfoForm">
                             <div class="form-row">
                                 <div class="form-group col-12 col-lg-6">
-                                    <label for="productCodePrefix">Service Code Prefix<span class="text-danger required-star">*</span> <small>(Min: 3 & Max: 5
+                                    <label for="serviceCodePrefix">Service Code Prefix<span class="text-danger required-star">*</span> <small>(Min: 3 & Max: 5
                                             characters)</small></label>
-                                    <input required maxlength="5" minlength="3" value="{{ $accountInfo->productCodePrefix ?? '' }}" type="text" class="form-control rounded" name="productCodePrefix"
-                                        id="productCodePrefix" placeholder="Service Code Prefix">
+                                    <input required maxlength="5" minlength="3" value="{{ $accountInfo->productCodePrefix ?? '' }}" type="text" class="form-control rounded" name="serviceCodePrefix"
+                                        id="serviceCodePrefix" placeholder="Service Code Prefix">
                                 </div>
 
                                 <div class="form-group col-12 col-lg-6">

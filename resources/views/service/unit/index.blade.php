@@ -19,24 +19,24 @@
             </div>
         </div>
         <div class="card-body p-1">
-            @include('product.unit.all')
+            @include('service.unit.all')
         </div>
     </div>
 </div>
 
-@include('product.unit.show')
-@include('product.unit.addEdit')
+@include('service.unit.show')
+@include('service.unit.addEdit')
 
 @endsection
 
 @section('script')
-@vite(['resources/js/product/unit-script.js'])
+@vite(['resources/js/service/unit-script.js'])
 <script>
 let unitUrls = {
-    'saveUnit': "{{ route('product.unit.store') }}",
-    'editUnit': "{{ route('product.unit.edit',['unit' => 'unitID']) }}",
-    'updateUnit': "{{ route('product.unit.update',['unit' => 'unitID']) }}",
-    'deleteUnit': "{{ route('product.unit.destroy',['unit' => 'unitID']) }}"
+    'saveUnit': "{{ route('service.unit.store') }}",
+    'editUnit': "{{ route('service.unit.edit',['unit' => 'unitID']) }}",
+    'updateUnit': "{{ route('service.unit.update',['unit' => 'unitID']) }}",
+    'deleteUnit': "{{ route('service.unit.destroy',['unit' => 'unitID']) }}"
 };
 
 $(document).ready(function() {

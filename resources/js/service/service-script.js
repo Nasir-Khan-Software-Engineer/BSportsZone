@@ -1,16 +1,16 @@
-WinPos.Product = (function (Urls){
+WinPos.Service = (function (Urls){
 
-    var editProduct = function (productID){
-        WinPos.Common.getAjaxCall(Urls.editProduct.replace('productID', productID), function (response){
+    var editService = function (serviceID){
+        WinPos.Common.getAjaxCall(Urls.editService.replace('serviceID', serviceID), function (response){
             if(response.status === 'success'){
-                var product = response.product;
+                var service = response.service;
                 var categories = response.categories;
                 var hasSales = response.hasSales || false;
 
-                $("#editProductID").html(' | Service ID: '+product.id);
-                $("#hiddenProductID").val(product.id); 
-                $("#editCode").val(product.code);
-                $("#editName").val(product.name);
+                $("#editServiceID").html(' | Service ID: '+service.id);
+                $("#hiddenServiceID").val(service.id); 
+                $("#editCode").val(service.code);
+                $("#editName").val(service.name);
                
                 // Reset price field state first
                 $("#editPrice").removeAttr('title');
@@ -22,11 +22,11 @@ WinPos.Product = (function (Urls){
                 // Remove any existing warning text
                 $("#editPrice").closest('.form-group').find('label .text-warning').remove();
                 
-                $("#editPrice").val(product.price);
+                $("#editPrice").val(service.price);
                 
                 // Set beautician
-                if(product.beautician_id){
-                    markSingleSelectBoxItem('editBeautician', product.beautician_id);
+                if(service.beautician_id){
+                    markSingleSelectBoxItem('editBeautician', service.beautician_id);
                 }else{
                     $("#editBeautician").val('');
                 }
@@ -44,11 +44,11 @@ WinPos.Product = (function (Urls){
                     }
                 }
                 
-                $("#editDescription").val(product.description);
-                if(product.image != null){
-                    $("#productImagePreviewEdit").html( '<div id="imagePreviewEdit" style="background-image: url(' + Urls.productImagePath + '/' + product.image + ');"></div' );
+                $("#editDescription").val(service.description);
+                if(service.image != null){
+                    $("#serviceImagePreviewEdit").html( '<div id="imagePreviewEdit" style="background-image: url(' + Urls.serviceImagePath + '/' + service.image + ');"></div' );
                 }else{
-                    $("#productImagePreviewEdit").html( '<div id="imagePreviewEdit" style="background-image: url();"></div' );
+                    $("#serviceImagePreviewEdit").html( '<div id="imagePreviewEdit" style="background-image: url();"></div' );
                 }
 
                 markMultipleSelectBoxItem('editCategory',categories);
@@ -58,9 +58,9 @@ WinPos.Product = (function (Urls){
                     $('[data-toggle="tooltip"]').tooltip();
                 }
                 
-                $("#updateProduct").show();
-                $("#editProductBasicInfoTab").click();
-                $("#productEditModal").modal('show');
+                $("#updateService").show();
+                $("#editServiceBasicInfoTab").click();
+                $("#serviceEditModal").modal('show');
 
             }else{
                 WinPos.Common.showValidationErrors(response.errors);
@@ -68,32 +68,32 @@ WinPos.Product = (function (Urls){
         });
     }
 
-    var saveProduct = function (formData){
-        WinPos.Common.postAjaxCall(Urls.saveProduct, JSON.stringify(formData), function (response){
+    var saveService = function (formData){
+        WinPos.Common.postAjaxCall(Urls.saveService, JSON.stringify(formData), function (response){
             if(response.status === 'success'){
                 WinPos.Datatable.refresh();
                 toastr.success(response.message);
-                WinPos.Common.hideBootstrapModal("productAddModal");
+                WinPos.Common.hideBootstrapModal("serviceAddModal");
             }else{
                 WinPos.Common.showValidationErrors(response.errors);
             }
         });
     }
 
-    var updateProduct = function (formData, productID){
-        WinPos.Common.putAjaxCallPost(Urls.updateProduct.replace("productID", productID), JSON.stringify(formData), function (response){
+    var updateService = function (formData, serviceID){
+        WinPos.Common.putAjaxCallPost(Urls.updateService.replace("serviceID", serviceID), JSON.stringify(formData), function (response){
             if(response.status === 'success'){
                 WinPos.Datatable.refresh();
                 toastr.success(response.message);
-                WinPos.Common.hideBootstrapModal("productEditModal");
+                WinPos.Common.hideBootstrapModal("serviceEditModal");
             }else{
                 WinPos.Common.showValidationErrors(response.errors);
             }
         });
     }
 
-    var deleteProduct = function (productID){
-        WinPos.Common.deleteAjaxCallPost(Urls.deleteProduct.replace('productID', productID), function (response){
+    var deleteService = function (serviceID){
+        WinPos.Common.deleteAjaxCallPost(Urls.deleteService.replace('serviceID', serviceID), function (response){
             if(response.status === 'success'){
                 WinPos.Datatable.refresh();
                 toastr.success(response.message);
@@ -150,9 +150,9 @@ WinPos.Product = (function (Urls){
                     render: function(data, type, row){
                         var image = "";
                         if(row.image){
-                            image = `<img width="100px" height="50px" src="`+Urls.productImagePath+`/`+row.image+`" alt="`+row.image+`">`;
+                            image = `<img width="100px" height="50px" src="`+Urls.serviceImagePath+`/`+row.image+`" alt="`+row.image+`">`;
                         }else{
-                            image = `<img width="100px" height="50px" src="`+Urls.defaultProductImagePath+`" alt="`+row.name+`">`;
+                            image = `<img width="100px" height="50px" src="`+Urls.defaultServiceImagePath+`" alt="`+row.name+`">`;
                         }
                         return image;
                     }
@@ -213,10 +213,10 @@ WinPos.Product = (function (Urls){
                     searchable: false,
                     className: 'text-center align-middle',
                     render: function (data, type, row) {
-                        let showBtn = `<a data-toggle="tooltip" data-placement="top" data-bs-original-title="Show" href="`+Urls.showProduct.replace('productID', row.id)+`" class="btn btn-sm thm-btn-bg thm-btn-text-color"><i class="fa-solid fa-eye"></i></a>`;
-                        let editBtn = ` <button data-toggle="tooltip" data-placement="top" data-bs-original-title="Edit" data-productid="${row.id}" class="btn btn-sm thm-btn-bg thm-btn-text-color edit-product"><i class="fa-solid fa-pen-to-square"></i></button>`;
-                        let copyBtn = ` <button data-bs-original-title="Create from this service" data-toggle="tooltip" data-placement="top" data-productid="${row.id}" class="btn btn-sm thm-btn-bg thm-btn-text-color copy-product" title="Create from this service"><i class="fa-solid fa-copy"></i></button>`;
-                        let deleteBtn = ` <button data-toggle="tooltip" data-placement="top" data-bs-original-title="Delete" data-productid="${row.id}" class="btn btn-sm thm-btn-bg thm-btn-text-color delete-product"><i class="fa-solid fa-trash"></i></button>`;
+                        let showBtn = `<a data-toggle="tooltip" data-placement="top" data-bs-original-title="Show" href="`+Urls.showService.replace('serviceID', row.id)+`" class="btn btn-sm thm-btn-bg thm-btn-text-color"><i class="fa-solid fa-eye"></i></a>`;
+                        let editBtn = ` <button data-toggle="tooltip" data-placement="top" data-bs-original-title="Edit" data-serviceid="${row.id}" class="btn btn-sm thm-btn-bg thm-btn-text-color edit-service"><i class="fa-solid fa-pen-to-square"></i></button>`;
+                        let copyBtn = ` <button data-bs-original-title="Create from this service" data-toggle="tooltip" data-placement="top" data-serviceid="${row.id}" class="btn btn-sm thm-btn-bg thm-btn-text-color copy-service" title="Create from this service"><i class="fa-solid fa-copy"></i></button>`;
+                        let deleteBtn = ` <button data-toggle="tooltip" data-placement="top" data-bs-original-title="Delete" data-serviceid="${row.id}" class="btn btn-sm thm-btn-bg thm-btn-text-color delete-service"><i class="fa-solid fa-trash"></i></button>`;
                         return showBtn + editBtn + copyBtn + deleteBtn;
                     }
                 }
@@ -248,29 +248,29 @@ WinPos.Product = (function (Urls){
         }
     }
 
-    var copyProduct = function (productID){
-        WinPos.Common.getAjaxCall(Urls.copyProduct.replace('productID', productID), function (response){
+    var copyService = function (serviceID){
+        WinPos.Common.getAjaxCall(Urls.copyService.replace('serviceID', serviceID), function (response){
             if(response.status === 'success'){
-                var product = response.product;
+                var service = response.service;
                 var categories = response.categories;
 
                 // Reset form
-                $("#productAddForm")[0].reset();
+                $("#serviceAddForm")[0].reset();
                 $('#imagePreview').css('background-image', '');
 
                 // Auto-fill form fields
-                $("#name").val(product.name);
-                $("#price").val(product.price);
-                $("#details").val(product.description || '');
+                $("#name").val(service.name);
+                $("#price").val(service.price);
+                $("#details").val(service.description || '');
                 
-                // Note: beautician is not copied when copying a product
+                // Note: beautician is not copied when copying a service
 
                 // Mark categories
                 markMultipleSelectBoxItem('category_id', categories);
 
                 // Open modal and go to basic info tab
-                $("#productBasicInfoTab").click();
-                WinPos.Common.showBootstrapModal("productAddModal");
+                $("#serviceBasicInfoTab").click();
+                WinPos.Common.showBootstrapModal("serviceAddModal");
             }else{
                 toastr.error(response.message || 'Failed to load service details.');
             }
@@ -279,11 +279,11 @@ WinPos.Product = (function (Urls){
     
 
     return {
-        saveProduct: saveProduct,
-        updateProduct: updateProduct,
-        deleteProduct: deleteProduct,
-        editProduct: editProduct,
-        copyProduct: copyProduct,
+        saveService: saveService,
+        updateService: updateService,
+        deleteService: deleteService,
+        editService: editService,
+        copyService: copyService,
         datatableConfiguration: datatableConfig
     }
-})(productUrls);
+})(serviceUrls);

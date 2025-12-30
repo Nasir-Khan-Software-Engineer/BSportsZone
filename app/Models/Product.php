@@ -48,4 +48,9 @@ class Product extends Model
         return $this->belongsTo(Employee::class, 'staff_id')
             ->activeAndPresentToday();
     }
+
+    public function variations()
+    {
+        return $this->hasMany(Variation::class, 'product_id');
+    }
 }

@@ -16,11 +16,11 @@ return new class extends Migration
             $table->integer('POSID');
             $table->string('code');
             $table->string('name'); 
-            $table->string('image')->nullable();
             $table->string('type')->default('Service');
             $table->integer('unit_id')->nullable();
             $table->integer('brand_id')->nullable();
-            $table->double('price');
+            $table->integer('supplier_id')->nullable();
+            $table->double('price'); // service price 
             $table->text('description')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();
             $table->unsignedBigInteger('updated_by')->nullable();

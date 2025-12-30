@@ -31,6 +31,8 @@ use App\Http\Controllers\LoyaltyCardController;
 use App\Http\Controllers\Employee\EmployeeController;
 use App\Http\Controllers\Employee\EmployeeReviewController;
 use App\Http\Controllers\Attendance\AttendanceController;
+use App\Http\Controllers\Product\ProductController;
+use App\Http\Controllers\Product\VariationController;
 
 // help portal controllers
 use App\Http\Controllers\HelpPortal\LoyaltyHelpController;
@@ -192,6 +194,27 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::get('/{service}/edit', 'edit')->name('edit')->middleware('permission');
             Route::put('/{service}', 'update')->name('update')->middleware('permission');
             Route::delete('/{service}', 'destroy')->name('destroy')->middleware('permission');
+        });
+    });
+
+    Route::prefix('product')->as('product.')->group(function () {
+        Route::controller(ProductController::class)->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::get('/datatable', 'datatable')->name('datatable');
+            Route::get('/{product}/edit', 'edit')->name('edit');
+            Route::get('/{product}', 'show')->name('show');
+            Route::post('/store', 'store')->name('store');
+            Route::put('/{product}', 'update')->name('update');
+            Route::delete('/{product}', 'destroy')->name('destroy');
+        });
+
+        Route::prefix('variation')->controller(VariationController::class)->group(function () {
+            Route::get('/', 'index')->name('variation.index');
+            Route::get('/datatable', 'datatable')->name('variation.datatable');
+            Route::get('/{variation}', 'show')->name('variation.show');
+            Route::post('/store', 'store')->name('variation.store');
+            Route::put('/{variation}', 'update')->name('variation.update');
+            Route::delete('/{variation}', 'destroy')->name('variation.destroy');
         });
     });
 

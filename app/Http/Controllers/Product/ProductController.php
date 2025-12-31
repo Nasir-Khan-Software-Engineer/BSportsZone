@@ -24,14 +24,12 @@ class ProductController extends Controller
         $categories = Category::where('POSID', '=', $POSID)->get();
         $units = Unit::where('POSID', '=', $POSID)->get();
         $suppliers = Supplier::where('POSID', '=', $POSID)->get();
-        $shops = Shop::where('POSID', '=', $POSID)->get();
 
-        return response()->json([
+        return view('product.index', [
             'brands' => $brands,
             'categories' => $categories,
             'units' => $units,
-            'suppliers' => $suppliers,
-            'shops' => $shops
+            'suppliers' => $suppliers
         ]);
     }
 
@@ -41,7 +39,7 @@ class ProductController extends Controller
         $searchCriteria = $request->input('search');
 
         $query = Product::where('products.POSID', $POSID)
-            ->with('creator')
+            ->with('creator', 'brand', 'unit', 'supplier', 'variations')
             ->where('type', 'Product')
             ->where(function($query) use ($searchCriteria) {
                 $query->where('code', 'like', "%{$searchCriteria}%")
@@ -91,6 +89,10 @@ class ProductController extends Controller
         $products->transform(function($product) {
             $product->formattedDate = formatDate($product->created_at);
             $product->formattedTime = formatTime($product->created_at);
+            $product->variations_count = $product->variations->count();
+            $product->brand_name = $product->brand->name ?? '-';
+            $product->unit_name = $product->unit->name ?? '-';
+            $product->supplier_name = $product->supplier->name ?? '-';
             
             if ($product->created_by == null) {
                 $product->createdBy = 'CustomData';
@@ -113,42 +115,38 @@ class ProductController extends Controller
     public function edit($id)
     {
         $POSID = auth()->user()->POSID;
-        $product = Product::with('categories', 'sales_items', 'variations')->where('POSID', $POSID)
+        $product = Product::with('categories', 'sales_items', 'variations', 'brand', 'unit', 'supplier')->where('POSID', $POSID)
             ->where('id', $id)->where('type', 'Product')
             ->first();
         
         if (!$product) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Product not found.'
-            ], 404);
+            abort(404, 'Product not found.');
         }
         
-        // Check if product has sales
-        $hasSales = $product->sales_items()->count() > 0;
+        $brands = Brand::where('POSID', '=', $POSID)->get();
+        $categories = Category::where('POSID', '=', $POSID)->get();
+        $units = Unit::where('POSID', '=', $POSID)->get();
+        $suppliers = Supplier::where('POSID', '=', $POSID)->get();
         
-        return response()->json([
-            'status'  => 'success',
+        return view('product.edit', [
             'product' => $product,
-            'categories' => $product->categories,
-            'variations' => $product->variations,
-            'hasSales' => $hasSales
+            'brands' => $brands,
+            'categories' => $categories,
+            'units' => $units,
+            'suppliers' => $suppliers
         ]);
     }
 
     public function show($id)
     {
         $POSID = auth()->user()->POSID;
-        $product = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'sales_items', 'variations')
+        $product = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'supplier', 'sales_items', 'variations')
             ->where('POSID', $POSID)->where('type', 'Product')
             ->where('id', $id)
             ->first();
 
         if (!$product) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Product not found.'
-            ], 404);
+            abort(404, 'Product not found.');
         }
 
         // Created/Updated By
@@ -168,8 +166,7 @@ class ProductController extends Controller
             return ($item->selling_price - $item->discount) * $item->quantity;
         });
 
-        return response()->json([
-            'status' => 'success',
+        return view('product.show', [
             'product' => $product
         ]);
     }
@@ -196,7 +193,6 @@ class ProductController extends Controller
                         ->where('POSID', $POSID),
                 ],
                 'category_id' => 'required',
-                'price' => 'required|numeric',
                 'description' => 'nullable|string|min:3'
             ]);
 
@@ -205,7 +201,7 @@ class ProductController extends Controller
             $product->code = (session('accountInfo.productCodePrefix') ?? 'PR').'-'.$request->code;
             $product->name = $request->name;
             $product->type = 'Product';
-            $product->price = (float)$request->price;
+            $product->price = 0; // Products don't have price, variations do
             $product->description = $request->description;
             $product->unit_id = $request->unit_id ?: null;
             $product->brand_id = $request->brand_id ?: null;
@@ -222,7 +218,8 @@ class ProductController extends Controller
             return response()->json([
                 'status'    => 'success',
                 'message'   => 'Product Created Successfully.',
-                'product'  => $product
+                'product'  => $product,
+                'redirect' => route('product.edit', $product->id)
             ]);
         
         } catch(ValidationException $exception) {
@@ -276,25 +273,8 @@ class ProductController extends Controller
                 ], 404);
             }
 
-            // Check if product has sales and prevent price change
-            $hasSales = $product->sales_items()->count() > 0;
-            if ($hasSales && $product->price != (float)$request->price) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'This product already has sales, so the price cannot be changed.',
-                    'errors' => [
-                        'price' => ['This product already has sales, so the price cannot be changed.']
-                    ]
-                ]);
-            } else {
-                // we need to validate the price required and numeric
-                $request->validate([
-                    'price' => 'required|numeric',
-                ]);
-            }
-
+            // Products don't have price, variations do
             $product->name = $request->name;
-            $product->price = (float)$request->price;
             $product->description = $request->description;
             $product->unit_id = $request->unit_id ?: null;
             $product->brand_id = $request->brand_id ?: null;

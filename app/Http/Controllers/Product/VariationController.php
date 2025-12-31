@@ -140,10 +140,11 @@ class VariationController extends Controller
             
             $request->validate([
                 'product_id' => 'required|exists:products,id',
+                'tagline' => 'required|string|max:255|unique:variations,tagline',
                 'description' => 'nullable|string|max:1000',
                 'cost_price' => 'required|numeric|min:0',
                 'selling_price' => 'required|numeric|min:0',
-                'stock' => 'required|integer|min:0',
+                'stock' => 'required|integer|min:1',
                 'status' => 'nullable|string|in:active,inactive'
             ]);
 
@@ -162,6 +163,7 @@ class VariationController extends Controller
 
             $variation = new Variation();
             $variation->product_id = $request->product_id;
+            $variation->tagline = $request->tagline;
             $variation->description = $request->description;
             $variation->cost_price = (float)$request->cost_price;
             $variation->selling_price = (float)$request->selling_price;
@@ -199,10 +201,11 @@ class VariationController extends Controller
             $POSID = auth()->user()->POSID;
             
             $request->validate([
+                'tagline' => 'required|string|max:255|unique:variations,tagline,' . $id,
                 'description' => 'nullable|string|max:1000',
                 'cost_price' => 'required|numeric|min:0',
                 'selling_price' => 'required|numeric|min:0',
-                'stock' => 'required|integer|min:0',
+                'stock' => 'required|integer|min:1',
                 'status' => 'nullable|string|in:active,inactive'
             ]);
 
@@ -225,6 +228,7 @@ class VariationController extends Controller
                 ], 403);
             }
 
+            $variation->tagline = $request->tagline;
             $variation->description = $request->description;
             $variation->cost_price = (float)$request->cost_price;
             $variation->selling_price = (float)$request->selling_price;

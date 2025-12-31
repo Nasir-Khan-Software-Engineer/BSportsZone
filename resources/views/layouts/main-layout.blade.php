@@ -137,14 +137,24 @@
 
             <!-- Nav Item - Pages Collapse Menu -->
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('service.*') ? 'not-collapsed' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#serviceDropdown" aria-expanded="true"
+                <a class="nav-link {{ request()->routeIs('service.*') || request()->routeIs('product.*') ? 'not-collapsed' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#serviceDropdown" aria-expanded="true"
                     aria-controls="serviceDropdown">
                     <i class="fa-solid fa-spa"></i>
-                    <span>Service</span>
+                    <span>Product & Service</span>
                 </a>
-                <div id="serviceDropdown" class="collapse {{ request()->routeIs('service.*') ? 'show' : '' }}" aria-labelledby="headingserviceDropdown" data-parent="#accordionSidebar">
+                <div id="serviceDropdown" class="collapse {{ request()->routeIs('service.*') || request()->routeIs('product.*') ? 'show' : '' }}" aria-labelledby="headingserviceDropdown" data-parent="#accordionSidebar">
 
                     <div class="bg-white py-2 collapse-inner rounded">
+
+                        @if(hasAccess('product.index'))
+                        <a class="collapse-item {{ request()->routeIs('product.*') ? 'active' : '' }}" href="{{ route('product.index') }}">
+                            <i class="fa-solid fa-box"></i> Product
+                        </a>
+                        @else
+                        <a href="javascript:void(0);" class="collapse-item text-gray-400 cursor-not-allowed no-access-link" data-message="You do not have permission to view Products.">
+                            <i class="fa-solid fa-box"></i> Product
+                        </a>
+                        @endif
 
                         @if(hasAccess('service.index'))
                         <a class="collapse-item {{ request()->routeIs('service.index') || request()->routeIs('service.show') ? 'active' : '' }}" href="{{ route('service.index') }}">

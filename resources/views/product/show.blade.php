@@ -74,7 +74,6 @@
                             <tr>
                                 <th class="text-center">Tagline</th>
                                 <th class="text-center">Description</th>
-                                <th class="text-center">Cost Price</th>
                                 <th class="text-center">Selling Price</th>
                                 <th class="text-center">Stock</th>
                                 <th class="text-center">Status</th>
@@ -85,7 +84,6 @@
                             <tr>
                                 <td class="text-center">{{ $variation->tagline }}</td>
                                 <td class="text-center">{{ $variation->description ?? '-' }}</td>
-                                <td class="text-center">TK {{ number_format($variation->cost_price, 2) }}</td>
                                 <td class="text-center">TK {{ number_format($variation->selling_price, 2) }}</td>
                                 <td class="text-center">{{ $variation->stock }}</td>
                                 <td class="text-center">

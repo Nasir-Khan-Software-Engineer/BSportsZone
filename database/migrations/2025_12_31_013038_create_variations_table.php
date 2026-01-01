@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('product_id');
             $table->string('tagline')->unique();
             $table->text('description')->nullable();
-            $table->double('cost_price')->default(0);
             $table->double('selling_price')->default(0);
             $table->integer('stock')->default(1);
             $table->string('status')->default('active');

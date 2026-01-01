@@ -15,6 +15,8 @@ use App\Repositories\ShopSetup\IShopSetupRepository;
 use App\Repositories\ShopSetup\ShopSetupRepository;
 use App\Repositories\Pos\PosRepository;
 use App\Repositories\Pos\IPosRepository;
+use App\Repositories\Purchase\PurchaseRepository;
+use App\Repositories\Purchase\IPurchaseRepository;
 
 class RepositoryLayerServiceProvider extends ServiceProvider
 {
@@ -29,6 +31,7 @@ class RepositoryLayerServiceProvider extends ServiceProvider
         $this->app->scoped(ICategoryRepository::class, CategoryRepository::class);
         $this->app->scoped(IBrandRepository::class, BrandRepository::class);
         $this->app->scoped(IPosRepository::class, PosRepository::class);
+        $this->app->scoped(IPurchaseRepository::class, PurchaseRepository::class);
     }
 
     /**

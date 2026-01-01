@@ -145,7 +145,6 @@ WinPos.Product = (function (Urls){
         let formData = {
             tagline: row.find('.variation-tagline').val(),
             description: row.find('.variation-description').val(),
-            cost_price: row.find('.variation-cost-price').val(),
             selling_price: row.find('.variation-selling-price').val(),
             stock: row.find('.variation-stock').val(),
             status: row.find('.variation-status').val()

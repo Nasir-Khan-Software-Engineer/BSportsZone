@@ -88,8 +88,8 @@ class ProductWithVariationSeeder extends Seeder
                 $variation->product_id = $product->id;
                 $variation->tagline = $uniqueTagline;
                 $variation->description = 'Variation description for ' . $sizeTag . ' of ' . $product->name;
-                $variation->cost_price = rand(50, max(50, (int)($product->price * 0.7))); // Cost price less than selling price
-                $variation->selling_price = rand(max($variation->cost_price, (int)($product->price * 0.8)), (int)($product->price * 1.2));
+               // $variation->cost_price = rand(50, max(50, (int)($product->price * 0.7))); // Cost price less than selling price
+                $variation->selling_price = rand(max($product->price+50, (int)($product->price * 0.8)), (int)($product->price * 1.2));
                 $variation->stock = rand(0, 100);
                 $variation->status = 'active';
                 $variation->save();

@@ -142,7 +142,6 @@ class VariationController extends Controller
                 'product_id' => 'required|exists:products,id',
                 'tagline' => 'required|string|max:255|unique:variations,tagline',
                 'description' => 'nullable|string|max:1000',
-                'cost_price' => 'required|numeric|min:0',
                 'selling_price' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:1',
                 'status' => 'nullable|string|in:active,inactive'
@@ -165,7 +164,6 @@ class VariationController extends Controller
             $variation->product_id = $request->product_id;
             $variation->tagline = $request->tagline;
             $variation->description = $request->description;
-            $variation->cost_price = (float)$request->cost_price;
             $variation->selling_price = (float)$request->selling_price;
             $variation->stock = (int)$request->stock;
             $variation->status = $request->status ?? 'active';
@@ -203,7 +201,6 @@ class VariationController extends Controller
             $request->validate([
                 'tagline' => 'required|string|max:255|unique:variations,tagline,' . $id,
                 'description' => 'nullable|string|max:1000',
-                'cost_price' => 'required|numeric|min:0',
                 'selling_price' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:1',
                 'status' => 'nullable|string|in:active,inactive'
@@ -230,7 +227,6 @@ class VariationController extends Controller
 
             $variation->tagline = $request->tagline;
             $variation->description = $request->description;
-            $variation->cost_price = (float)$request->cost_price;
             $variation->selling_price = (float)$request->selling_price;
             $variation->stock = (int)$request->stock;
             $variation->status = $request->status ?? 'active';

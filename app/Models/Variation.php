@@ -14,14 +14,12 @@ class Variation extends Model
         'product_id',
         'tagline',
         'description',
-        'cost_price',
         'selling_price',
         'stock',
         'status',
     ];
 
     protected $casts = [
-        'cost_price' => 'double',
         'selling_price' => 'double',
         'stock' => 'integer',
     ];

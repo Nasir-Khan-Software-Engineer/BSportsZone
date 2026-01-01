@@ -33,6 +33,7 @@ use App\Http\Controllers\Employee\EmployeeReviewController;
 use App\Http\Controllers\Attendance\AttendanceController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\VariationController;
+use App\Http\Controllers\Stock\PurchaseController;
 
 // help portal controllers
 use App\Http\Controllers\HelpPortal\LoyaltyHelpController;
@@ -225,6 +226,19 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::post('/store', 'store')->name('variation.store');
             Route::put('/{variation}', 'update')->name('variation.update');
             Route::delete('/{variation}', 'destroy')->name('variation.destroy');
+        });
+    });
+
+    Route::prefix('stock')->as('stock.')->group(function () {
+        Route::prefix('purchase')->controller(\App\Http\Controllers\Stock\PurchaseController::class)->group(function () {
+            Route::get('/', 'index')->name('purchase.index');
+            Route::get('/datatable', 'datatable')->name('purchase.datatable');
+            Route::get('/create', 'create')->name('purchase.create');
+            Route::post('/store', 'store')->name('purchase.store');
+            Route::get('/{purchase}/edit', 'edit')->name('purchase.edit');
+            Route::put('/{purchase}', 'update')->name('purchase.update');
+            Route::get('/{purchase}', 'show')->name('purchase.show');
+            Route::get('/variations/get', 'getProductVariations')->name('purchase.variations.get');
         });
     });
 

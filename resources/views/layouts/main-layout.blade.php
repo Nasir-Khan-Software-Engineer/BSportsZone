@@ -146,15 +146,10 @@
 
                     <div class="bg-white py-2 collapse-inner rounded">
 
-                        @if(hasAccess('product.index'))
                         <a class="collapse-item {{ request()->routeIs('product.*') ? 'active' : '' }}" href="{{ route('product.index') }}">
                             <i class="fa-solid fa-box"></i> Product
                         </a>
-                        @else
-                        <a href="javascript:void(0);" class="collapse-item text-gray-400 cursor-not-allowed no-access-link" data-message="You do not have permission to view Products.">
-                            <i class="fa-solid fa-box"></i> Product
-                        </a>
-                        @endif
+                        
 
                         @if(hasAccess('service.index'))
                         <a class="collapse-item {{ request()->routeIs('service.index') || request()->routeIs('service.show') ? 'active' : '' }}" href="{{ route('service.index') }}">
@@ -233,6 +228,26 @@
                             <i class="fa-solid fa-people-carry-box"></i> Customer
                         </a>
                         @endif
+
+                    </div>
+                </div>
+
+            </li>
+
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('stock.*') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#stockDropdown" aria-expanded="true" aria-controls="stockDropdown">
+                    <i class="fa-solid fa-boxes-stacked"></i>
+                    <span>Stock</span>
+                </a>
+                <div id="stockDropdown" class="collapse {{ request()->routeIs('stock.*') ? 'show' : '' }}" aria-labelledby="headingstockDropdown" data-parent="#accordionSidebar">
+
+                    <div class="bg-white py-2 collapse-inner rounded">
+
+                        <a class="collapse-item {{ request()->routeIs('stock.purchase.*') ? 'active' : '' }}" href="{{ route('stock.purchase.index') }}">
+                            <i class="fa-solid fa-cart-shopping"></i> Purchases
+                        </a>
 
                     </div>
                 </div>

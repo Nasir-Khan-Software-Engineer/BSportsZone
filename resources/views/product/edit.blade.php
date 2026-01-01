@@ -98,7 +98,6 @@
                             <tr>
                                 <th class="text-center align-middle" style="width: 15%;">Tagline</th>
                                 <th class="text-center align-middle" style="width: 20%;">Description</th>
-                                <th class="text-center align-middle" style="width: 10%;">Cost Price</th>
                                 <th class="text-center align-middle" style="width: 10%;">Selling Price</th>
                                 <th class="text-center align-middle" style="width: 10%;">Stock</th>
                                 <th class="text-center align-middle" style="width: 10%;">Status</th>
@@ -114,9 +113,6 @@
                                     </td>
                                     <td>
                                         <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}">
-                                    </td>
-                                    <td>
-                                        <input type="number" step="0.01" class="form-control form-control-sm variation-cost-price" value="{{ $variation->cost_price }}" data-variation-id="{{ $variation->id }}">
                                     </td>
                                     <td>
                                         <input type="number" step="0.01" class="form-control form-control-sm variation-selling-price" value="{{ $variation->selling_price }}" data-variation-id="{{ $variation->id }}">
@@ -138,7 +134,7 @@
                                 @endforeach
                             @else
                                 <tr id="noVariationsRow">
-                                    <td colspan="7" class="text-center">No variations found. Click "Add New Variation" to create one.</td>
+                                    <td colspan="6" class="text-center">No variations found. Click "Add New Variation" to create one.</td>
                                 </tr>
                             @endif
                         </tbody>
@@ -171,11 +167,7 @@
                         <textarea class="form-control rounded" name="description" id="variationDescription" rows="3" placeholder="Variation description"></textarea>
                     </div>
                     <div class="row">
-                        <div class="col-6 form-group">
-                            <label for="variationCostPrice">Cost Price*</label>
-                            <input required type="number" step="0.01" class="form-control rounded" name="cost_price" id="variationCostPrice" placeholder="0.00">
-                        </div>
-                        <div class="col-6 form-group">
+                        <div class="col-12 form-group">
                             <label for="variationSellingPrice">Selling Price*</label>
                             <input required type="number" step="0.01" class="form-control rounded" name="selling_price" id="variationSellingPrice" placeholder="0.00">
                         </div>

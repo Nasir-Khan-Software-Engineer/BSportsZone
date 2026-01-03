@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('unit_id')->nullable();
             $table->integer('brand_id')->nullable();
             $table->integer('supplier_id')->nullable();
+            $table->string('image')->nullable();
             $table->double('price'); // service price 
             $table->text('description')->nullable();
             $table->unsignedBigInteger('created_by')->nullable();

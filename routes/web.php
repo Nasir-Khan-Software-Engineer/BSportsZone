@@ -222,8 +222,10 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::prefix('variation')->controller(VariationController::class)->group(function () {
             Route::get('/', 'index')->name('variation.index');
             Route::get('/datatable', 'datatable')->name('variation.datatable');
-            Route::get('/{variation}', 'show')->name('variation.show');
             Route::post('/store', 'store')->name('variation.store');
+            Route::get('/{variation}/purchase-items', 'getPurchaseItems')->name('variation.purchase-items');
+            Route::post('/{variation}/add-stock', 'addStockFromPurchaseItem')->name('variation.add-stock');
+            Route::get('/{variation}', 'show')->name('variation.show');
             Route::put('/{variation}', 'update')->name('variation.update');
             Route::delete('/{variation}', 'destroy')->name('variation.destroy');
         });

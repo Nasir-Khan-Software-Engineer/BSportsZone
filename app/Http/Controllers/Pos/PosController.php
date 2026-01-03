@@ -143,7 +143,6 @@ class PosController extends Controller
         // Sales table sales
         $sales = new Sales;
         $sales->POSID = $POSID;
-        $sales->shop_id = 1;
         $sales->invoice_code = (session('accountInfo.invoiceNumberPrefix') ?? 'AU') . '-'.date('YmdHis');
         $sales->customerId = ((int) $request->customerId);
         $sales->total_amount = $totalAmount;
@@ -151,7 +150,6 @@ class PosController extends Controller
         $sales->discount_value = $request->discount;
         $sales->discount_amount = $discountAmount;
         $sales->total_payable_amount = $request->payment["paidAmount"]; // paid amount and paybale amount same as there is no due and multiple payment option is not enabled.
-        $sales->payment_date = date('Y-m-d');
         $sales->created_by = auth()->user()->id;
         $sales->updated_by = auth()->user()->id;
         $sales->adjustmentAmt = $request->adjustmentAmt;

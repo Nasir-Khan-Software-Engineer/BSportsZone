@@ -19,6 +19,9 @@ class ProductWithVariationSeeder extends Seeder
      */
     public function run(): void
     {
+       // Product::truncate();
+      //  Variation::truncate();
+
         $POSID = 1;
         $createdBy = 1;
 
@@ -90,7 +93,7 @@ class ProductWithVariationSeeder extends Seeder
                 $variation->description = 'Variation description for ' . $sizeTag . ' of ' . $product->name;
                // $variation->cost_price = rand(50, max(50, (int)($product->price * 0.7))); // Cost price less than selling price
                 $variation->selling_price = rand(max($product->price+50, (int)($product->price * 0.8)), (int)($product->price * 1.2));
-                $variation->stock = rand(0, 100);
+                $variation->stock = 0;
                 $variation->status = 'active';
                 $variation->save();
             }

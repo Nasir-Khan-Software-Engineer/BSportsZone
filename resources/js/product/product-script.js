@@ -175,6 +175,112 @@ WinPos.Product = (function (Urls){
         });
     }
 
+    var openStockUpdateModal = function (variationId){
+        // Show loading state
+        $('#purchaseItemsContainer').html('<p class="text-muted text-center">Loading purchase items...</p>');
+        $('#modalVariationTagline').text('Loading...');
+        
+        // Open modal
+        WinPos.Common.showBootstrapModal("stockUpdateModal");
+        
+        // Fetch purchase items
+        WinPos.Common.getAjaxCall(Urls.getPurchaseItems.replace('variationID', variationId), function (response){
+            if(response.status === 'success'){
+                $('#modalVariationTagline').text(response.variation.tagline);
+                displayPurchaseItems(response.purchase_items, response.variation);
+            }else{
+                $('#purchaseItemsContainer').html('<p class="text-danger text-center">' + (response.message || 'Failed to load purchase items.') + '</p>');
+            }
+        });
+    }
+
+    var displayPurchaseItems = function (purchaseItems, variation){
+        let container = $('#purchaseItemsContainer');
+        
+        if(purchaseItems.length === 0){
+            container.html('<p class="text-muted text-center">No purchase items available for this variation.</p>');
+            return;
+        }
+
+        let html = '';
+        purchaseItems.forEach(function(item){
+            html += `
+                <div class="card border mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <strong>Invoice Number:</strong> ${item.invoice_number} | 
+                            <strong>Purchase Date:</strong> ${item.purchase_date}
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-primary">Information</h6>
+                                <ul class="list-unstyled">
+                                    <li><strong>Available Stock in the warehouse:</strong> ${item.available_stock}</li>
+                                    <li><strong>The cost price of this product:</strong> ${parseFloat(item.cost_price).toFixed(2)}</li>
+                                    <li><strong>Your current selling price of this product is:</strong> ${parseFloat(item.selling_price).toFixed(2)}</li>
+                                    <li><strong>You already sell X items of these products.</strong> <span class="text-muted">(Will be updated later)</span></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-primary">Action</h6>
+                                <div class="d-flex align-items-center gap-2">
+                                    <label class="mb-0">Add</label>
+                                    <input type="number" 
+                                           class="form-control form-control-sm" 
+                                           id="qtyInput_${item.id}" 
+                                           min="1" 
+                                           max="${item.available_stock}" 
+                                           value="1" 
+                                           style="width: 100px;">
+                                    <label class="mb-0">item(s) to this variant from these purchases.</label>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-success add-stock-btn" 
+                                            data-purchase-item-id="${item.id}" 
+                                            data-variation-id="${variation.id}">
+                                        <i class="fa-solid fa-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6 class="text-primary">Price Update Section</h6>
+                                <p class="text-muted mb-0">You can't update the price as you already sell some items.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.html(html);
+    }
+
+    var addStockFromPurchaseItem = function (variationId, purchaseItemId, quantity){
+        let formData = {
+            purchase_item_id: purchaseItemId,
+            quantity: quantity
+        };
+        
+        WinPos.Common.postAjaxCall(Urls.addStockFromPurchase.replace('variationID', variationId), JSON.stringify(formData), function (response){
+            if(response.status === 'success'){
+                toastr.success(response.message);
+                // Update the stock input in the table
+                $('tr[data-variation-id="' + variationId + '"] .variation-stock').val(response.variation.stock);
+                // Reload purchase items to update available stock
+                openStockUpdateModal(variationId);
+            }else{
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        });
+    }
+
     return {
         datatableConfiguration: datatableConfiguration,
         populateCreateForm: populateCreateForm,
@@ -184,7 +290,9 @@ WinPos.Product = (function (Urls){
         loadProductDetails: loadProductDetails,
         saveVariation: saveVariation,
         updateVariationFromTable: updateVariationFromTable,
-        deleteVariation: deleteVariation
+        deleteVariation: deleteVariation,
+        openStockUpdateModal: openStockUpdateModal,
+        addStockFromPurchaseItem: addStockFromPurchaseItem
     }
 })(productUrls);
 
@@ -199,5 +307,25 @@ $(document).on('click', '.delete-product', function() {
         let productId = $(this).data('productid');
         WinPos.Product.deleteProduct(productId);
     }
+});
+
+// Handle add stock from purchase item
+$(document).on('click', '.add-stock-btn', function() {
+    let purchaseItemId = $(this).data('purchase-item-id');
+    let variationId = $(this).data('variation-id');
+    let quantity = parseInt($('#qtyInput_' + purchaseItemId).val());
+    
+    if(!quantity || quantity < 1){
+        toastr.error('Please enter a valid quantity.');
+        return;
+    }
+    
+    let maxQty = parseInt($('#qtyInput_' + purchaseItemId).attr('max'));
+    if(quantity > maxQty){
+        toastr.error('Quantity cannot exceed available stock: ' + maxQty);
+        return;
+    }
+    
+    WinPos.Product.addStockFromPurchaseItem(variationId, purchaseItemId, quantity);
 });
 

@@ -16,6 +16,9 @@ return new class extends Migration
             $table->bigInteger('POSID')->default(1);
             $table->foreignId('sales_id')->constrained(table: 'sales', indexName: 'fk_sales_items_Sales')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('product_id')->constrained(table: 'products', indexName: 'fk_sales_item_products')->onUpdate('cascade')->onDelete('cascade');
+            
+            $table->unsignedBigInteger('variation_id')->nullable();
+            $table->string('variant_tagline')->nullable();
 
             $table->decimal('product_price', $precision = 8, $scale = 2)->default(0);
             $table->decimal('selling_price', $precision = 8, $scale = 2)->default(0);

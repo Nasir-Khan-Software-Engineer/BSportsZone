@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 use App\Models\Variation;
 use App\Models\Product;
+use App\Models\PurchaseItem;
 use Exception;
 
 class VariationController extends Controller
@@ -290,6 +291,145 @@ class VariationController extends Controller
                 'status'    => 'error',
                 'message'   => 'Something went wrong.',
             ]);
+        }
+    }
+
+    public function getPurchaseItems($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            $variation = Variation::with('product')
+                ->where('id', $id)
+                ->first();
+
+            if (!$variation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Variation not found.'
+                ], 404);
+            }
+
+            // Verify product belongs to the user's POSID
+            if ($variation->product->POSID != $POSID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ], 403);
+            }
+
+            // Get all purchase items for this variation with purchase details
+            $purchaseItems = PurchaseItem::with(['purchase'])
+                ->where('product_variant_id', $id)
+                ->where('unallocated_qty', '>', 0) // Only items with available stock
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Format the data for the frontend
+            $formattedItems = $purchaseItems->map(function($item) use ($variation) {
+                return [
+                    'id' => $item->id,
+                    'purchase_id' => $item->purchase_id,
+                    'invoice_number' => $item->purchase->invoice_number ?? 'N/A',
+                    'purchase_date' => $item->purchase->purchase_date ? formatDate($item->purchase->purchase_date) : 'N/A',
+                    'available_stock' => $item->unallocated_qty,
+                    'cost_price' => $item->cost_price,
+                    'selling_price' => $variation->selling_price,
+                    'sold_items' => 0, // Placeholder as per PRD - will be updated later
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'variation' => [
+                    'id' => $variation->id,
+                    'tagline' => $variation->tagline,
+                    'selling_price' => $variation->selling_price,
+                    'current_stock' => $variation->stock,
+                ],
+                'purchase_items' => $formattedItems
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
+        }
+    }
+
+    public function addStockFromPurchaseItem(Request $request, $id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $request->validate([
+                'purchase_item_id' => 'required|exists:purchase_items,id',
+                'quantity' => 'required|integer|min:1',
+            ]);
+
+            $variation = Variation::with('product')
+                ->where('id', $id)
+                ->first();
+
+            if (!$variation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Variation not found.'
+                ], 404);
+            }
+
+            // Verify product belongs to the user's POSID
+            if ($variation->product->POSID != $POSID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ], 403);
+            }
+
+            $purchaseItem = PurchaseItem::findOrFail($request->purchase_item_id);
+
+            // Verify purchase item belongs to this variation
+            if ($purchaseItem->product_variant_id != $id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid purchase item for this variation.'
+                ], 400);
+            }
+
+            // Verify available quantity
+            if ($request->quantity > $purchaseItem->unallocated_qty) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Insufficient available stock. Available: ' . $purchaseItem->unallocated_qty
+                ], 400);
+            }
+
+            // Update variation stock
+            $variation->stock += $request->quantity;
+            $variation->save();
+
+            // Update purchase item unallocated quantity
+            $purchaseItem->unallocated_qty -= $request->quantity;
+            $purchaseItem->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Stock added successfully.',
+                'variation' => [
+                    'id' => $variation->id,
+                    'stock' => $variation->stock,
+                ]
+            ]);
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => '',
+                'errors' => $exception->validator->errors()
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
         }
     }
 }

@@ -142,6 +142,13 @@ WinPos.Product = (function (Urls){
 
     var updateVariationFromTable = function (variationId){
         let row = $('tr[data-variation-id="' + variationId + '"]');
+        
+        // Check if variation is inactive
+        if(row.hasClass('table-secondary') || row.find('.variation-status').prop('disabled')){
+            toastr.error('Cannot update inactive variant.');
+            return;
+        }
+        
         let formData = {
             tagline: row.find('.variation-tagline').val(),
             description: row.find('.variation-description').val(),
@@ -160,6 +167,14 @@ WinPos.Product = (function (Urls){
     }
 
     var deleteVariation = function (variationId){
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        
+        // Check if variation is inactive
+        if(row.hasClass('table-secondary') || row.find('.variation-status').prop('disabled')){
+            toastr.error('Cannot delete inactive variant.');
+            return;
+        }
+        
         WinPos.Common.deleteAjaxCallPost(Urls.deleteVariation.replace('variationID', variationId), function (response){
             if(response.status === 'success'){
                 toastr.success(response.message);
@@ -281,6 +296,9 @@ WinPos.Product = (function (Urls){
         // Show loading state
         $('#priceUpdateContainer').html('<p class="text-muted text-center">Loading price information...</p>');
         $('#priceModalVariationTagline').text('Loading...');
+        // Reset button visibility
+        $('#savePriceUpdate').hide();
+        $('#createFreshVariantBtn').hide();
         
         // Open modal
         WinPos.Common.showBootstrapModal("priceUpdateModal");
@@ -301,8 +319,10 @@ WinPos.Product = (function (Urls){
         let variation = data.variation;
         
         if(data.has_sales){
-            // Hide save button
+            // Hide save button, show create fresh variant button
             $('#savePriceUpdate').hide();
+            $('#createFreshVariantBtn').show();
+            $('#createFreshVariantBtn').data('variation-id', variation.id);
             
             // Show message that price cannot be updated due to existing sales
             let html = '<div class="alert alert-warning">';
@@ -315,8 +335,9 @@ WinPos.Product = (function (Urls){
             html += '</div>';
             container.html(html);
         }else{
-            // Show save button
+            // Show save button, hide create fresh variant button
             $('#savePriceUpdate').show();
+            $('#createFreshVariantBtn').hide();
             
             // Show price update form
             let costPrice = data.cost_price ? parseFloat(data.cost_price).toFixed(2) : 'N/A';
@@ -376,6 +397,20 @@ WinPos.Product = (function (Urls){
         });
     }
 
+    var createFreshVariant = function (variationId){
+        WinPos.Common.postAjaxCall(Urls.createFreshVariant.replace('variationID', variationId), JSON.stringify({}), function (response){
+            if(response.status === 'success'){
+                toastr.success(response.message);
+                // Close modal
+                WinPos.Common.hideBootstrapModal("priceUpdateModal");
+                // Reload page to show new variation and updated inactive variant
+                location.reload();
+            }else{
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        });
+    }
+
     return {
         datatableConfiguration: datatableConfiguration,
         populateCreateForm: populateCreateForm,
@@ -389,7 +424,8 @@ WinPos.Product = (function (Urls){
         openStockUpdateModal: openStockUpdateModal,
         addStockFromPurchaseItem: addStockFromPurchaseItem,
         openPriceUpdateModal: openPriceUpdateModal,
-        updateVariationPrice: updateVariationPrice
+        updateVariationPrice: updateVariationPrice,
+        createFreshVariant: createFreshVariant
     }
 })(productUrls);
 

@@ -107,14 +107,15 @@
                         <tbody>
                             @if(isset($product->variations) && $product->variations->count() > 0)
                                 @foreach($product->variations as $variation)
-                                <tr data-variation-id="{{ $variation->id }}">
+                                <tr data-variation-id="{{ $variation->id }}" class="{{ $variation->status == 'inactive' ? 'table-secondary' : '' }}">
                                     <td>
-                                        <input type="text" class="form-control form-control-sm variation-tagline" value="{{ $variation->tagline }}" data-variation-id="{{ $variation->id }}">
+                                        <input type="text" class="form-control form-control-sm variation-tagline" value="{{ $variation->tagline }}" data-variation-id="{{ $variation->id }}" {{ $variation->status == 'inactive' ? 'readonly' : '' }}>
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}">
+                                        <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}" {{ $variation->status == 'inactive' ? 'readonly' : '' }}>
                                     </td>
                                     <td>
+                                        @if($variation->status == 'active')
                                         <div class="d-flex align-items-center gap-1">
                                             <button type="button" class="btn btn-sm btn-outline-danger price-decrease-btn" data-variation-id="{{ $variation->id }}" title="Decrease Price">
                                                 <i class="fa-solid fa-minus"></i>
@@ -124,8 +125,12 @@
                                                 <i class="fa-solid fa-plus"></i>
                                             </button>
                                         </div>
+                                        @else
+                                        <input type="number" readonly step="0.01" class="form-control form-control-sm variation-selling-price" value="{{ $variation->selling_price }}" data-variation-id="{{ $variation->id }}">
+                                        @endif
                                     </td>
                                     <td>
+                                        @if($variation->status == 'active')
                                         <div class="d-flex align-items-center gap-1">
                                             <button type="button" class="btn btn-sm btn-outline-danger stock-decrease-btn" data-variation-id="{{ $variation->id }}" title="Decrease Stock">
                                                 <i class="fa-solid fa-minus"></i>
@@ -135,16 +140,23 @@
                                                 <i class="fa-solid fa-plus"></i>
                                             </button>
                                         </div>
+                                        @else
+                                        <input type="number" readonly class="form-control form-control-sm variation-stock" value="{{ $variation->stock }}" data-variation-id="{{ $variation->id }}">
+                                        @endif
                                     </td>
                                     <td>
-                                        <select class="form-control form-control-sm variation-status" data-variation-id="{{ $variation->id }}">
+                                        <select class="form-control form-control-sm variation-status" data-variation-id="{{ $variation->id }}" {{ $variation->status == 'inactive' ? 'disabled' : '' }}>
                                             <option value="active" {{ $variation->status == 'active' ? 'selected' : '' }}>Active</option>
                                             <option value="inactive" {{ $variation->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                         </select>
                                     </td>
                                     <td class="text-center">
+                                        @if($variation->status == 'active')
                                         <button type="button" class="btn btn-sm btn-success save-variation" data-variation-id="{{ $variation->id }}"><i class="fa-solid fa-save"></i></button>
                                         <button type="button" class="btn btn-sm btn-danger delete-variation" data-variation-id="{{ $variation->id }}"><i class="fa-solid fa-trash"></i></button>
+                                        @else
+                                        <button type="button" class="btn btn-sm btn-info show-variation" data-variation-id="{{ $variation->id }}" title="Show Variation"><i class="fa-solid fa-eye"></i></button>
+                                        @endif
                                     </td>
                                 </tr>
                                 @endforeach
@@ -303,6 +315,7 @@
             <div class="modal-footer">
                 <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Close</button>
                 <button type="button" id="savePriceUpdate" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" style="display: none;"><i class="fa-solid fa-floppy-disk"></i> Update Price</button>
+                <button type="button" id="createFreshVariantBtn" class="btn btn-success rounded btn-sm" style="display: none;"><i class="fa-solid fa-plus"></i> Create Fresh Variant</button>
             </div>
         </div>
     </div>
@@ -321,6 +334,7 @@ let productUrls = {
     'getPurchaseItems': "{{ route('product.variation.purchase-items',['variation' => 'variationID']) }}",
     'addStockFromPurchase': "{{ route('product.variation.add-stock',['variation' => 'variationID']) }}",
     'getPriceUpdateInfo': "{{ route('product.variation.price-update-info',['variation' => 'variationID']) }}",
+    'createFreshVariant': "{{ route('product.variation.create-fresh-variant',['variation' => 'variationID']) }}",
 };
 
 let productId = {{ $product->id ?? 'null' }};
@@ -357,15 +371,34 @@ $(document).ready(function() {
         }
     });
 
+    // Show variation (for inactive variants - placeholder for future use)
+    $(document).on('click', '.show-variation', function() {
+        let variationId = $(this).data('variation-id');
+        // Placeholder for future implementation
+        toastr.info('Show variation feature will be implemented in the future.');
+    });
+
     // Stock increase/decrease buttons
     $(document).on('click', '.stock-increase-btn, .stock-decrease-btn', function() {
         let variationId = $(this).data('variation-id');
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        // Check if variation is inactive
+        if(row.hasClass('table-secondary')){
+            toastr.error('Cannot update stock for inactive variant.');
+            return;
+        }
         WinPos.Product.openStockUpdateModal(variationId);
     });
 
     // Price increase/decrease buttons
     $(document).on('click', '.price-increase-btn, .price-decrease-btn', function() {
         let variationId = $(this).data('variation-id');
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        // Check if variation is inactive
+        if(row.hasClass('table-secondary')){
+            toastr.error('Cannot update price for inactive variant.');
+            return;
+        }
         WinPos.Product.openPriceUpdateModal(variationId);
     });
 
@@ -380,6 +413,14 @@ $(document).ready(function() {
         }
         
         WinPos.Product.updateVariationPrice(variationId, newPrice);
+    });
+
+    // Create fresh variant
+    $(document).on('click', '#createFreshVariantBtn', function() {
+        let variationId = $(this).data('variation-id');
+        if(confirm('Are you sure you want to create a fresh variant? This will mark the current variant as inactive and transfer all stock to the new variant.')){
+            WinPos.Product.createFreshVariant(variationId);
+        }
     });
 });
 </script>

@@ -142,7 +142,7 @@ class VariationController extends Controller
             
             $request->validate([
                 'product_id' => 'required|exists:products,id',
-                'tagline' => 'required|string|max:255|unique:variations,tagline',
+                'tagline' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
                 'selling_price' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:1',
@@ -162,13 +162,31 @@ class VariationController extends Controller
                 ], 404);
             }
 
+            // Check if there's already an active variation with the same tagline
+            $status = $request->status ?? 'active';
+            if ($status === 'active') {
+                $existingActive = Variation::where('tagline', $request->tagline)
+                    ->where('status', 'active')
+                    ->exists();
+                
+                if ($existingActive) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'An active variation with this tagline already exists.',
+                        'errors' => [
+                            'tagline' => ['An active variation with this tagline already exists.']
+                        ]
+                    ]);
+                }
+            }
+
             $variation = new Variation();
             $variation->product_id = $request->product_id;
             $variation->tagline = $request->tagline;
             $variation->description = $request->description;
             $variation->selling_price = (float)$request->selling_price;
             $variation->stock = (int)$request->stock;
-            $variation->status = $request->status ?? 'active';
+            $variation->status = $status;
 
             $variation->save();
 
@@ -201,7 +219,7 @@ class VariationController extends Controller
             $POSID = auth()->user()->POSID;
             
             $request->validate([
-                'tagline' => 'required|string|max:255|unique:variations,tagline,' . $id,
+                'tagline' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
                 'selling_price' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:1',
@@ -227,11 +245,30 @@ class VariationController extends Controller
                 ], 403);
             }
 
+            // Check if there's already an active variation with the same tagline (excluding current)
+            $status = $request->status ?? $variation->status;
+            if ($status === 'active') {
+                $existingActive = Variation::where('tagline', $request->tagline)
+                    ->where('status', 'active')
+                    ->where('id', '!=', $id)
+                    ->exists();
+                
+                if ($existingActive) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'An active variation with this tagline already exists.',
+                        'errors' => [
+                            'tagline' => ['An active variation with this tagline already exists.']
+                        ]
+                    ], 422);
+                }
+            }
+
             $variation->tagline = $request->tagline;
             $variation->description = $request->description;
             $variation->selling_price = (float)$request->selling_price;
             $variation->stock = (int)$request->stock;
-            $variation->status = $request->status ?? 'active';
+            $variation->status = $status;
 
             $variation->save();
 
@@ -501,6 +538,77 @@ class VariationController extends Controller
                 'has_sales' => $hasSales,
                 'sold_items_qty' => $soldItemsQty ?? 0,
                 'cost_price' => $costPrice
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
+        }
+    }
+
+    public function createFreshVariant($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            $variation = Variation::with('product')
+                ->where('id', $id)
+                ->first();
+
+            if (!$variation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Variation not found.'
+                ], 404);
+            }
+
+            // Verify product belongs to the user's POSID
+            if ($variation->product->POSID != $POSID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ], 403);
+            }
+
+            // Check if there are any sales for this variation
+            $soldItemsQty = Sales_items::where('variation_id', $id)
+                ->where('POSID', $POSID)
+                ->sum('quantity');
+
+            if ($soldItemsQty == 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot create fresh variant. This variation has no sales.'
+                ], 400);
+            }
+
+            // Use the same tagline since the original will be inactive
+            // Only one active variation with the same tagline is allowed
+            $newTagline = $variation->tagline;
+
+            // Create new variation with same data
+            $newVariation = new Variation();
+            $newVariation->product_id = $variation->product_id;
+            $newVariation->tagline = $newTagline;
+            $newVariation->description = $variation->description;
+            $newVariation->selling_price = $variation->selling_price;
+            $newVariation->stock = $variation->stock; // Transfer all stock
+            $newVariation->status = 'active';
+            $newVariation->save();
+
+            // Mark original variation as inactive
+            $variation->status = 'inactive';
+            $variation->stock = 0; // Clear stock from original
+            $variation->save();
+
+            // Transfer purchase items to new variation
+            PurchaseItem::where('product_variant_id', $id)
+                ->update(['product_variant_id' => $newVariation->id]);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Fresh variant created successfully. Original variant marked as inactive.',
+                'variation' => $newVariation
             ]);
         } catch (Exception $exception) {
             return response()->json([

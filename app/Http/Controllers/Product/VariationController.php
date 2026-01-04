@@ -439,4 +439,74 @@ class VariationController extends Controller
             ], 500);
         }
     }
+
+    public function getPriceUpdateInfo($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            $variation = Variation::with('product')
+                ->where('id', $id)
+                ->first();
+
+            if (!$variation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Variation not found.'
+                ], 404);
+            }
+
+            // Verify product belongs to the user's POSID
+            if ($variation->product->POSID != $POSID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ], 403);
+            }
+
+            // Check if there are any sales for this variation
+            $soldItemsQty = Sales_items::where('variation_id', $id)
+                ->where('POSID', $POSID)
+                ->sum('quantity');
+
+            $hasSales = $soldItemsQty > 0;
+
+            // Get cost price from purchase items (weighted average or latest)
+            $purchaseItems = PurchaseItem::where('product_variant_id', $id)
+                ->where('purchased_qty', '>', 0)
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            $costPrice = null;
+            if ($purchaseItems->count() > 0) {
+                // Calculate weighted average cost price
+                $totalCost = 0;
+                $totalQty = 0;
+                foreach ($purchaseItems as $item) {
+                    $totalCost += $item->cost_price * $item->purchased_qty;
+                    $totalQty += $item->purchased_qty;
+                }
+                if ($totalQty > 0) {
+                    $costPrice = $totalCost / $totalQty;
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'variation' => [
+                    'id' => $variation->id,
+                    'tagline' => $variation->tagline,
+                    'selling_price' => $variation->selling_price,
+                    'current_stock' => $variation->stock,
+                ],
+                'has_sales' => $hasSales,
+                'sold_items_qty' => $soldItemsQty ?? 0,
+                'cost_price' => $costPrice
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
+        }
+    }
 }

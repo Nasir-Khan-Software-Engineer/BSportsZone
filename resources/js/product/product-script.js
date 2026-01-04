@@ -277,6 +277,105 @@ WinPos.Product = (function (Urls){
         });
     }
 
+    var openPriceUpdateModal = function (variationId){
+        // Show loading state
+        $('#priceUpdateContainer').html('<p class="text-muted text-center">Loading price information...</p>');
+        $('#priceModalVariationTagline').text('Loading...');
+        
+        // Open modal
+        WinPos.Common.showBootstrapModal("priceUpdateModal");
+        
+        // Fetch price update information
+        WinPos.Common.getAjaxCall(Urls.getPriceUpdateInfo.replace('variationID', variationId), function (response){
+            if(response.status === 'success'){
+                $('#priceModalVariationTagline').text(response.variation.tagline);
+                displayPriceUpdateInfo(response);
+            }else{
+                $('#priceUpdateContainer').html('<p class="text-danger text-center">' + (response.message || 'Failed to load price information.') + '</p>');
+            }
+        });
+    }
+
+    var displayPriceUpdateInfo = function (data){
+        let container = $('#priceUpdateContainer');
+        let variation = data.variation;
+        
+        if(data.has_sales){
+            // Hide save button
+            $('#savePriceUpdate').hide();
+            
+            // Show message that price cannot be updated due to existing sales
+            let html = '<div class="alert alert-warning">';
+            html += '<h6 class="alert-heading"><i class="fa-solid fa-exclamation-triangle"></i> Price Update Restricted</h6>';
+            html += '<p class="mb-0">';
+            html += 'You cannot update the price of this variant as you already have ' + (data.sold_items_qty || 0) + ' sales recorded for this item. ';
+            html += 'To update the price, you need to first create a new variant from this variant and mark this one as stockout. ';
+            html += 'This will move all available stock to the new variant while keeping this variant for reporting and historical purposes.';
+            html += '</p>';
+            html += '</div>';
+            container.html(html);
+        }else{
+            // Show save button
+            $('#savePriceUpdate').show();
+            
+            // Show price update form
+            let costPrice = data.cost_price ? parseFloat(data.cost_price).toFixed(2) : 'N/A';
+            let html = '<div class="card border mb-3">';
+            html += '<div class="card-header">';
+            html += '<h6 class="mb-0">Price Information</h6>';
+            html += '</div>';
+            html += '<div class="card-body">';
+            html += '<div class="row mb-3">';
+            html += '<div class="col-12">';
+            html += '<p class="mb-2"><strong>Variation Name:</strong> ' + (variation.tagline || '-') + '</p>';
+            html += '<p class="mb-2"><strong>Cost Price:</strong> ' + costPrice + '</p>';
+            html += '<p class="mb-2"><strong>Current Selling Price:</strong> ' + parseFloat(variation.selling_price || 0).toFixed(2) + '</p>';
+            html += '</div>';
+            html += '</div>';
+            html += '<hr>';
+            html += '<div class="row">';
+            html += '<div class="col-12">';
+            html += '<form id="priceUpdateForm">';
+            html += '<div class="form-group">';
+            html += '<label for="newSellingPrice">New Selling Price*</label>';
+            html += '<input type="number" step="0.01" min="0" class="form-control rounded" name="selling_price" id="newSellingPrice" value="' + parseFloat(variation.selling_price || 0).toFixed(2) + '" required>';
+            html += '<small class="form-text text-muted">Current cost price: ' + costPrice + '</small>';
+            html += '</div>';
+            html += '<input type="hidden" id="priceUpdateVariationId" value="' + variation.id + '">';
+            html += '</form>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            container.html(html);
+        }
+    }
+
+    var updateVariationPrice = function (variationId, newPrice){
+        let formData = {
+            selling_price: newPrice
+        };
+        
+        // Get current variation data from table
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        formData.tagline = row.find('.variation-tagline').val();
+        formData.description = row.find('.variation-description').val();
+        formData.stock = row.find('.variation-stock').val();
+        formData.status = row.find('.variation-status').val();
+        
+        WinPos.Common.putAjaxCallPost(Urls.updateVariation.replace("variationID", variationId), JSON.stringify(formData), function (response){
+            if(response.status === 'success'){
+                toastr.success(response.message);
+                // Update the price input in the table
+                row.find('.variation-selling-price').val(newPrice);
+                // Close modal
+                WinPos.Common.hideBootstrapModal("priceUpdateModal");
+            }else{
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        });
+    }
+
     return {
         datatableConfiguration: datatableConfiguration,
         populateCreateForm: populateCreateForm,
@@ -288,7 +387,9 @@ WinPos.Product = (function (Urls){
         updateVariationFromTable: updateVariationFromTable,
         deleteVariation: deleteVariation,
         openStockUpdateModal: openStockUpdateModal,
-        addStockFromPurchaseItem: addStockFromPurchaseItem
+        addStockFromPurchaseItem: addStockFromPurchaseItem,
+        openPriceUpdateModal: openPriceUpdateModal,
+        updateVariationPrice: updateVariationPrice
     }
 })(productUrls);
 

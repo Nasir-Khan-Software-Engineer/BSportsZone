@@ -115,7 +115,15 @@
                                         <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}">
                                     </td>
                                     <td>
-                                        <input type="number" readonly step="0.01" class="form-control form-control-sm variation-selling-price" value="{{ $variation->selling_price }}" data-variation-id="{{ $variation->id }}">
+                                        <div class="d-flex align-items-center gap-1">
+                                            <button type="button" class="btn btn-sm btn-outline-danger price-decrease-btn" data-variation-id="{{ $variation->id }}" title="Decrease Price">
+                                                <i class="fa-solid fa-minus"></i>
+                                            </button>
+                                            <input type="number" readonly step="0.01" class="form-control form-control-sm variation-selling-price" value="{{ $variation->selling_price }}" data-variation-id="{{ $variation->id }}" style="flex: 1; min-width: 80px;">
+                                            <button type="button" class="btn btn-sm btn-outline-success price-increase-btn" data-variation-id="{{ $variation->id }}" title="Increase Price">
+                                                <i class="fa-solid fa-plus"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-1">
@@ -277,6 +285,29 @@
     </div>
 </div>
 
+<!-- Price Update Modal -->
+<div class="modal fade" id="priceUpdateModal" tabindex="-1" role="dialog" aria-labelledby="priceUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content rounded">
+            <div class="modal-header rounded">
+                <h5 class="modal-title" id="priceUpdateModalLabel">Update Price - <span id="priceModalVariationTagline"></span></h5>
+                <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="priceUpdateContainer">
+                    <p class="text-muted text-center">Loading price information...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Close</button>
+                <button type="button" id="savePriceUpdate" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" style="display: none;"><i class="fa-solid fa-floppy-disk"></i> Update Price</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @section('script')
@@ -289,6 +320,7 @@ let productUrls = {
     'deleteVariation': "{{ route('product.variation.destroy',['variation' => 'variationID']) }}",
     'getPurchaseItems': "{{ route('product.variation.purchase-items',['variation' => 'variationID']) }}",
     'addStockFromPurchase': "{{ route('product.variation.add-stock',['variation' => 'variationID']) }}",
+    'getPriceUpdateInfo': "{{ route('product.variation.price-update-info',['variation' => 'variationID']) }}",
 };
 
 let productId = {{ $product->id ?? 'null' }};
@@ -329,6 +361,25 @@ $(document).ready(function() {
     $(document).on('click', '.stock-increase-btn, .stock-decrease-btn', function() {
         let variationId = $(this).data('variation-id');
         WinPos.Product.openStockUpdateModal(variationId);
+    });
+
+    // Price increase/decrease buttons
+    $(document).on('click', '.price-increase-btn, .price-decrease-btn', function() {
+        let variationId = $(this).data('variation-id');
+        WinPos.Product.openPriceUpdateModal(variationId);
+    });
+
+    // Save price update
+    $(document).on('click', '#savePriceUpdate', function() {
+        let variationId = $('#priceUpdateVariationId').val();
+        let newPrice = parseFloat($('#newSellingPrice').val());
+        
+        if(!newPrice || newPrice < 0){
+            toastr.error('Please enter a valid price.');
+            return;
+        }
+        
+        WinPos.Product.updateVariationPrice(variationId, newPrice);
     });
 });
 </script>

@@ -115,14 +115,14 @@
                                         <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}">
                                     </td>
                                     <td>
-                                        <input type="number" step="0.01" class="form-control form-control-sm variation-selling-price" value="{{ $variation->selling_price }}" data-variation-id="{{ $variation->id }}">
+                                        <input type="number" readonly step="0.01" class="form-control form-control-sm variation-selling-price" value="{{ $variation->selling_price }}" data-variation-id="{{ $variation->id }}">
                                     </td>
                                     <td>
                                         <div class="d-flex align-items-center gap-1">
                                             <button type="button" class="btn btn-sm btn-outline-danger stock-decrease-btn" data-variation-id="{{ $variation->id }}" title="Decrease Stock">
                                                 <i class="fa-solid fa-minus"></i>
                                             </button>
-                                            <input type="number" class="form-control form-control-sm variation-stock" value="{{ $variation->stock }}" data-variation-id="{{ $variation->id }}" style="flex: 1; min-width: 60px;">
+                                            <input type="number" readonly class="form-control form-control-sm variation-stock" value="{{ $variation->stock }}" data-variation-id="{{ $variation->id }}" style="flex: 1; min-width: 60px;">
                                             <button type="button" class="btn btn-sm btn-outline-success stock-increase-btn" data-variation-id="{{ $variation->id }}" title="Increase Stock">
                                                 <i class="fa-solid fa-plus"></i>
                                             </button>
@@ -214,12 +214,64 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div id="purchaseItemsContainer">
-                    <p class="text-muted text-center">Loading purchase items...</p>
+                <!-- Variation Information Section -->
+                <div class="card border mb-3">
+                    <div class="card-header">
+                        <h6 class="mb-0">Variation Information</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Variation Name:</strong> <span id="variationNameDisplay">-</span></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Current Selling Price:</strong> <span id="currentSellingPriceDisplay">-</span></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Current Stocks:</strong> <span id="currentStocksDisplay">-</span></p>
+                            </div>
+                            <div class="col-6">
+                                <p class="mb-2"><strong>Already Sales QTY:</strong> <span id="alreadySalesQtyDisplay">-</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stock Update Section -->
+                <div class="card border">
+                    <div class="card-header">
+                        <h6 class="mb-0">Stock Update</h6>
+                    </div>
+                    <div class="card-body p-0">
+                        <div id="purchaseItemsContainer">
+                            <p class="text-muted text-center p-3">Loading purchase items...</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stock Update Confirmation Modal -->
+<div class="modal fade" id="stockUpdateConfirmationModal" tabindex="-1" role="dialog" aria-labelledby="stockUpdateConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded">
+            <div class="modal-header rounded">
+                <h5 class="modal-title" id="stockUpdateConfirmationModalLabel">Confirm Stock Update</h5>
+                <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> No, Close</button>
+                <button type="button" id="confirmStockUpdate" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-check"></i> Yes, Update Stock</button>
             </div>
         </div>
     </div>

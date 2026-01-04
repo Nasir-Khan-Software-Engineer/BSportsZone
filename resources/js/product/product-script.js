@@ -177,8 +177,12 @@ WinPos.Product = (function (Urls){
 
     var openStockUpdateModal = function (variationId){
         // Show loading state
-        $('#purchaseItemsContainer').html('<p class="text-muted text-center">Loading purchase items...</p>');
+        $('#purchaseItemsContainer').html('<p class="text-muted text-center p-3">Loading purchase items...</p>');
         $('#modalVariationTagline').text('Loading...');
+        $('#variationNameDisplay').text('-');
+        $('#currentSellingPriceDisplay').text('-');
+        $('#currentStocksDisplay').text('-');
+        $('#alreadySalesQtyDisplay').text('-');
         
         // Open modal
         WinPos.Common.showBootstrapModal("stockUpdateModal");
@@ -187,77 +191,69 @@ WinPos.Product = (function (Urls){
         WinPos.Common.getAjaxCall(Urls.getPurchaseItems.replace('variationID', variationId), function (response){
             if(response.status === 'success'){
                 $('#modalVariationTagline').text(response.variation.tagline);
+                displayVariationInfo(response.variation);
                 displayPurchaseItems(response.purchase_items, response.variation);
             }else{
-                $('#purchaseItemsContainer').html('<p class="text-danger text-center">' + (response.message || 'Failed to load purchase items.') + '</p>');
+                $('#purchaseItemsContainer').html('<p class="text-danger text-center p-3">' + (response.message || 'Failed to load purchase items.') + '</p>');
             }
         });
+    }
+
+    var displayVariationInfo = function (variation){
+        $('#variationNameDisplay').text(variation.tagline || '-');
+        $('#currentSellingPriceDisplay').text(parseFloat(variation.selling_price || 0).toFixed(2));
+        $('#currentStocksDisplay').text(variation.current_stock || 0);
+        $('#alreadySalesQtyDisplay').text(variation.sold_items_qty || 0);
     }
 
     var displayPurchaseItems = function (purchaseItems, variation){
         let container = $('#purchaseItemsContainer');
         
         if(purchaseItems.length === 0){
-            container.html('<p class="text-muted text-center">No purchase items available for this variation.</p>');
+            container.html('<p class="text-muted text-center p-3">No purchase items available for this variation.</p>');
             return;
         }
 
-        let html = '';
+        let html = '<div class="table-responsive"><table class="table table-bordered table-hover mb-0">';
+        html += '<thead class="thead-light">';
+        html += '<tr>';
+        html += '<th class="text-center align-middle">Purchases Date</th>';
+        html += '<th class="text-center align-middle">Cost Price</th>';
+        html += '<th class="text-center align-middle">Available Stocks</th>';
+        html += '<th class="text-center align-middle">Action</th>';
+        html += '</tr>';
+        html += '</thead>';
+        html += '<tbody>';
+        
         purchaseItems.forEach(function(item){
-            html += `
-                <div class="card border mb-3">
-                    <div class="card-header">
-                        <h6 class="mb-0">
-                            <strong>Invoice Number:</strong> ${item.invoice_number} | 
-                            <strong>Purchase Date:</strong> ${item.purchase_date}
-                        </h6>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <h6 class="text-primary">Information</h6>
-                                <ul class="list-unstyled">
-                                    <li><strong>Available Stock in the warehouse:</strong> ${item.available_stock}</li>
-                                    <li><strong>The cost price of this product:</strong> ${parseFloat(item.cost_price).toFixed(2)}</li>
-                                    <li><strong>Your current selling price of this product is:</strong> ${parseFloat(item.selling_price).toFixed(2)}</li>
-                                    <li><strong>You already sell X items of these products.</strong> <span class="text-muted">(Will be updated later)</span></li>
-                                </ul>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row mb-3">
-                            <div class="col-12">
-                                <h6 class="text-primary">Action</h6>
-                                <div class="d-flex align-items-center gap-2">
-                                    <label class="mb-0">Add</label>
-                                    <input type="number" 
-                                           class="form-control form-control-sm" 
-                                           id="qtyInput_${item.id}" 
-                                           min="1" 
-                                           max="${item.available_stock}" 
-                                           value="1" 
-                                           style="width: 100px;">
-                                    <label class="mb-0">item(s) to this variant from these purchases.</label>
-                                    <button type="button" 
-                                            class="btn btn-sm btn-success add-stock-btn" 
-                                            data-purchase-item-id="${item.id}" 
-                                            data-variation-id="${variation.id}">
-                                        <i class="fa-solid fa-plus"></i> Add
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-12">
-                                <h6 class="text-primary">Price Update Section</h6>
-                                <p class="text-muted mb-0">You can't update the price as you already sell some items.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
+            html += '<tr>';
+            html += '<td class="text-center align-middle">' + (item.purchase_date || 'N/A') + '</td>';
+            html += '<td class="text-center align-middle">' + parseFloat(item.cost_price || 0).toFixed(2) + '</td>';
+            html += '<td class="text-center align-middle">' + (item.available_stock || 0) + '</td>';
+            html += '<td class="text-center align-middle">';
+            html += '<div class="d-flex align-items-center justify-content-center gap-2">';
+            html += '<input type="number" ';
+            html += 'class="form-control form-control-sm" ';
+            html += 'id="qtyInput_' + item.id + '" ';
+            html += 'min="1" ';
+            html += 'max="' + (item.available_stock || 0) + '" ';
+            html += 'value="1" ';
+            html += 'style="width: 80px;">';
+            html += '<button type="button" ';
+            html += 'class="btn btn-sm btn-success add-stock-btn" ';
+            html += 'data-purchase-item-id="' + item.id + '" ';
+            html += 'data-variation-id="' + variation.id + '" ';
+            html += 'data-cost-price="' + item.cost_price + '" ';
+            html += 'data-selling-price="' + variation.selling_price + '">';
+            html += '<i class="fa-solid fa-plus"></i> Add';
+            html += '</button>';
+            html += '</div>';
+            html += '</td>';
+            html += '</tr>';
         });
+        
+        html += '</tbody>';
+        html += '</table></div>';
         
         container.html(html);
     }
@@ -313,6 +309,8 @@ $(document).on('click', '.delete-product', function() {
 $(document).on('click', '.add-stock-btn', function() {
     let purchaseItemId = $(this).data('purchase-item-id');
     let variationId = $(this).data('variation-id');
+    let costPrice = parseFloat($(this).data('cost-price'));
+    let sellingPrice = parseFloat($(this).data('selling-price'));
     let quantity = parseInt($('#qtyInput_' + purchaseItemId).val());
     
     if(!quantity || quantity < 1){
@@ -326,6 +324,30 @@ $(document).on('click', '.add-stock-btn', function() {
         return;
     }
     
+    // Store data for confirmation
+    $('#confirmStockUpdate').data('purchase-item-id', purchaseItemId);
+    $('#confirmStockUpdate').data('variation-id', variationId);
+    $('#confirmStockUpdate').data('quantity', quantity);
+    
+    // Show confirmation modal
+    let confirmationMessage = 'The cost price of this product is ' + costPrice.toFixed(2) + ', ';
+    confirmationMessage += 'Are you sure want to sell this product for ' + sellingPrice.toFixed(2) + ' (Current price). ';
+    confirmationMessage += 'If not please update the price first.';
+    $('#confirmationMessage').text(confirmationMessage);
+    
+    WinPos.Common.showBootstrapModal("stockUpdateConfirmationModal");
+});
+
+// Handle confirmation
+$(document).on('click', '#confirmStockUpdate', function() {
+    let purchaseItemId = $(this).data('purchase-item-id');
+    let variationId = $(this).data('variation-id');
+    let quantity = $(this).data('quantity');
+    
+    // Close confirmation modal
+    WinPos.Common.hideBootstrapModal("stockUpdateConfirmationModal");
+    
+    // Add stock
     WinPos.Product.addStockFromPurchaseItem(variationId, purchaseItemId, quantity);
 });
 

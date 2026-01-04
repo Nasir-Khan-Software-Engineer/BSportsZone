@@ -8,6 +8,7 @@ use Illuminate\Validation\ValidationException;
 use App\Models\Variation;
 use App\Models\Product;
 use App\Models\PurchaseItem;
+use App\Models\Sales_items;
 use Exception;
 
 class VariationController extends Controller
@@ -324,6 +325,11 @@ class VariationController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
+            // Calculate total sold items for this variation
+            $soldItemsQty = Sales_items::where('variation_id', $id)
+                ->where('POSID', $POSID)
+                ->sum('quantity');
+
             // Format the data for the frontend
             $formattedItems = $purchaseItems->map(function($item) use ($variation) {
                 return [
@@ -345,6 +351,7 @@ class VariationController extends Controller
                     'tagline' => $variation->tagline,
                     'selling_price' => $variation->selling_price,
                     'current_stock' => $variation->stock,
+                    'sold_items_qty' => $soldItemsQty ?? 0,
                 ],
                 'purchase_items' => $formattedItems
             ]);

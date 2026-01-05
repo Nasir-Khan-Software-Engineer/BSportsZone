@@ -97,6 +97,7 @@ class StaffReportController extends Controller
             // Get total services within date range
             $totalServices = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $staff->id)
+                ->where('type', 'Service')
                 ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
                 ->count();
 
@@ -225,6 +226,7 @@ class StaffReportController extends Controller
             // Get total services within date range
             $totalServices = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $staff->id)
+                ->where('type', 'Service')
                 ->whereBetween('created_at', [$from . ' 00:00:00', $to . ' 23:59:59'])
                 ->count();
 

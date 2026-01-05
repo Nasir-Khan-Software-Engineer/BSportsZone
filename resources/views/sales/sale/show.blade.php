@@ -77,6 +77,7 @@
             </div>
             @endif
 
+            
             <!-- SERVICE LIST -->
             <div class="card border mb-3">
                 <div class="card-body p-1">
@@ -93,20 +94,64 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($sale->items as $item)
-                            <tr>
-                                <td>{{ $item->service->code }}</td>
-                                <td>{{ $item->service->name }}</td>
-                                <td class="text-center">{{ $item->staff->name ?? 'None' }}</td>
-                                <td class="text-center">{{ $item->quantity }}</td>
-                                <td class="text-end">{{ number_format($item->selling_price,2) }} Tk</td>
-                            </tr>
-                            @endforeach
+                            @forelse ($sale->items->where('type', 'Service') as $item)
+                                <tr>
+                                    <td>{{ $item->service->code ?? '-' }}</td>
+                                    <td>{{ $item->service->name ?? '-' }}</td>
+                                    <td class="text-center">{{ $item->staff->name ?? 'None' }}</td>
+                                    <td class="text-center">{{ $item->quantity ?? 0 }}</td>
+                                    <td class="text-end">
+                                        {{ number_format($item->selling_price ?? 0, 2) }} Tk
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center text-muted">
+                                        No service items found
+                                    </td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
-
                 </div>
             </div>
+
+            <!-- PRODUCT LIST -->
+            <div class="card border mb-3">
+                <div class="card-body p-1">
+                    <h5 class="mb-2">Product List</h5>
+
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Product Code</th>
+                                <th>Product Name</th>
+                                <th class="text-center">QTY</th>
+                                <th class="text-end">Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse ($sale->items->where('type', 'Product') as $item)
+                                <tr>
+                                    <td>{{ $item->product->code ?? '-' }}</td>
+                                    <td>{{ $item->product->name ?? '-' }}</td>
+                                    <td class="text-center">{{ $item->quantity ?? 0 }}</td>
+                                    <td class="text-end">
+                                        {{ number_format($item->selling_price ?? 0, 2) }} Tk
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="4" class="text-center text-muted">
+                                        No product items found
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
 
             <!-- PAYMENT LIST -->
             <div class="card border mb-3">

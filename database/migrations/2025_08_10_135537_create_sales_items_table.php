@@ -19,6 +19,7 @@ return new class extends Migration
             
             $table->unsignedBigInteger('variation_id')->nullable();
             $table->string('variant_tagline')->nullable();
+            $table->string('type')->default('Service');
 
             $table->decimal('product_price', $precision = 8, $scale = 2)->default(0);
             $table->decimal('selling_price', $precision = 8, $scale = 2)->default(0);

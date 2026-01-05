@@ -129,12 +129,12 @@ class ServiceController extends Controller
 
     public function edit($id){
         $POSID = auth()->user()->POSID;
-        $service = Product::with('categories','sales_items', 'staff')->where('POSID', $POSID)
+        $service = Product::with('categories','salesItemServices', 'staff')->where('POSID', $POSID)
             ->where('id', $id)->where('type', 'Service')
             ->first();
         
         // Check if service has sales
-        $hasSales = $service->sales_items()->count() > 0;
+        $hasSales = $service->salesItemServices()->count() > 0;
         
         return response()->json([
             'status'  => 'success',
@@ -170,7 +170,7 @@ class ServiceController extends Controller
 
     public function show($id){
         $POSID = auth()->user()->POSID;
-        $service = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'sales_items', 'staff')
+        $service = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'salesItemServices', 'staff')
             ->where('POSID', $POSID)->where('type', 'Service')
             ->where('id', $id)
             ->first();
@@ -180,15 +180,15 @@ class ServiceController extends Controller
         $service->updatedBy = $service->updater->name ?? '';
 
         // Get the latest sale
-        $lastSale = $service->sales_items()->latest()->first();
+        $lastSale = $service->salesItemServices()->latest()->first();
 
         $service->lastSaleAt = $lastSale ? formatDateAndTime($lastSale->created_at) : null;
 
         // Total number of sales
-        $service->totalSalesCount = $service->sales_items()->count();
+        $service->totalSalesCount = $service->salesItemServices()->count();
 
         // Total amount of sales
-        $service->totalSalesAmount = $service->sales_items->sum(function($item) {
+        $service->totalSalesAmount = $service->salesItemServices->sum(function($item) {
             return ($item->selling_price - $item->discount) * $item->quantity;
         });
 
@@ -344,10 +344,10 @@ class ServiceController extends Controller
                 'description' => 'nullable|string|min:3'
             ]);
 
-            $service = Product::with('sales_items')->where('POSID', $POSID)->where('type', 'Service')->where('id', $id)->first();
+            $service = Product::with('salesItemServices')->where('POSID', $POSID)->where('type', 'Service')->where('id', $id)->first();
 
             // Check if service has sales and prevent price change
-            $hasSales = $service->sales_items()->count() > 0;
+            $hasSales = $service->salesItemServices()->count() > 0;
             if ($hasSales && $service->price != (float)$request->price) {
                 return response()->json([
                     'status' => 'error',
@@ -458,7 +458,7 @@ class ServiceController extends Controller
                 ->where('id', $id)->where('type', 'Service')
                 ->first();
 
-            if($service->sales_items()->count() > 0){
+            if($service->salesItemServices()->count() > 0){
                 return response()->json([
                     'status' => 'error',
                     'errors' => [

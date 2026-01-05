@@ -107,32 +107,32 @@
 }
 
 /* // category and brand select2 clear icon css  */
-.category-brand-select .select2-selection__clear span{
+.category-product-service-select .select2-selection__clear span{
     display: none;
 }
-.category-brand-select .select2-container--classic .select2-selection--single{
+.category-product-service-select .select2-container--classic .select2-selection--single{
     padding-right: 0px !important;
 }
-.category-brand-select .select2-container--classic .select2-selection--single .select2-selection__clear{
+.category-product-service-select .select2-container--classic .select2-selection--single .select2-selection__clear{
     margin-right: 5px;
 }
-.category-brand-select .select2-container--classic .select2-selection__clear {
+.category-product-service-select .select2-container--classic .select2-selection__clear {
     color: #ff4d4f; 
     cursor: pointer;
     height: 100% !important;
     margin-right: 5px;
 }
-.category-brand-select .select2-container--classic .select2-selection__clear::after {
+.category-product-service-select .select2-container--classic .select2-selection__clear::after {
     content: "\f00d";
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
 }
 
-.category-brand-select span.select2-container{
+.category-product-service-select span.select2-container{
     border: 1px solid rgb(63, 63, 63) !important;
     border-radius: 0px !important;
 }
-.category-brand-select span.select2-container .select2-selection__placeholder{
+.category-product-service-select span.select2-container .select2-selection__placeholder{
     color: #4d4d4d;
 }
 
@@ -156,7 +156,7 @@
 /* Grid view layout (4 per row) */
 #searchServiceContainer.grid-view {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 5px;
 }
 
@@ -201,7 +201,7 @@
 .pos-page-font-size{
     font-size: 16px !important;
 }
-.category-brand-select .selection .select2{
+.category-product-service-select .selection .select2{
     font-size: 16px !important;
     border-radius: 5px !important;
     /* // not working  */

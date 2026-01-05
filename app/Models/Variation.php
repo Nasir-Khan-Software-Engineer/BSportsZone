@@ -34,4 +34,9 @@ class Variation extends Model
     {
         return $this->hasMany(\App\Models\PurchaseItem::class, 'product_variant_id');
     }
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
+    }
 }

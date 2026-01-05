@@ -326,6 +326,8 @@ class HomeController extends Controller
         $serviceQuery = Sales_items::join('sales', 'sales_items.sales_id', '=', 'sales.id')
             ->join('products', 'sales_items.product_id', '=', 'products.id')
             ->where('sales.POSID', $POSID)
+            ->where('sales_items.type', 'Service')
+            ->where('products.type', 'Service')
             ->whereBetween('sales.created_at', [$startDate, $endDate])
             ->selectRaw('products.name as service_name, SUM(sales_items.quantity) as total_count')
             ->groupBy('products.id', 'products.name')

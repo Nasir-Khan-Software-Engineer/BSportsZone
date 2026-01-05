@@ -365,6 +365,7 @@ class VariationController extends Controller
             // Calculate total sold items for this variation
             $soldItemsQty = Sales_items::where('variation_id', $id)
                 ->where('POSID', $POSID)
+                ->where('type', 'Product')
                 ->sum('quantity');
 
             // Format the data for the frontend
@@ -503,6 +504,7 @@ class VariationController extends Controller
             // Check if there are any sales for this variation
             $soldItemsQty = Sales_items::where('variation_id', $id)
                 ->where('POSID', $POSID)
+                ->where('type', 'Product')
                 ->sum('quantity');
 
             $hasSales = $soldItemsQty > 0;
@@ -573,6 +575,7 @@ class VariationController extends Controller
             // Check if there are any sales for this variation
             $soldItemsQty = Sales_items::where('variation_id', $id)
                 ->where('POSID', $POSID)
+                ->where('type', 'Product')
                 ->sum('quantity');
 
             if ($soldItemsQty == 0) {

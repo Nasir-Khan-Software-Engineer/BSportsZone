@@ -32,6 +32,8 @@ use App\Services\Sms\SMSServiceInterface;
 use App\Services\Sms\SMSService;
 use App\Services\Purchase\IPurchaseService;
 use App\Services\Purchase\PurchaseService;
+use App\Services\Product\IProductService;
+use App\Services\Product\ProductService;
 
 class ServiceLayerServiceProvider extends ServiceProvider
 {
@@ -54,6 +56,7 @@ class ServiceLayerServiceProvider extends ServiceProvider
         $this->app->scoped(ILoyaltyService::class, LoyaltyService::class);
         $this->app->scoped(SMSServiceInterface::class, SMSService::class);
         $this->app->scoped(IPurchaseService::class, PurchaseService::class);
+        $this->app->scoped(IProductService::class, ProductService::class);
     }
 
     /**

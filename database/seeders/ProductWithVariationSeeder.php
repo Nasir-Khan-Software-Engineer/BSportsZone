@@ -48,7 +48,7 @@ class ProductWithVariationSeeder extends Seeder
             $product->code = 'PRD-' . str_pad($i, 4, '0', STR_PAD_LEFT);
             $product->name = 'Product ' . $i;
             $product->type = 'Product';
-            $product->price = rand(100, 5000); // Random price between 100 and 5000
+            $product->price = 0; // Random price between 100 and 5000
             $product->description = 'This is a description for Product ' . $i;
             $product->supplier_id = $supplierId;
             $product->brand_id = $brandId;
@@ -92,7 +92,7 @@ class ProductWithVariationSeeder extends Seeder
                 $variation->tagline = $uniqueTagline;
                 $variation->description = 'Variation description for ' . $sizeTag . ' of ' . $product->name;
                // $variation->cost_price = rand(50, max(50, (int)($product->price * 0.7))); // Cost price less than selling price
-                $variation->selling_price = rand(max($product->price+50, (int)($product->price * 0.8)), (int)($product->price * 1.2));
+                $variation->selling_price = 0;
                 $variation->stock = 0;
                 $variation->status = 'active';
                 $variation->save();

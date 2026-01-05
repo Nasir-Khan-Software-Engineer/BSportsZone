@@ -23,9 +23,12 @@ class Product extends Model
         return $this->belongsToMany(Category::class);
     }
 
-    public function sales_items()
-    {
-        return $this->hasMany(Sales_items::class, 'product_id');
+    public function salesItemProducts(){
+        return $this->hasMany(Sales_items::class, 'product_id')->where('type', 'Product');
+    }
+
+    public function salesItemServices(){
+        return $this->hasMany(Sales_items::class, 'product_id')->where('type', 'Service');
     }
     
     public function creator()

@@ -3,26 +3,25 @@ namespace App\Services\Pos;
 
 use App\Repositories\Pos\IPosRepository;
 use App\Services\Service\IServiceService;
+use App\Services\Product\IProductService;
 
 class PosService implements IPosService{
 
     public function __construct(IPosRepository $iPosRepository,
-                                IServiceService $iServiceService){
+                                IServiceService $iServiceService,
+                                IProductService $iProductService){
         $this->posRepository = $iPosRepository;
         $this->serviceService = $iServiceService;
+        $this->productService = $iProductService;
     }
 
-    public function recentServices($posId, $shopId, $categoryId, $brandId){
-        return $this->posRepository->recentServices($posId, $shopId, $categoryId, $brandId);
-    }
-
-    public function getPosPageServices($posId){
-        $ids = $this->serviceService->getTopSellingServiceIds($posId);
-        if($ids && count($ids) > 0){
-            return $this->serviceService->getServiceByIds($ids);
+    public function getPosPageItems($posId, $type = 'Product'){
+        if($type == 'Product'){
+            return $this->productService->getTopSellingProducts($posId);
+        } else {
+            return $this->serviceService->getTopSellingServices($posId);
         }
-
-        return $this->serviceService->getRecentServices($posId, 1, 0, 0);
     }
+
 }
 

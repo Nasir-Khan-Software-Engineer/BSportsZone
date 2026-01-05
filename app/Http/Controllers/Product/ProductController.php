@@ -39,7 +39,7 @@ class ProductController extends Controller
         $searchCriteria = $request->input('search');
 
         $query = Product::where('products.POSID', $POSID)
-            ->with('creator', 'brand', 'unit', 'supplier', 'variations')
+            ->with('creator', 'variations.purchaseItems')
             ->where('type', 'Product')
             ->where(function($query) use ($searchCriteria) {
                 $query->where('code', 'like', "%{$searchCriteria}%")
@@ -66,20 +66,14 @@ class ProductController extends Controller
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
-        } elseif ($orderColumn == 3) {
+        } elseif ($orderColumn == 2) {
             // Order by name
             $products = (clone $query)->orderBy('name', $orderDir)
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
-        } elseif ($orderColumn == 4) {
-            // Order by price
-            $products = (clone $query)->orderBy('price', $orderDir)
-                ->skip($request->input('start'))
-                ->take($request->input('length'))
-                ->get();
         } else {
-            // Default sorting by ID descending
+            // Default sorting by ID descending (other columns are not sortable)
             $products = (clone $query)->orderBy('id', 'desc')
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
@@ -90,9 +84,47 @@ class ProductController extends Controller
             $product->formattedDate = formatDate($product->created_at);
             $product->formattedTime = formatTime($product->created_at);
             $product->variations_count = $product->variations->count();
-            $product->brand_name = $product->brand->name ?? '-';
-            $product->unit_name = $product->unit->name ?? '-';
-            $product->supplier_name = $product->supplier->name ?? '-';
+            
+            // Calculate salable stocks (sum of all active variations' stock)
+            $product->salable_stocks = $product->variations->where('status', 'active')->sum('stock');
+            
+            // Calculate warehouse stocks (sum of all purchase items' unallocated_qty for all variations)
+            $product->warehouse_stocks = 0;
+            $costPrices = [];
+            foreach ($product->variations as $variation) {
+                foreach ($variation->purchaseItems as $purchaseItem) {
+                    $product->warehouse_stocks += $purchaseItem->unallocated_qty;
+                    if ($purchaseItem->cost_price > 0) {
+                        $costPrices[] = $purchaseItem->cost_price;
+                    }
+                }
+            }
+            
+            // Calculate cost price range
+            if (!empty($costPrices)) {
+                $minCost = min($costPrices);
+                $maxCost = max($costPrices);
+                $product->cost_price_range = $minCost == $maxCost 
+                    ? number_format($minCost, 2) 
+                    : number_format($minCost, 2) . ' - ' . number_format($maxCost, 2);
+            } else {
+                $product->cost_price_range = '-';
+            }
+            
+            // Calculate selling price range (from variations)
+            $sellingPrices = $product->variations->where('status', 'active')->pluck('selling_price')->filter(function($price) {
+                return $price > 0;
+            })->toArray();
+            
+            if (!empty($sellingPrices)) {
+                $minSelling = min($sellingPrices);
+                $maxSelling = max($sellingPrices);
+                $product->selling_price_range = $minSelling == $maxSelling 
+                    ? number_format($minSelling, 2) 
+                    : number_format($minSelling, 2) . ' - ' . number_format($maxSelling, 2);
+            } else {
+                $product->selling_price_range = '-';
+            }
             
             if ($product->created_by == null) {
                 $product->createdBy = 'CustomData';
@@ -115,7 +147,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $POSID = auth()->user()->POSID;
-        $product = Product::with('categories', 'sales_items', 'variations', 'brand', 'unit', 'supplier')->where('POSID', $POSID)
+        $product = Product::with('categories', 'salesItemProducts', 'variations', 'brand', 'unit', 'supplier')->where('POSID', $POSID)
             ->where('id', $id)->where('type', 'Product')
             ->first();
         
@@ -140,7 +172,7 @@ class ProductController extends Controller
     public function show($id)
     {
         $POSID = auth()->user()->POSID;
-        $product = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'supplier', 'sales_items', 'variations')
+        $product = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'supplier', 'salesItemProducts', 'variations')
             ->where('POSID', $POSID)->where('type', 'Product')
             ->where('id', $id)
             ->first();
@@ -154,15 +186,15 @@ class ProductController extends Controller
         $product->updatedBy = $product->updater->name ?? '';
 
         // Get the latest sale
-        $lastSale = $product->sales_items()->latest()->first();
+        $lastSale = $product->salesItemProducts()->latest()->first();
 
         $product->lastSaleAt = $lastSale ? formatDateAndTime($lastSale->created_at) : null;
 
         // Total number of sales
-        $product->totalSalesCount = $product->sales_items()->count();
+        $product->totalSalesCount = $product->salesItemProducts()->count();
 
         // Total amount of sales
-        $product->totalSalesAmount = $product->sales_items->sum(function($item) {
+        $product->totalSalesAmount = $product->salesItemProducts->sum(function($item) {
             return ($item->selling_price - $item->discount) * $item->quantity;
         });
 
@@ -264,7 +296,7 @@ class ProductController extends Controller
                 'description' => 'nullable|string|min:3'
             ]);
 
-            $product = Product::with('sales_items')->where('POSID', $POSID)->where('type', 'Product')->where('id', $id)->first();
+            $product = Product::with('salesItemProducts')->where('POSID', $POSID)->where('type', 'Product')->where('id', $id)->first();
 
             if (!$product) {
                 return response()->json([
@@ -335,7 +367,7 @@ class ProductController extends Controller
                 ], 404);
             }
 
-            if($product->sales_items()->count() > 0) {
+            if($product->salesItemProducts()->count() > 0) {
                 return response()->json([
                     'status' => 'error',
                     'errors' => [

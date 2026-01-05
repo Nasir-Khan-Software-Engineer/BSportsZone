@@ -22,18 +22,24 @@ use App\Models\LoyaltyHistory;
 use App\Jobs\SendSmsJob;
 use App\Services\Sms\SmsTemplateBuilder;
 use Carbon\Carbon;
+use App\Services\Product\IProductService;
+use App\Services\Service\IServiceService;
 
 class PosController extends Controller
 {
     public function __construct(IPosService $iPosService,
                                 ICategoryService $iCategoryService,
                                 IBrandService $iBrandService,
-                                IAccountSetupService $iAccountService){
+                                IAccountSetupService $iAccountService,
+                                IProductService $iProductService,
+                                IServiceService $iServiceService) {
 
         $this->posService = $iPosService;
         $this->categoryService = $iCategoryService;
         $this->brandService = $iBrandService;
         $this->accountService = $iAccountService;
+        $this->productService = $iProductService;
+        $this->serviceService = $iServiceService;
     }
 
     public function index(){
@@ -41,10 +47,12 @@ class PosController extends Controller
         $categories = $this->categoryService->getAllCategories(auth()->user()->POSID);
         $brands = $this->brandService->getBrands(auth()->user()->POSID);
 
-        $topSellingServices = $this->posService->getPosPageServices(auth()->user()->POSID);
+        $defaultType = "Product";
+
+        $topServiceOrProduct = $this->posService->getPosPageItems($POSID, $defaultType);
 
         return view('pos/index',[
-            'recentServices' => $topSellingServices,
+            'recentServices' => $topServiceOrProduct,
             'categories' => $categories,
             'brands' => $brands]);
     }
@@ -53,46 +61,17 @@ class PosController extends Controller
     {
         $serviceName = $request->input('searchCriteria');
         $categoryId  = $request->input('categoryId');
-        $brandId     = $request->input('brandId');
+        $productType = $request->input('productOrService');
         $posId       = auth()->user()->POSID;
+        $searchResult;
 
-        $services = Product::select(
-                'products.id',
-                'products.name',
-                'products.POSID',
-                'code',
-                'products.price',
-                'products.image',
-                'products.staff_id'
-            )
-            ->with('TodaysStaff:id,name')
-            ->where('products.POSID', $posId)
-            ->where('type', 'Service')
-            // search by name or code
-            ->when($serviceName, function ($query, $serviceName) {
-                $query->where(function ($q) use ($serviceName) {
-                    $q->where('products.name', 'like', "%{$serviceName}%")
-                    ->orWhere('code', 'like', "%{$serviceName}%");
-                });
-            })
+        if($productType == "Service"){
+            $searchResult = $this->serviceService->searchService($posId, $serviceName, $categoryId);
+        }else{
+            $searchResult = $this->productService->searchProduct($posId, $serviceName, $categoryId);
+        }
 
-            // filter by brand if set and not 0
-            ->when(!empty($brandId) && $brandId != 0, function ($query) use ($brandId) {
-                $query->where('products.brand_id', $brandId);
-            })
-
-            // filter by category if set and not 0
-            ->when(!empty($categoryId) && $categoryId != 0, function ($query) use ($categoryId) {
-                $query->whereHas('categories', function ($q) use ($categoryId) {
-                    $q->where('category.id', $categoryId);
-                });
-            })
-
-            ->orderBy('products.updated_at', 'desc')
-            ->limit(30)
-            ->get();
-
-        return response()->json($services);
+        return response()->json($searchResult);
     }
 
     public function saveSales(Request $request){
@@ -121,9 +100,9 @@ class PosController extends Controller
         $serviceIds = array_column($request->services, 'id');
         $POSID = auth()->user()->POSID;
 
-        $services = Product::select('products.id', 'products.price')
+        $services = Product::select('products.id', 'products.price', 'products.type')
             ->where('products.POSID', $POSID)
-            ->where('type', 'Service')
+            //->where('type', 'Service')
             ->whereIn('products.id', $serviceIds)
             ->get();
 
@@ -177,10 +156,18 @@ class PosController extends Controller
             $salesItemObj['product_price'] = $service->price;
             $salesItemObj['selling_price'] = $service->price;
             $salesItemObj['quantity'] = $serviceData['quantity'];
+            $salesItemObj['type'] = $service->type;
             $salesItemObj['created_at'] = $now;
             $salesItemObj['updated_at'] = $now;
 
             array_push($salesItems, $salesItemObj);
+
+            // if service type is Product we need to reduce the product variation stock quantity
+            // from fronend we need to get product id, product variation id and quantity
+            // we need to show the product variation in product front end 
+            // we need to design the ui
+
+
         }
 
         Sales_items::insert($salesItems);
@@ -452,6 +439,7 @@ class PosController extends Controller
 
             // Get today's service count for each staff
             $todayServiceCounts = Sales_items::where('POSID', $posId)
+                ->where('type', 'Service')
                 ->whereDate('created_at', $today)
                 ->whereNotNull('staff_id')
                 ->selectRaw('staff_id, COUNT(*) as service_count')

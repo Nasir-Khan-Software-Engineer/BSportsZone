@@ -27,6 +27,11 @@ class Sales_items extends Model
         return $this->belongsTo(Product::class, 'product_id')->where('type', 'Service');
     }
 
+    public function product()
+    {
+        return $this->belongsTo(Product::class, 'product_id')->where('type', 'Product');
+    }
+
     public function staff()
     {
         return $this->belongsTo(Employee::class, 'staff_id');

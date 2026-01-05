@@ -135,6 +135,7 @@ class SaleController extends Controller
             $sale = Sales::where('POSID', $POSID)
                 ->with([
                     'items.service',
+                    'items.product',
                     'items.staff',
                     'createdByUser',
                     'updatedByUser',

@@ -47,7 +47,7 @@ WinPos.Pos = (function (Urls) {
 
     var addCartItem = function (service) {
         const cartItem = cartObj.items.find((item) => item.id == service.id);
-
+        debugger;
         if (cartItem) {
             cartItem.quantity++;
         } else {
@@ -62,7 +62,8 @@ WinPos.Pos = (function (Urls) {
                 price: parseFloat(service.price), 
                 quantity: 1,
                 staff_id: staffId,
-                staff_name: staffName
+                staff_name: staffName,
+                type: service.type
             });
         }
 
@@ -143,22 +144,22 @@ WinPos.Pos = (function (Urls) {
         cartObj.total = totalSum;
     }
 
-    var search = function (searchCriteria, categoryId, brandId) {
+    var search = function (searchCriteria, categoryId, productOrService) {
 
         categoryId = (categoryId == null || categoryId == "") ? 0 : categoryId;
-        brandId = (brandId == null || brandId == "") ? 0 : brandId;
+        productOrService = (productOrService == null || productOrService == "") ? 0 : productOrService;
 
         const params = new URLSearchParams({
             searchCriteria: searchCriteria || "",
             categoryId: categoryId || "0",
-            brandId: brandId || "0"
+            productOrService: productOrService || "Product"
         });
 
         const queryString = "?" + params.toString();
 
         return new Promise((resolve, reject) => {
 
-            const cacheKey = (searchCriteria + "-" + categoryId + "-" + brandId).toLowerCase();
+            const cacheKey = (searchCriteria + "-" + categoryId + "-" + productOrService).toLowerCase();
 
             if (search.cache[cacheKey]) {
                 resolve(search.cache[cacheKey]);
@@ -323,14 +324,26 @@ WinPos.Pos = (function (Urls) {
             prodName.attr('title', item.name);
             prodName.text(WinPos.Common.truncate(item.name, 15));
 
+            const tagLine = $('<p>');
+            tagLine.addClass('m-0')
+            tagLine.attr('style', 'font-size: 12px;');
+            tagLine.text(`(${item.tagline} | ${item.stock})`);
+
             const prodCode = $('<p>');
             prodCode.addClass('m-0')
             prodCode.attr('style', 'font-size: 12px;');
             prodCode.text(`(${item.code})`);
 
+            const price = $('<p>');
+            price.addClass('m-0')
+            price.attr('style', 'font-size: 12px;');
+            price.text(`(${item.price}) Tk.`);
+
             girdDev.append(imgCon);
             girdDev.append(prodName);
+            girdDev.append(tagLine);
             girdDev.append(prodCode);
+            girdDev.append(price);
 
             girdDev.on('click', () => {
                 WinPos.Pos.cart.addItem(item)

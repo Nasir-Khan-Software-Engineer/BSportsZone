@@ -183,18 +183,16 @@
     <div class="col-md-4">
         <div class="mb-3">
             <div class="row">
-                <div class="col mb-2 d-flex justify-content-between gap-1 category-brand-select">
+                <div class="col mb-2 d-flex justify-content-between gap-1 category-product-service-select">
                     <select id="posSearchCategory" class="form-select flex-fill rounded pos-page-font-size">
                         <option value="0">Select Category</option>
                         @foreach($categories as $category)
                         <option value="{{$category->id}}">{{$category->name}}</option>
                         @endforeach
                     </select>
-                    <select id="posSearchBrand" class="form-select flex-fill rounded  pos-page-font-size">
-                        <option value="0">Select Brand</option>
-                        @foreach($brands as $brand)
-                        <option value="{{$brand->id}}">{{$brand->name}}</option>
-                        @endforeach
+                    <select id="posProductService" class="form-select flex-fill rounded  pos-page-font-size">
+                        <option selected value="Product">Product</option>
+                        <option value="Service">Service</option>
                     </select>
                 </div>
             </div>
@@ -219,13 +217,15 @@
                             @endif
 
                             <p style="text-align: center;" class="m-0 mt-1 pos-page-font-size" title="{{ $recProd->name }}">
-                                {{ mb_strimwidth($recProd->name, 0, 15, '...') }}
+                                {{ mb_strimwidth($recProd->name, 0, 35, '...') }}
                             </p>
+                            <p style="font-size: 12px;" class="m-0">({{ $recProd->tagline }} | {{$recProd->stock}})</p>
                             <p style="font-size: 12px;" class="m-0">({{ $recProd->code }})</p>
+                            <p style="font-size: 12px;" class="m-0">({{ $recProd->price }}) Tk.</p>
                         </div>
 
                         <div class="list-item recent-service list-group-item list-group-item-action d-none pos-page-font-size" data-id="{{ $recProd->id }}">
-                            {{ $recProd->code }} | {{ $recProd->name }}
+                            {{ $recProd->code }} -> {{ $recProd->name }} ({{ $recProd->tagline }} -> {{$recProd->stock}}) -> ({{ $recProd->price }}) Tk
                         </div>
                         @endforeach
                     </div>
@@ -308,8 +308,8 @@ $(document).ready(function() {
     const posSearchCategory = $("#posSearchCategory");
     posSearchCategory.val("0").trigger('change');
 
-    const posSearchBrand = $("#posSearchBrand");
-    posSearchBrand.val("0").trigger('change');
+    const posProductService = $("#posProductService");
+    $('#posProductService').val('Product').trigger('change');
 
     const posSearchInput = $("#posSearchInput");
     posSearchInput.val("");
@@ -416,7 +416,7 @@ $(document).ready(function() {
         runServiceSearch();
     });
 
-    $(document).on('change', '#posSearchBrand', function() {
+    $(document).on('change', '#posProductService', function() {
         runServiceSearch();
     });
 
@@ -430,10 +430,10 @@ $(document).ready(function() {
         theme: 'classic'
     });
 
-    $('#posSearchBrand').select2({
+    $('#posProductService').select2({
         placeholder: {
             id: '0',
-            text: 'All Brand'
+            text: 'Select Type'
         },
         allowClear: true,
         width: '100%',
@@ -655,13 +655,19 @@ $(document).on('click', '#posLastSalesHistoryModalBtn', function() {
 function renderCart(cart) {
     const dom = [];
     cart.items.forEach((item) => {
-        const staffName = item.staff_name || '---------';
-        const staffDisplay = '<span class="text-muted assigned-staff" data-toggle="tooltip" data-placement="top" title="Click to Change" data-item-id="' + item.id + '" style="cursor: pointer;"> <i class="fa-solid fa-hand-holding-heart"></i> Staff: ' +
-            staffName + ' <button class="staff-change-button"><i class="fa-solid fa-pen-to-square"></i></button></span>';
-        
+
         dom.push('<tr>');
-        dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + 
+
+        if(item.type == 'Service') {
+            const staffName = item.staff_name || '---------';
+            const staffDisplay = '<span class="text-muted assigned-staff" data-toggle="tooltip" data-placement="top" title="Click to Change" data-item-id="' + item.id + '" style="cursor: pointer;"> <i class="fa-solid fa-hand-holding-heart"></i> Staff: ' +
+            staffName + ' <button class="staff-change-button"><i class="fa-solid fa-pen-to-square"></i></button></span>';
+            dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + 
                 ' <br> ' + staffDisplay + '</td>');
+        }else{
+            dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + '</td>');
+        }
+        
         dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '"></td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + item.price.toFixed(2) + ' Tk.</td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + ((item.price) * item.quantity).toFixed(2) + ' Tk.</td>');
@@ -711,13 +717,13 @@ function renderCart(cart) {
 function runServiceSearch() {
     let searchInput = $('#posSearchInput').val();
     let searchCategory = $('#posSearchCategory').val();
-    let searchBrand = $('#posSearchBrand').val();
+    let searchProductOrService = $('#posProductService').val();
 
     if (searchInput.length == 1 || searchInput.length == 2) {
         return;
     }
 
-    WinPos.Pos.searchService(searchInput, searchCategory, searchBrand)
+    WinPos.Pos.searchService(searchInput, searchCategory, searchProductOrService)
         .then((searchResult) => {
             WinPos.Pos.RenderSearchService(searchResult);
         })

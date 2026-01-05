@@ -16,15 +16,30 @@ WinPos.Product = (function (Urls){
                 { data: 'id', name: 'id', orderable: true },
                 { data: 'code', name: 'code', orderable: true },
                 { data: 'name', name: 'name', orderable: true },
-                { data: 'unit_name', name: 'unit_name', orderable: false },
-                { data: 'brand_name', name: 'brand_name', orderable: false },
-                { data: 'supplier_name', name: 'supplier_name', orderable: false },
+                { data: 'salable_stocks', name: 'salable_stocks', orderable: false },
+                { data: 'warehouse_stocks', name: 'warehouse_stocks', orderable: false },
+                { data: 'cost_price_range', name: 'cost_price_range', orderable: false },
+                { data: 'selling_price_range', name: 'selling_price_range', orderable: false },
                 { data: 'variations_count', name: 'variations_count', orderable: false },
                 { data: 'action', name: 'action', orderable: false, searchable: false }
             ],
             columnDefs: [
                 {
-                    targets: 7,
+                    targets: [3, 4],
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        return data !== null && data !== undefined ? data : '0';
+                    }
+                },
+                {
+                    targets: [5, 6],
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        return data || '-';
+                    }
+                },
+                {
+                    targets: 8,
                     render: function (data, type, row) {
                         return '<a href="' + Urls.showProduct.replace('productID', row.id) + '" class="btn btn-sm thm-btn-bg thm-btn-text-color" data-toggle="tooltip" title="View Details"><i class="fa-solid fa-eye"></i></a> ' +
                                '<a href="' + Urls.editProduct.replace('productID', row.id) + '" class="btn btn-sm thm-btn-bg thm-btn-text-color" data-toggle="tooltip" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a> ' +

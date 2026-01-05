@@ -517,12 +517,14 @@ class EmployeeController extends Controller
             // Get today's service count
             $todayServicesCount = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $employee->id)
+                ->where('type', 'Service')
                 ->whereDate('created_at', $today)
                 ->count();
             
             // Get all services for this staff
             $allServices = Sales_items::where('POSID', $posId)
                 ->where('staff_id', $employee->id)
+                ->where('type', 'Service')
                 ->get();
             
             // Calculate total services

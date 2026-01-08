@@ -128,15 +128,36 @@ WinPos.Purchase = (function (Urls){
 
     var addItemToTable = function (variantId, tagline, costPrice, purchasedQty, sellableQty) {
         const tbody = $('#purchaseItemsTableBody');
-        const row = $('<tr data-variant-id="' + variantId + '"></tr>');
         
-        row.append('<td>' + tagline + '</td>');
-        row.append('<td class="text-center">' + parseFloat(costPrice).toFixed(2) + '</td>');
-        row.append('<td class="text-center">' + purchasedQty + '</td>');
-        row.append('<td class="text-center">' + sellableQty + '</td>');
-        row.append('<td class="text-center"><button type="button" class="btn btn-sm btn-danger remove-purchase-item" data-variant-id="' + variantId + '"><i class="fa-solid fa-trash"></i></button></td>');
+        // Check if we're on edit page (has unallocated qty column and allocated qty column)
+        const isEditPage = $('#purchaseItemsTable thead th').length >= 6;
         
-        tbody.append(row);
+        if (isEditPage) {
+            // Edit page format - with editable inputs and buttons
+            const row = $('<tr data-variant-id="' + variantId + '" data-editable="true"></tr>');
+            
+            row.append('<td>' + tagline + '</td>');
+            row.append('<td><input type="number" step="0.01" class="form-control form-control-sm rounded cost-price-input" value="' + parseFloat(costPrice).toFixed(2) + '" data-variant-id="' + variantId + '"></td>');
+            row.append('<td><input type="number" class="form-control form-control-sm rounded purchased-qty-input" value="' + purchasedQty + '" data-variant-id="' + variantId + '"></td>');
+            row.append('<td class="text-center unallocated-qty-cell">' + sellableQty + '</td>'); // Unallocated Qty (same as purchased for new items)
+            row.append('<td class="text-center allocated-qty-cell">0</td>'); // Allocated Qty (0 for new items)
+            row.append('<td class="text-center">' +
+                '<button type="button" class="btn btn-sm btn-danger remove-purchase-item" data-variant-id="' + variantId + '" title="Remove Item"><i class="fa-solid fa-trash"></i></button>' +
+                '</td>');
+            
+            tbody.append(row);
+        } else {
+            // Create page format
+            const row = $('<tr data-variant-id="' + variantId + '"></tr>');
+            
+            row.append('<td>' + tagline + '</td>');
+            row.append('<td class="text-center">' + parseFloat(costPrice).toFixed(2) + '</td>');
+            row.append('<td class="text-center">' + purchasedQty + '</td>');
+            row.append('<td class="text-center">' + sellableQty + '</td>');
+            row.append('<td class="text-center"><button type="button" class="btn btn-sm btn-danger remove-purchase-item" data-variant-id="' + variantId + '"><i class="fa-solid fa-trash"></i></button></td>');
+            
+            tbody.append(row);
+        }
     }
 
     var removeItemFromPurchase = function (variantId) {
@@ -160,40 +181,51 @@ WinPos.Purchase = (function (Urls){
         let totalUnallocated = 0;
 
         // Check if we're on edit page (items in table with unallocated qty column)
-        if ($('#purchaseItemsTableBody tr').length > 0 && $('#purchaseItemsTableBody tr:first').find('td').length >= 4) {
-            // Edit page - has unallocated qty column
+        if ($('#purchaseItemsTableBody tr').length > 0 && $('#purchaseItemsTableBody tr:first').find('td').length >= 5) {
+            // Edit page - has unallocated qty and allocated qty columns
             $('#purchaseItemsTableBody tr').each(function() {
                 const variantId = $(this).data('variant-id');
-                if (variantId) {
-                    const isEditable = $(this).data('editable') === 'true' || $(this).data('editable') === true;
-                    let costPrice, purchasedQty, unallocatedQty;
+                const itemId = $(this).data('item-id');
+                const isEditable = $(this).data('editable') === 'true' || $(this).data('editable') === true;
+                let costPrice, purchasedQty, unallocatedQty;
+                
+                if (isEditable && $(this).find('.cost-price-input').length) {
+                    // Editable item with inputs (existing or new)
+                    costPrice = parseFloat($(this).find('.cost-price-input').val()) || 0;
+                    purchasedQty = parseInt($(this).find('.purchased-qty-input').val()) || 0;
+                    // For editable items, unallocated = purchased (since no allocation has occurred)
+                    unallocatedQty = purchasedQty;
                     
-                    if (isEditable) {
-                        costPrice = parseFloat($(this).find('.cost-price-input').val()) || 0;
-                        purchasedQty = parseInt($(this).find('.purchased-qty-input').val()) || 0;
-                        // For editable items, unallocated = purchased (since no allocation has occurred)
-                        unallocatedQty = purchasedQty;
-                    } else {
-                        // For non-editable items, read from displayed text
-                        const costPriceText = $(this).find('td:eq(1)').text().trim();
-                        const purchasedQtyText = $(this).find('td:eq(2)').text().trim();
-                        const unallocatedQtyText = $(this).find('td:eq(3)').text().trim();
-                        
-                        costPrice = parseFloat(costPriceText.replace(/,/g, '')) || 0;
-                        purchasedQty = parseInt(purchasedQtyText) || 0;
-                        unallocatedQty = parseInt(unallocatedQtyText) || 0;
+                    // Update unallocated and allocated qty cells for new items
+                    if (!itemId) {
+                        $(this).find('.unallocated-qty-cell').text(purchasedQty);
+                        $(this).find('.allocated-qty-cell').text('0');
                     }
+                } else {
+                    // Non-editable item (has allocated qty) - read from displayed text
+                    const costPriceText = $(this).find('td:eq(1)').text().trim();
+                    const purchasedQtyText = $(this).find('td:eq(2)').text().trim();
+                    const unallocatedQtyText = $(this).find('td:eq(3)').text().trim();
                     
-                    totalQty += purchasedQty;
-                    totalCost += costPrice * purchasedQty;
-                    totalUnallocated += unallocatedQty;
+                    costPrice = parseFloat(costPriceText.replace(/,/g, '')) || 0;
+                    purchasedQty = parseInt(purchasedQtyText) || 0;
+                    unallocatedQty = parseInt(unallocatedQtyText) || 0;
                 }
+                
+                totalQty += purchasedQty;
+                totalCost += costPrice * purchasedQty;
+                totalUnallocated += unallocatedQty;
             });
             
             $('#totalQty').text(totalQty);
             $('#totalCost').text(totalCost.toFixed(2));
             if ($('#totalUnallocated').length) {
                 $('#totalUnallocated').text(totalUnallocated);
+            }
+            if ($('#totalAllocated').length) {
+                // Calculate total allocated (purchased - unallocated)
+                let totalAllocated = totalQty - totalUnallocated;
+                $('#totalAllocated').text(totalAllocated);
             }
         } else {
             // Create page - use purchaseItems array
@@ -275,8 +307,98 @@ WinPos.Purchase = (function (Urls){
         WinPos.Common.putAjaxCallPost(Urls.updatePurchase, JSON.stringify(formData), function (response){
             if(response.status === 'success'){
                 toastr.success(response.message);
-                WinPos.Datatable.refresh();
+                // Reload page to reflect changes
+                location.reload();
             }else{
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        });
+    }
+
+    var updatePurchaseItem = function (itemId) {
+        let row = $('tr[data-item-id="' + itemId + '"]');
+        let isEditable = row.data('editable') === 'true' || row.data('editable') === true;
+        
+        // Check if item is editable (no allocated qty)
+        if (!isEditable) {
+            toastr.error('Cannot update purchase item. This item has allocated quantity.');
+            return;
+        }
+        
+        let costPrice = parseFloat(row.find('.cost-price-input').val()) || 0;
+        let purchasedQty = parseInt(row.find('.purchased-qty-input').val()) || 0;
+        
+        if (costPrice <= 0 || purchasedQty <= 0) {
+            toastr.error('Please enter valid cost price and purchased quantity.');
+            return;
+        }
+        
+        let formData = {
+            cost_price: costPrice,
+            purchased_qty: purchasedQty
+        };
+        
+        WinPos.Common.putAjaxCallPost(Urls.updatePurchaseItem.replace('ITEM_ID', itemId), JSON.stringify(formData), function (response){
+            if(response.status === 'success'){
+                toastr.success(response.message);
+                // Reload page to reflect changes (including allocated qty)
+                location.reload();
+            }else{
+                if(response.message){
+                    toastr.error(response.message);
+                }
+                if(response.errors){
+                    WinPos.Common.showValidationErrors(response.errors);
+                }
+            }
+        }, function(xhr){
+            var response = xhr.responseJSON || {};
+            if(response.message){
+                toastr.error(response.message);
+            } else {
+                toastr.error('An error occurred while updating the purchase item.');
+            }
+            if(response.errors && !response.message){
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        });
+    }
+
+    var removePurchaseItem = function (itemId) {
+        let row = $('tr[data-item-id="' + itemId + '"]');
+        let isEditable = row.data('editable') === 'true' || row.data('editable') === true;
+        
+        // Check if item is editable (no allocated qty)
+        if (!isEditable) {
+            toastr.error('Cannot remove purchase item. This item has allocated quantity.');
+            return;
+        }
+        
+        if (!confirm('Are you sure you want to remove this purchase item?')) {
+            return;
+        }
+        
+        WinPos.Common.deleteAjaxCallPost(Urls.removePurchaseItem.replace('ITEM_ID', itemId), function (response){
+            if(response.status === 'success'){
+                toastr.success(response.message);
+                // Reload page to reflect changes
+                location.reload();
+            }else{
+                if(response.message){
+                    toastr.error(response.message);
+                }
+                if(response.errors){
+                    WinPos.Common.showValidationErrors(response.errors);
+                }
+            }
+        }, function(xhr){
+            var response = xhr.responseJSON || {};
+            if(response.message){
+                toastr.error(response.message);
+            } else {
+                toastr.error('An error occurred while removing the purchase item.');
+            }
+            if(response.errors && !response.message){
                 WinPos.Common.showValidationErrors(response.errors);
             }
         });
@@ -289,7 +411,9 @@ WinPos.Purchase = (function (Urls){
         removeItemFromPurchase: removeItemFromPurchase,
         calculateTotals: calculateTotals,
         savePurchase: savePurchase,
-        updatePurchase: updatePurchase
+        updatePurchase: updatePurchase,
+        updatePurchaseItem: updatePurchaseItem,
+        removePurchaseItem: removePurchaseItem
     }
 })(purchaseUrls);
 
@@ -300,8 +424,4 @@ $(document).on('click', '.add-variant-btn', function() {
     WinPos.Purchase.addVariantToPurchase(variantId, tagline);
 });
 
-$(document).on('click', '.remove-purchase-item', function() {
-    const variantId = $(this).data('variant-id');
-    WinPos.Purchase.removeItemFromPurchase(variantId);
-});
 

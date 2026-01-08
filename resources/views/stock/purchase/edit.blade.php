@@ -94,6 +94,7 @@
                                     <th class="text-center">Cost Price</th>
                                     <th class="text-center">Purchased Qty</th>
                                     <th class="text-center">Unallocated Qty</th>
+                                    <th class="text-center">Allocated Qty</th>
                                     <th class="text-center">Action</th>
                                 </tr>
                             </thead>
@@ -116,8 +117,16 @@
                                         @endif
                                     </td>
                                     <td>{{ $item->unallocated_qty }}</td>
-                                    <td>
-                                        @if(!$item->is_editable)
+                                    <td class="text-center">{{ $item->purchased_qty - $item->unallocated_qty }}</td>
+                                    <td class="text-center">
+                                        @if($item->is_editable)
+                                            <button type="button" class="btn btn-sm btn-success save-purchase-item" data-item-id="{{ $item->id }}" title="Save Item">
+                                                <i class="fa-solid fa-save"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-danger remove-purchase-item" data-item-id="{{ $item->id }}" title="Remove Item">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        @else
                                             <span class="text-muted">Allocated</span>
                                         @endif
                                     </td>
@@ -130,6 +139,7 @@
                                     <td class="text-center"><strong id="totalCost">{{ number_format($purchase->total_cost_price ?? 0, 2) }}</strong></td>
                                     <td class="text-center"><strong id="totalQty">{{ $purchase->total_qty ?? 0 }}</strong></td>
                                     <td class="text-center"><strong id="totalUnallocated">{{ $purchase->purchaseItems->sum('unallocated_qty') ?? 0 }}</strong></td>
+                                    <td class="text-center"><strong id="totalAllocated">{{ $purchase->purchaseItems->sum(function($item) { return $item->purchased_qty - $item->unallocated_qty; }) ?? 0 }}</strong></td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -152,7 +162,9 @@
 <script>
 let purchaseUrls = {
     'updatePurchase': "{{ route('stock.purchase.update', ['purchase' => $purchase->id]) }}",
-    'getVariations': "{{ route('stock.purchase.variations.get') }}"
+    'getVariations': "{{ route('stock.purchase.variations.get') }}",
+    'updatePurchaseItem': "{{ route('stock.purchase.item.update', ['purchaseItem' => 'ITEM_ID']) }}",
+    'removePurchaseItem': "{{ route('stock.purchase.item.remove', ['purchaseItem' => 'ITEM_ID']) }}"
 };
 
 let purchaseData = {
@@ -195,7 +207,29 @@ $(document).ready(function() {
         WinPos.Purchase.updatePurchase();
     });
 
-    // Note: Remove item functionality removed from edit page - items can only be removed on create page
+    // Save purchase item
+    $(document).on('click', '.save-purchase-item', function() {
+        let itemId = $(this).data('item-id');
+        if (itemId) {
+            WinPos.Purchase.updatePurchaseItem(itemId);
+        }
+    });
+
+    // Remove purchase item (for existing items with item-id)
+    $(document).on('click', '.remove-purchase-item[data-item-id]', function() {
+        let itemId = $(this).data('item-id');
+        if (itemId) {
+            WinPos.Purchase.removePurchaseItem(itemId);
+        }
+    });
+
+    // Remove purchase item (for new items added via variant selection)
+    $(document).on('click', '.remove-purchase-item[data-variant-id]', function() {
+        let variantId = $(this).data('variant-id');
+        if (variantId) {
+            WinPos.Purchase.removeItemFromPurchase(variantId);
+        }
+    });
 
     // Update item values
     $(document).on('change', '.cost-price-input, .purchased-qty-input', function() {

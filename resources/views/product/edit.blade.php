@@ -96,23 +96,27 @@
                     <table class="table table-bordered" id="variationsTable">
                         <thead>
                             <tr>
-                                <th class="text-center align-middle" style="width: 15%;">Tagline</th>
-                                <th class="text-center align-middle" style="width: 20%;">Description</th>
+                                <th class="text-center align-middle" style="width: 12%;">Tagline</th>
+                                <th class="text-center align-middle" style="width: 18%;">Description</th>
                                 <th class="text-center align-middle" style="width: 10%;">Selling Price</th>
                                 <th class="text-center align-middle" style="width: 10%;">Stock</th>
-                                <th class="text-center align-middle" style="width: 10%;">Status</th>
+                                <th class="text-center align-middle" style="width: 12%;">Available Stock in Warehouse</th>
+                                <th class="text-center align-middle" style="width: 8%;">Status</th>
                                 <th class="text-center align-middle" style="width: 15%;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @if(isset($product->variations) && $product->variations->count() > 0)
                                 @foreach($product->variations as $variation)
-                                <tr data-variation-id="{{ $variation->id }}" class="{{ $variation->status == 'inactive' ? 'table-secondary' : '' }}">
+                                @php
+                                    $isEditable = $variation->status == 'active' && !($variation->has_sales_items ?? false);
+                                @endphp
+                                <tr data-variation-id="{{ $variation->id }}" class="{{ $variation->status == 'inactive' ? 'table-secondary' : '' }}" data-has-sales="{{ $variation->has_sales_items ? 'true' : 'false' }}" data-is-editable="{{ $isEditable ? 'true' : 'false' }}">
                                     <td>
-                                        <input type="text" class="form-control form-control-sm variation-tagline" value="{{ $variation->tagline }}" data-variation-id="{{ $variation->id }}" {{ $variation->status == 'inactive' ? 'readonly' : '' }}>
+                                        <input type="text" class="form-control form-control-sm variation-tagline" value="{{ $variation->tagline }}" data-variation-id="{{ $variation->id }}" readonly>
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}" {{ $variation->status == 'inactive' ? 'readonly' : '' }}>
+                                        <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}" readonly>
                                     </td>
                                     <td>
                                         @if($variation->status == 'active')
@@ -144,15 +148,19 @@
                                         <input type="number" readonly class="form-control form-control-sm variation-stock" value="{{ $variation->stock }}" data-variation-id="{{ $variation->id }}">
                                         @endif
                                     </td>
+                                    <td class="text-center align-middle">
+                                        <span class="badge badge-info">{{ $variation->available_stock_in_warehouse ?? 0 }}</span>
+                                    </td>
                                     <td>
-                                        <select class="form-control form-control-sm variation-status" data-variation-id="{{ $variation->id }}" {{ $variation->status == 'inactive' ? 'disabled' : '' }}>
+                                        <select class="form-control form-control-sm variation-status" data-variation-id="{{ $variation->id }}" data-original-status="{{ $variation->status }}" data-original-tagline="{{ $variation->tagline }}">
                                             <option value="active" {{ $variation->status == 'active' ? 'selected' : '' }}>Active</option>
                                             <option value="inactive" {{ $variation->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
                                         </select>
                                     </td>
                                     <td class="text-center">
                                         @if($variation->status == 'active')
-                                        <button type="button" class="btn btn-sm btn-success save-variation" data-variation-id="{{ $variation->id }}"><i class="fa-solid fa-save"></i></button>
+                                        <button type="button" class="btn btn-sm btn-primary edit-variation" data-variation-id="{{ $variation->id }}" title="Edit Variation"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        <button type="button" class="btn btn-sm btn-success save-variation" data-variation-id="{{ $variation->id }}" style="display: none;"><i class="fa-solid fa-save"></i></button>
                                         <button type="button" class="btn btn-sm btn-danger delete-variation" data-variation-id="{{ $variation->id }}"><i class="fa-solid fa-trash"></i></button>
                                         @else
                                         <button type="button" class="btn btn-sm btn-info show-variation" data-variation-id="{{ $variation->id }}" title="Show Variation"><i class="fa-solid fa-eye"></i></button>
@@ -162,7 +170,7 @@
                                 @endforeach
                             @else
                                 <tr id="noVariationsRow">
-                                    <td colspan="6" class="text-center">No variations found. Click "Add New Variation" to create one.</td>
+                                    <td colspan="7" class="text-center">No variations found. Click "Add New Variation" to create one.</td>
                                 </tr>
                             @endif
                         </tbody>
@@ -194,24 +202,12 @@
                         <label for="variationDescription">Description</label>
                         <textarea class="form-control rounded" name="description" id="variationDescription" rows="3" placeholder="Variation description"></textarea>
                     </div>
-                    <div class="row">
-                        <div class="col-12 form-group">
-                            <label for="variationSellingPrice">Selling Price*</label>
-                            <input required type="number" step="0.01" class="form-control rounded" name="selling_price" id="variationSellingPrice" placeholder="0.00">
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-6 form-group">
-                            <label for="variationStock">Stock*</label>
-                            <input required type="number" min="1" class="form-control rounded" name="stock" id="variationStock" value="1">
-                        </div>
-                        <div class="col-6 form-group">
-                            <label for="variationStatus">Status</label>
-                            <select class="form-control rounded" name="status" id="variationStatus">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="variationStatus">Status</label>
+                        <select class="form-control rounded" name="status" id="variationStatus">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
                 </form>
             </div>
@@ -357,10 +353,83 @@ $(document).ready(function() {
         WinPos.Product.saveVariation();
     });
 
+    // Edit variation
+    $(document).on('click', '.edit-variation', function() {
+        let variationId = $(this).data('variation-id');
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        let isEditable = row.data('is-editable') === true || row.data('is-editable') === 'true';
+        let hasSales = row.data('has-sales') === true || row.data('has-sales') === 'true';
+        
+        // Check if variation is inactive
+        if(row.hasClass('table-secondary')){
+            toastr.error('Cannot edit inactive variant.');
+            return;
+        }
+        
+        // Check if variation can be edited
+        if(!isEditable){
+            if(hasSales){
+                toastr.error('Cannot edit variation. This variation has sales items associated with it.');
+            } else {
+                toastr.error('Cannot edit this variation.');
+            }
+            return;
+        }
+        
+        // Make inputs editable - remove readonly attribute and property
+        row.find('.variation-tagline').removeAttr('readonly').prop('readonly', false);
+        row.find('.variation-description').removeAttr('readonly').prop('readonly', false);
+        
+        // Add visual indication that fields are editable
+        row.find('.variation-tagline, .variation-description').addClass('editing');
+        
+        // Status dropdown is always enabled (can always change status)
+        // No need to enable/disable it here
+        
+        // Show save button, hide edit button
+        row.find('.edit-variation').hide();
+        row.find('.save-variation').show();
+        
+        // Focus on tagline input
+        setTimeout(function(){
+            row.find('.variation-tagline').focus().select();
+        }, 100);
+    });
+
     // Save variation from table
     $(document).on('click', '.save-variation', function() {
         let variationId = $(this).data('variation-id');
         WinPos.Product.updateVariationFromTable(variationId);
+    });
+
+    // Save status change automatically
+    $(document).on('change', '.variation-status', function() {
+        let variationId = $(this).data('variation-id');
+        let newStatus = $(this).val();
+        let originalStatus = $(this).data('original-status');
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        let hasSales = row.data('has-sales') === true || row.data('has-sales') === 'true';
+        
+        // If status hasn't changed, do nothing
+        if(newStatus === originalStatus){
+            return;
+        }
+        
+        // If variation has sales items, only save status (status-only update)
+        if(hasSales){
+            WinPos.Product.updateVariationStatusOnly(variationId, newStatus);
+        } else {
+            // If variation doesn't have sales, check if we're in edit mode
+            // If save button is visible, don't auto-save (let user click save)
+            // If save button is hidden, auto-save the status change
+            if(row.find('.save-variation').is(':visible')){
+                // In edit mode, don't auto-save - let user click save button
+                return;
+            } else {
+                // Not in edit mode, auto-save status change
+                WinPos.Product.updateVariationStatusOnly(variationId, newStatus);
+            }
+        }
     });
 
     // Delete variation

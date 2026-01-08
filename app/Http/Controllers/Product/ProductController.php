@@ -12,6 +12,8 @@ use App\Models\Category;
 use App\Models\Unit;
 use App\Models\Supplier;
 use App\Models\Shop;
+use App\Models\PurchaseItem;
+use App\Models\Sales_items;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -153,6 +155,33 @@ class ProductController extends Controller
         
         if (!$product) {
             abort(404, 'Product not found.');
+        }
+        
+        // Calculate available stock in warehouse for each variation using a single query
+        $variationIds = $product->variations->pluck('id')->toArray();
+        $availableStockData = [];
+        $salesItemsData = [];
+        if (!empty($variationIds)) {
+            $availableStockData = PurchaseItem::whereIn('product_variant_id', $variationIds)
+                ->selectRaw('product_variant_id, SUM(unallocated_qty) as total_available_stock')
+                ->groupBy('product_variant_id')
+                ->pluck('total_available_stock', 'product_variant_id')
+                ->toArray();
+            
+            // Check if variations have sales items
+            $salesItemsData = \App\Models\Sales_items::whereIn('variation_id', $variationIds)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->selectRaw('variation_id, COUNT(*) as sales_count')
+                ->groupBy('variation_id')
+                ->pluck('sales_count', 'variation_id')
+                ->toArray();
+        }
+        
+        // Attach available stock and sales items info to each variation
+        foreach ($product->variations as $variation) {
+            $variation->available_stock_in_warehouse = $availableStockData[$variation->id] ?? 0;
+            $variation->has_sales_items = isset($salesItemsData[$variation->id]) && $salesItemsData[$variation->id] > 0;
         }
         
         $brands = Brand::where('POSID', '=', $POSID)->get();

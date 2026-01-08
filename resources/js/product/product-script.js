@@ -158,8 +158,8 @@ WinPos.Product = (function (Urls){
     var updateVariationFromTable = function (variationId){
         let row = $('tr[data-variation-id="' + variationId + '"]');
         
-        // Check if variation is inactive
-        if(row.hasClass('table-secondary') || row.find('.variation-status').prop('disabled')){
+        // Check if variation is inactive (only check table-secondary class)
+        if(row.hasClass('table-secondary')){
             toastr.error('Cannot update inactive variant.');
             return;
         }
@@ -175,7 +175,93 @@ WinPos.Product = (function (Urls){
         WinPos.Common.putAjaxCallPost(Urls.updateVariation.replace("variationID", variationId), JSON.stringify(formData), function (response){
             if(response.status === 'success'){
                 toastr.success(response.message);
+                // Make inputs readonly again
+                row.find('.variation-tagline').prop('readonly', true).attr('readonly', 'readonly');
+                row.find('.variation-description').prop('readonly', true).attr('readonly', 'readonly');
+                // Remove editing class
+                row.find('.variation-tagline, .variation-description').removeClass('editing');
+                // Status dropdown is always enabled (can always change status)
+                // No need to disable it
+                // Show edit button, hide save button
+                row.find('.edit-variation').show();
+                row.find('.save-variation').hide();
             }else{
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        }, function(xhr){
+            // Error callback - handle 422 and other error responses
+            var response = xhr.responseJSON || {};
+            
+            // Show error message - prioritize message over errors to avoid duplicates
+            if(response.message){
+                toastr.error(response.message);
+            } else if(xhr.status === 422){
+                toastr.error('Validation failed. Please check the errors.');
+            } else {
+                toastr.error('An error occurred while updating the variation.');
+            }
+            
+            // Only show validation errors if there's no message to avoid duplicates
+            if(response.errors && !response.message){
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        });
+    }
+
+    var updateVariationStatusOnly = function (variationId, newStatus){
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        
+        // Get current values from the row
+        let formData = {
+            tagline: row.find('.variation-tagline').val(),
+            description: row.find('.variation-description').val(),
+            selling_price: row.find('.variation-selling-price').val(),
+            stock: row.find('.variation-stock').val(),
+            status: newStatus
+        };
+        
+        WinPos.Common.putAjaxCallPost(Urls.updateVariation.replace("variationID", variationId), JSON.stringify(formData), function (response){
+            if(response.status === 'success'){
+                toastr.success(response.message);
+                // Update the original status data attribute
+                row.find('.variation-status').data('original-status', newStatus);
+                // Update row class if status changed to inactive
+                if(newStatus === 'inactive'){
+                    row.addClass('table-secondary');
+                    // Make fields readonly
+                    row.find('.variation-tagline').prop('readonly', true).attr('readonly', 'readonly');
+                    row.find('.variation-description').prop('readonly', true).attr('readonly', 'readonly');
+                    // Status dropdown should remain enabled (can always change status)
+                } else {
+                    row.removeClass('table-secondary');
+                    // Status dropdown should remain enabled
+                }
+                // Reload page to reflect all changes
+                location.reload();
+            }else{
+                // Revert status dropdown on error
+                let originalStatus = row.find('.variation-status').data('original-status');
+                row.find('.variation-status').val(originalStatus);
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        }, function(xhr){
+            // Error callback - handle 422 and other error responses
+            var response = xhr.responseJSON || {};
+            // Revert status dropdown on error
+            let originalStatus = row.find('.variation-status').data('original-status');
+            row.find('.variation-status').val(originalStatus);
+            
+            // Show error message - prioritize message over errors to avoid duplicates
+            if(response.message){
+                toastr.error(response.message);
+            } else if(xhr.status === 422){
+                toastr.error('Validation failed. Please check the errors.');
+            } else {
+                toastr.error('An error occurred while updating the status.');
+            }
+            
+            // Only show validation errors if there's no message to avoid duplicates
+            if(response.errors && !response.message){
                 WinPos.Common.showValidationErrors(response.errors);
             }
         });
@@ -184,25 +270,58 @@ WinPos.Product = (function (Urls){
     var deleteVariation = function (variationId){
         let row = $('tr[data-variation-id="' + variationId + '"]');
         
-        // Check if variation is inactive
-        if(row.hasClass('table-secondary') || row.find('.variation-status').prop('disabled')){
+        // Check if variation is inactive (only check table-secondary class, not disabled status)
+        if(row.hasClass('table-secondary')){
             toastr.error('Cannot delete inactive variant.');
             return;
         }
         
-        WinPos.Common.deleteAjaxCallPost(Urls.deleteVariation.replace('variationID', variationId), function (response){
-            if(response.status === 'success'){
-                toastr.success(response.message);
-                // Remove row from table
-                $('tr[data-variation-id="' + variationId + '"]').remove();
-                // If no variations left, show message
-                if($("#variationsTable tbody tr").length === 0){
-                    $("#variationsTable tbody").html('<tr id="noVariationsRow"><td colspan="7" class="text-center">No variations found. Click "Add New Variation" to create one.</td></tr>');
+        WinPos.Common.deleteAjaxCallPost(
+            Urls.deleteVariation.replace('variationID', variationId), 
+            function (response){
+                // Success callback
+                if(response.status === 'success'){
+                    toastr.success(response.message);
+                    // Remove row from table
+                    $('tr[data-variation-id="' + variationId + '"]').remove();
+                    // If no variations left, show message
+                    if($("#variationsTable tbody tr").length === 0){
+                        $("#variationsTable tbody").html('<tr id="noVariationsRow"><td colspan="7" class="text-center">No variations found. Click "Add New Variation" to create one.</td></tr>');
+                    }
+                }else{
+                    // Show error message
+                    if(response.message){
+                        toastr.error(response.message);
+                    }
+                    // Show validation errors if any
+                    if(response.errors){
+                        WinPos.Common.showValidationErrors(response.errors);
+                    }
                 }
-            }else{
-                WinPos.Common.showValidationErrors(response.errors);
+            },
+            function (xhr){
+                // Error callback - handle 422 and other error responses
+                var response = xhr.responseJSON || {};
+                
+                // Show error message - prioritize message over errors to avoid duplicates
+                if(response.message){
+                    toastr.error(response.message);
+                } else if(xhr.status === 422){
+                    toastr.error('Cannot delete this variation. Please check the requirements.');
+                } else if(xhr.status === 404){
+                    toastr.error('Variation not found.');
+                } else if(xhr.status === 403){
+                    toastr.error('Unauthorized access.');
+                } else {
+                    toastr.error('An error occurred while deleting the variation.');
+                }
+                
+                // Only show validation errors if there's no message to avoid duplicates
+                if(response.errors && !response.message){
+                    WinPos.Common.showValidationErrors(response.errors);
+                }
             }
-        });
+        );
     }
 
     var openStockUpdateModal = function (variationId){
@@ -435,6 +554,7 @@ WinPos.Product = (function (Urls){
         loadProductDetails: loadProductDetails,
         saveVariation: saveVariation,
         updateVariationFromTable: updateVariationFromTable,
+        updateVariationStatusOnly: updateVariationStatusOnly,
         deleteVariation: deleteVariation,
         openStockUpdateModal: openStockUpdateModal,
         addStockFromPurchaseItem: addStockFromPurchaseItem,

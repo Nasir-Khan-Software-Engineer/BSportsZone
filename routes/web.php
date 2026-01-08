@@ -243,6 +243,8 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::put('/{purchase}', 'update')->name('purchase.update');
             Route::get('/{purchase}', 'show')->name('purchase.show');
             Route::get('/variations/get', 'getProductVariations')->name('purchase.variations.get');
+            Route::put('/item/{purchaseItem}', 'updatePurchaseItem')->name('purchase.item.update');
+            Route::delete('/item/{purchaseItem}', 'removePurchaseItem')->name('purchase.item.remove');
         });
     });
 

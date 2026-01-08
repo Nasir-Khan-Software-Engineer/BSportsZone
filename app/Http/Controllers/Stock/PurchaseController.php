@@ -9,6 +9,8 @@ use App\Services\Purchase\IPurchaseService;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Variation;
+use App\Models\PurchaseItem;
+use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
 {
@@ -280,6 +282,131 @@ class PurchaseController extends Controller
                 'status' => 'error',
                 'message' => 'Failed to load variations.'
             ]);
+        }
+    }
+
+    public function updatePurchaseItem(Request $request, $id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $request->validate([
+                'cost_price' => 'required|numeric|min:0',
+                'purchased_qty' => 'required|integer|min:1',
+            ]);
+
+            $purchaseItem = PurchaseItem::with('purchase')->findOrFail($id);
+
+            // Verify purchase belongs to the user's POSID
+            if ($purchaseItem->purchase->pos_id != $POSID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ], 403);
+            }
+
+            // Check if item has allocated qty (cannot update if allocated)
+            if (!$purchaseItem->isEditable()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot update purchase item. This item has allocated quantity.'
+                ], 422);
+            }
+
+            DB::transaction(function () use ($purchaseItem, $request) {
+                // Update purchase item
+                $purchaseItem->cost_price = (float)$request->cost_price;
+                $purchaseItem->purchased_qty = (int)$request->purchased_qty;
+                $purchaseItem->unallocated_qty = (int)$request->purchased_qty; // Reset unallocated to match purchased
+                $purchaseItem->save();
+
+                // Recalculate purchase totals
+                $purchase = $purchaseItem->purchase;
+                $totalQty = $purchase->purchaseItems->sum('purchased_qty');
+                $totalCostPrice = $purchase->purchaseItems->sum(function($item) {
+                    return $item->cost_price * $item->purchased_qty;
+                });
+
+                $purchase->total_qty = $totalQty;
+                $purchase->total_cost_price = $totalCostPrice;
+                $purchase->save();
+            });
+
+            $purchaseItem->load('variation');
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Purchase item updated successfully.',
+                'item' => $purchaseItem
+            ]);
+
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => '',
+                'errors' => $exception->validator->errors()
+            ]);
+        } catch (\Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
+        }
+    }
+
+    public function removePurchaseItem($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $purchaseItem = PurchaseItem::with('purchase')->findOrFail($id);
+
+            // Verify purchase belongs to the user's POSID
+            if ($purchaseItem->purchase->pos_id != $POSID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ], 403);
+            }
+
+            // Check if item has allocated qty (cannot remove if allocated)
+            if (!$purchaseItem->isEditable()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot remove purchase item. This item has allocated quantity.'
+                ], 422);
+            }
+
+            DB::transaction(function () use ($purchaseItem) {
+                $purchase = $purchaseItem->purchase;
+                
+                // Delete the purchase item
+                $purchaseItem->delete();
+
+                // Refresh purchase to get updated items
+                $purchase->refresh();
+                
+                // Recalculate purchase totals
+                $totalQty = $purchase->purchaseItems->sum('purchased_qty');
+                $totalCostPrice = $purchase->purchaseItems->sum(function($item) {
+                    return $item->cost_price * $item->purchased_qty;
+                });
+
+                $purchase->total_qty = $totalQty;
+                $purchase->total_cost_price = $totalCostPrice;
+                $purchase->save();
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Purchase item removed successfully.'
+            ]);
+
+        } catch (\Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
         }
     }
 }

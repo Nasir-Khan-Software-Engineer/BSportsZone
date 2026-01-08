@@ -144,8 +144,6 @@ class VariationController extends Controller
                 'product_id' => 'required|exists:products,id',
                 'tagline' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
-                'selling_price' => 'required|numeric|min:0',
-                'stock' => 'required|integer|min:1',
                 'status' => 'nullable|string|in:active,inactive'
             ]);
 
@@ -184,8 +182,8 @@ class VariationController extends Controller
             $variation->product_id = $request->product_id;
             $variation->tagline = $request->tagline;
             $variation->description = $request->description;
-            $variation->selling_price = (float)$request->selling_price;
-            $variation->stock = (int)$request->stock;
+            $variation->selling_price = 0;
+            $variation->stock = 0;
             $variation->status = $status;
 
             $variation->save();
@@ -245,10 +243,39 @@ class VariationController extends Controller
                 ], 403);
             }
 
-            // Check if there's already an active variation with the same tagline (excluding current)
+            // Check if variation has sales items - if yes, cannot edit (except status)
+            $salesItemsCount = Sales_items::where('variation_id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->count();
+
+            // Get the new status
             $status = $request->status ?? $variation->status;
+            $taglineChanged = $request->tagline !== $variation->tagline;
+            $statusChanged = $status !== $variation->status;
+            
+            // If variation has sales items, only allow status change, not other fields
+            if ($salesItemsCount > 0) {
+                // Check if any field other than status is being changed
+                $otherFieldsChanged = $taglineChanged || 
+                    ($request->has('description') && $request->description !== $variation->description) ||
+                    ($request->has('selling_price') && (float)$request->selling_price !== (float)$variation->selling_price) ||
+                    ($request->has('stock') && (int)$request->stock !== (int)$variation->stock);
+                
+                if ($otherFieldsChanged) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Cannot edit variation. This variation has ' . $salesItemsCount . ' sales item(s) associated with it. Only status can be changed.'
+                    ], 422);
+                }
+            }
+
+            // Check if there's already an active variation with the same tagline (excluding current)
+            // This check applies when status is being set to active
+            // Tagline must be unique for active variations
             if ($status === 'active') {
-                $existingActive = Variation::where('tagline', $request->tagline)
+                $taglineToCheck = $request->tagline ?? $variation->tagline;
+                $existingActive = Variation::where('tagline', $taglineToCheck)
                     ->where('status', 'active')
                     ->where('id', '!=', $id)
                     ->exists();
@@ -256,9 +283,9 @@ class VariationController extends Controller
                 if ($existingActive) {
                     return response()->json([
                         'status' => 'error',
-                        'message' => 'An active variation with this tagline already exists.',
+                        'message' => 'An active variation with this tagline already exists. Tagline must be unique for active variations.',
                         'errors' => [
-                            'tagline' => ['An active variation with this tagline already exists.']
+                            'tagline' => ['An active variation with this tagline already exists. Tagline must be unique for active variations.']
                         ]
                     ], 422);
                 }
@@ -316,6 +343,30 @@ class VariationController extends Controller
                     'status' => 'error',
                     'message' => 'Unauthorized access.'
                 ], 403);
+            }
+
+            // Check if variation has purchase items (any purchase items, not just unallocated)
+            $purchaseItemsCount = PurchaseItem::where('product_variant_id', $id)
+                ->count();
+
+            if ($purchaseItemsCount > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot delete variation. This variation has ' . $purchaseItemsCount . ' purchase item(s) associated with it.'
+                ], 422);
+            }
+
+            // Check if variation has sales items
+            $salesItemsCount = Sales_items::where('variation_id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->count();
+
+            if ($salesItemsCount > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot delete variation. This variation has ' . $salesItemsCount . ' sales item(s) associated with it.'
+                ], 422);
             }
 
             $variation->delete();

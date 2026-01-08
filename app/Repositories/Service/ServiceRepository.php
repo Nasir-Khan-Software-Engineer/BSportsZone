@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Service;
 use App\Models\Product;
-
+use Illuminate\Support\Facades\DB;
 class ServiceRepository implements IServiceRepository
 {
     /**
@@ -22,7 +22,10 @@ class ServiceRepository implements IServiceRepository
                 'products.price',
                 'products.image',
                 'products.staff_id',
-                'products.type'
+                'products.type',
+                DB::raw('0 as stock'),
+                DB::raw('0 as variation_id'),
+                DB::raw('"" as tagline')
             )
             ->with('TodaysStaff:id,name')
             ->where('products.POSID', $posId)

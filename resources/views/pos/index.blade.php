@@ -208,7 +208,7 @@
                 <div class="col" style="overflow-y: auto; overflow-x: hidden; height: 80vh;">
                     <div id="searchServiceContainer" class="grid-view">
                         @foreach($recentServices as $recProd)
-                        <div data-toggle="tooltip" data-placement="top" title="{{ $recProd->name }}" class="grid-item recent-service d-flex flex-column align-items-center p-2"
+                        <div data-stock="{{ $recProd->stock }}" data-toggle="tooltip" data-placement="top" title="{{ $recProd->name }}" class="grid-item recent-service d-flex flex-column align-items-center p-2"
                             style="background-color: #ccc;" data-id="{{ $recProd->id }}">
                             @if(!empty($recProd->image))
                             <img src="{{ asset("images/{$recProd->POSID}/services/{$recProd->image}") }}" class="rounded" style="width: 100px; height: 50px; object-fit: cover;">
@@ -394,7 +394,6 @@ $(document).ready(function() {
             .then((response) => {
                 WinPos.Pos.printReceipt(response);
             }).catch((response) => {
-                console.log(response);
                 if (response.responseJSON && response.responseJSON.message) {
                     toastr.error(response.responseJSON.message, "Error");
                 } else if (response.message) {
@@ -664,11 +663,13 @@ function renderCart(cart) {
             staffName + ' <button class="staff-change-button"><i class="fa-solid fa-pen-to-square"></i></button></span>';
             dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + 
                 ' <br> ' + staffDisplay + '</td>');
+            dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '"></td>');
+            
         }else{
-            dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + '</td>');
+            dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + ' (' + item.tagline + ')</td>');
+            dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input max="' + item.stock + '" type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '"></td>');
         }
         
-        dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '"></td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + item.price.toFixed(2) + ' Tk.</td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + ((item.price) * item.quantity).toFixed(2) + ' Tk.</td>');
         dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><button type="button" class="btn thm-btn-bg thm-btn-text-color btn-sm remove-cart-service pos-page-font-size" data-id="' +

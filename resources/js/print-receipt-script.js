@@ -10,7 +10,6 @@ WinPos.PrintReceipt = (function(){
     receiptDomString: [],
 
     getPreview: function(data){
-        //debugger;
         this.receiptDomString = [];
 
         for(let x in this.config){
@@ -174,7 +173,11 @@ WinPos.PrintReceipt.algoTypes.salesDetails = {
             let staffName = item.staff_name || 'None';
 
             dom.push('<tr>');
-                dom.push('<td style="text-align: left;">' + shortServiceName + '</td>');
+                if(item.tagline){
+                    dom.push('<td style="text-align: left;">' + shortServiceName + ' (' + item.tagline + ')</td>');
+                }else{
+                    dom.push('<td style="text-align: left;">' + shortServiceName + '</td>');
+                }
                 dom.push('<td style="width: 50px; text-align: right;">'+ item.quantity +'</td>');
                 dom.push('<td style="width: 50px; text-align: right;">'+ (item.price) +'</td>');
                 dom.push('<td style="width: 50px; text-align: right;">'+ ((item.price) * item.quantity) +'</td>');
@@ -189,7 +192,6 @@ WinPos.PrintReceipt.algoTypes.salesDetails = {
         dom.push('</table>');
 
         dom.push('<p style="text-align: center;">-------------------------------------------------------------</p>');
-        //debugger;
         const totalAmount = data.cartInfo.total;
         const discountAmount = (data.cartInfo.discountType == 'fixed')? data.cartInfo.discount : (totalAmount * data.cartInfo.discount)/100;
         const adjustmentAmount = data.cartInfo.adjustment;

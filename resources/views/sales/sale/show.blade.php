@@ -90,29 +90,31 @@
                                 <th>Service Name</th>
                                 <th class="text-center">Staff</th>
                                 <th class="text-center">QTY</th>
-                                <th class="text-end">Price</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total Price</th>
                             </tr>
                         </thead>
+
                         <tbody>
-                            @forelse ($sale->items->where('type', 'Service') as $item)
+                            @forelse ($serviceList as $item)
                                 <tr>
-                                    <td>{{ $item->service->code ?? '-' }}</td>
-                                    <td>{{ $item->service->name ?? '-' }}</td>
-                                    <td class="text-center">{{ $item->staff->name ?? 'None' }}</td>
-                                    <td class="text-center">{{ $item->quantity ?? 0 }}</td>
-                                    <td class="text-end">
-                                        {{ number_format($item->selling_price ?? 0, 2) }} Tk
-                                    </td>
+                                    <td>{{ $item['code'] ?? '-' }}</td>
+                                    <td>{{ $item['name'] ?? '-' }}</td>
+                                    <td class="text-center">{{ $item['staff_name'] }}</td>
+                                    <td class="text-center">{{ $item['quantity'] }}</td>
+                                    <td class="text-end">{{ number_format($item['selling_price'], 2) }} Tk</td>
+                                    <td class="text-end">{{ number_format($item['total_price'], 2) }} Tk</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="text-center text-muted">
+                                    <td colspan="6" class="text-center text-muted">
                                         No service items found
                                     </td>
                                 </tr>
                             @endforelse
                         </tbody>
                     </table>
+
                 </div>
             </div>
 
@@ -127,17 +129,21 @@
                                 <th>Product Code</th>
                                 <th>Product Name</th>
                                 <th class="text-center">QTY</th>
-                                <th class="text-end">Price</th>
+                                <th class="text-end">Unit Price</th>
+                                <th class="text-end">Total Price</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($sale->items->where('type', 'Product') as $item)
+                            @forelse ($productList as $item)
                                 <tr>
-                                    <td>{{ $item->product->code ?? '-' }}</td>
-                                    <td>{{ $item->product->name ?? '-' }}</td>
-                                    <td class="text-center">{{ $item->quantity ?? 0 }}</td>
+                                    <td>{{ $item['code'] ?? '-' }}</td>
+                                    <td>{{ $item['name'] ?? '-' }} {{($item['tagline'])}}</td>
+                                    <td class="text-center">{{ $item['quantity'] }}</td>
                                     <td class="text-end">
-                                        {{ number_format($item->selling_price ?? 0, 2) }} Tk
+                                        {{ number_format($item['selling_price'], 2) }} Tk
+                                    </td>
+                                    <td class="text-end">
+                                        {{ number_format($item['total_price'], 2) }} Tk
                                     </td>
                                 </tr>
                             @empty
@@ -219,7 +225,6 @@ let saleUrls = {
 
 $(document).ready(function() {
 // we need to pass the $sale as json
-
     WinPos.sale.setCurrentSalesDetails({
         status: "success",
         sale: @json($sale),
@@ -230,7 +235,6 @@ $(document).ready(function() {
     });
 
  $("#printSalesBtn").on('click', function(){
-    debugger;
     WinPos.sale.printReceipt();
  });
 
@@ -239,7 +243,6 @@ $(document).ready(function() {
 
 // $(document).on('click', '#printSalesBtn', function(){
 //     alert("Print Sales");
-//     debugger;
 //    // WinPos.sale.printReceipt();
 // });
 

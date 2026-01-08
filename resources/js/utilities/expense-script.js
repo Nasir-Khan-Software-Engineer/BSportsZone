@@ -117,7 +117,6 @@ WinPos.Expense = (function(Urls){
     var save = function (formData){
         return new Promise((resolve, rejected) => {
             WinPos.Common.postAjaxCall(Urls.saveExpense, JSON.stringify(formData), function (response){
-                console.log(response);
                 if(response.status === 'success'){
                     WinPos.Datatable.refresh();
                     toastr.success(response.message);

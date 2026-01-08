@@ -411,9 +411,6 @@ function updateServicesTable(data) {
 
 
 function renderSalesExpenseChart(data) {
-
-    console.log(data.expense);
-
     const ctx = document.getElementById("salesExpenseChart").getContext("2d");
 
     // Convert strings → numbers

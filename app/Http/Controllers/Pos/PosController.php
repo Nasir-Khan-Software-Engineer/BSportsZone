@@ -24,6 +24,7 @@ use App\Services\Sms\SmsTemplateBuilder;
 use Carbon\Carbon;
 use App\Services\Product\IProductService;
 use App\Services\Service\IServiceService;
+use App\Models\Variation;
 
 class PosController extends Controller
 {
@@ -96,28 +97,19 @@ class PosController extends Controller
                 'message' => 'Please Select or Create a Customer.'
             ],500);
         }
+        
 
-        $serviceIds = array_column($request->services, 'id');
-        $POSID = auth()->user()->POSID;
-
-        $services = Product::select('products.id', 'products.price', 'products.type')
-            ->where('products.POSID', $POSID)
-            //->where('type', 'Service')
-            ->whereIn('products.id', $serviceIds)
-            ->get();
-
-        $totalAmount = $services->sum(function ($item) use($request) {
-            $qty = array_filter($request->services, function($prod) use($item){
-                return (int) $prod['id'] == $item->id;
-            });
-            return ($item->price ?? 0)  * reset($qty)['quantity'];
+        $totalAmount = collect($request->services)->sum(function ($item) {
+            $price = (float) ($item['price'] ?? 0);
+            $quantity = (int) ($item['quantity'] ?? 0);
+            return $price * $quantity;
         });
-
 
         $discountAmount = $request->discount;
         if($request->discountType != 'fixed'){
             $discountAmount = ($totalAmount * $request->discount)/100;
         }
+        $POSID = auth()->user()->POSID;
 
         // Sales table sales
         $sales = new Sales;
@@ -133,6 +125,14 @@ class PosController extends Controller
         $sales->updated_by = auth()->user()->id;
         $sales->adjustmentAmt = $request->adjustmentAmt;
         $sales->save();
+        // end storing sales
+
+
+        $serviceIds = array_column($request->services, 'id');
+        $services = Product::select('products.id')
+            ->where('products.POSID', $POSID)
+            ->whereIn('products.id', $serviceIds)
+            ->get();
 
         $salesItems = [];
         $now = now();
@@ -140,11 +140,8 @@ class PosController extends Controller
         foreach($services as $service){
             $salesItemObj = [];
 
-            $qty = array_filter($request->services, function($item) use($service){
-                return (int) $item['id'] == $service->id;
-            });
+            $serviceData = collect($request->services)->firstWhere('id', (int) $service->id) ?? [];
 
-            $serviceData = reset($qty);
             $staffId = isset($serviceData['staff_id']) && !empty($serviceData['staff_id']) 
                 ? (int)$serviceData['staff_id'] 
                 : null;
@@ -153,24 +150,53 @@ class PosController extends Controller
             $salesItemObj['sales_id'] = $sales->id;
             $salesItemObj['product_id'] = $service->id;
             $salesItemObj['staff_id'] = $staffId;
-            $salesItemObj['product_price'] = $service->price;
-            $salesItemObj['selling_price'] = $service->price;
+            $salesItemObj['product_price'] = 0; // need to update from the purchases
+            $salesItemObj['selling_price'] = $serviceData['price'];
             $salesItemObj['quantity'] = $serviceData['quantity'];
-            $salesItemObj['type'] = $service->type;
             $salesItemObj['created_at'] = $now;
             $salesItemObj['updated_at'] = $now;
 
+            $salesItemObj['variation_id'] = $serviceData['variation_id'];
+            $salesItemObj['variant_tagline'] = $serviceData['tagline'];
+            $salesItemObj['type'] = $serviceData['type'];
+
             array_push($salesItems, $salesItemObj);
-
-            // if service type is Product we need to reduce the product variation stock quantity
-            // from fronend we need to get product id, product variation id and quantity
-            // we need to show the product variation in product front end 
-            // we need to design the ui
-
 
         }
 
         Sales_items::insert($salesItems);
+
+
+        // reduce the stock
+        $serviceRequest = collect($request->services);
+        foreach ($serviceRequest as $item) {
+            if ($item['type'] != "Product") {
+                continue;
+            }
+
+            $variation = Variation::where('product_id', $item['id'])
+                ->where('id', $item['variation_id'])
+                ->first();
+
+            if (!$variation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Variation not found.'
+                ]);
+            }
+
+            if($item['quantity'] > $variation->stock){
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Stock not available.'
+                ]);
+            }
+
+            $variation->decrement('stock', $item['quantity']);
+        }
+        // end product reduce stock
+
+
 
         // Send SMS after items are inserted (so quantity can be calculated)
         $smsConfig = session('sms_config');

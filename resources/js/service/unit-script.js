@@ -43,8 +43,6 @@ WinPos.Unit = (function (Urls){
                 toastr.success(response.message);
                 WinPos.Common.hideBootstrapModal("unitAddEditModal");
             }else{
-                console.log(response);
-                
                 WinPos.Common.showValidationErrors(response.errors);
             }
         });

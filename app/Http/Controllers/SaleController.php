@@ -91,6 +91,7 @@ class SaleController extends Controller
             $sale = Sales::where('POSID', $POSID)
             ->with([
                 'items.service',
+                'items.product.variations',
                 'items.staff',
                 'createdByUser',
                 'updatedByUser',
@@ -99,7 +100,10 @@ class SaleController extends Controller
                 'loyaltyHistories',
             ])
             ->findOrFail($id);
+            
 
+            $productList = $this->getSalesProductList($sale);
+            $serviceList = $this->getSalesServiceList($sale);
 
             $sale->formattedCreatedDate = formatDateAndTime($sale->created_at);
             $sale->formattedUpdatedDate = formatDateAndTime($sale->updated_at);
@@ -116,7 +120,9 @@ class SaleController extends Controller
                 'loyaltyHistories' => $sale->loyaltyHistories,
                 'created_by_user' => $sale->createdByUser,
                 'updated_by_user' => $sale->updatedByUser,
-                'payments' => $sale->payments
+                'payments' => $sale->payments,
+                'productList' => $productList,
+                'serviceList' => $serviceList
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -135,7 +141,7 @@ class SaleController extends Controller
             $sale = Sales::where('POSID', $POSID)
                 ->with([
                     'items.service',
-                    'items.product',
+                    'items.product.variations',
                     'items.staff',
                     'createdByUser',
                     'updatedByUser',
@@ -145,6 +151,9 @@ class SaleController extends Controller
                 ])
                 ->findOrFail($id);
 
+            $productList = $this->getSalesProductList($sale);
+            $serviceList = $this->getSalesServiceList($sale);
+                            
             // format dates
             $sale->formattedCreatedDate = formatDateAndTime($sale->created_at);
             $sale->formattedUpdatedDate = formatDateAndTime($sale->updated_at);
@@ -173,7 +182,7 @@ class SaleController extends Controller
             }
 
             // return with compact 
-            return view('sales.sale.show', compact('sale'));
+            return view('sales.sale.show', compact('sale', 'productList', 'serviceList'));
 
         } catch (\Exception $e) {
             return back()->with('error', $e->getMessage());
@@ -217,5 +226,48 @@ class SaleController extends Controller
                 'message'   => 'Something went wrong.',
             ]);
         }
+    }
+
+
+    private function getSalesServiceList($sale){
+        $serviceList = $sale->items
+                ->filter(fn ($item) => !is_null($item->service))
+                ->map(function ($item) {
+
+                    $service = $item->service;
+
+                    return [
+                        'type'          => 'Service',
+                        'code'          => $service->code ?? null,
+                        'name'          => $service->name,
+                        'staff_name'    => $item->staff?->name ?? 'N/A',
+                        'selling_price' => $item->selling_price,
+                        'quantity'      => $item->quantity,
+                        'total_price'   => $item->selling_price * $item->quantity,
+                    ];
+                })
+                ->values();
+        return $serviceList;
+    }
+
+    private function getSalesProductList($sale){
+        $productList = $sale->items
+                ->filter(fn ($item) => !is_null($item->product))
+                ->map(function ($item) {
+
+                    $product = $item->product;
+
+                    return [
+                        'type'          => 'Product',
+                        'code'          => $product->code,
+                        'name'          => $product->name,
+                        'quantity'      => $item->quantity,
+                        'tagline'       => $item->variant_tagline,
+                        'selling_price' => $item->selling_price,
+                        'total_price'   => $item->quantity * $item->selling_price
+                    ];
+                })
+                ->values(); // reindex
+        return $productList;
     }
 }

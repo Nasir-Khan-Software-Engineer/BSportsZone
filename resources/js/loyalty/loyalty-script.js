@@ -41,8 +41,6 @@ WinPos.Loyalty = (function (Urls) {
                 (response) => {
                     if (response.status === 'success') {
                         console.log('Loyalty Status:', response.loyaltyInfo);
-                        //debugger;
-
                         $('#posLoyaltyHistoryModalBtn').prop('disabled', false);
                         $('#loyaltyVerificationModal').modal('hide');
                         $("#hiddenTerminalCustomerCardId").val(response.loyaltyInfo.cardStatus.card_id);
@@ -56,7 +54,6 @@ WinPos.Loyalty = (function (Urls) {
 
                         let remainingNote = "";
                         let eligibleText = "";
-                        //debugger;
                         if (settings.minimum_sales_amount_applies_for == 'Single') {
                             if (response.loyaltyInfo.isEligibleForNewCard) {
                                 remainingNote = "This customer has maximum spent " + response.loyaltyInfo.currentTotalSpent + "Tk. in a single visit.";

@@ -247,18 +247,12 @@ $(document).ready(function() {
             toastr.error(clientErrors.join('<br>'));
             return;
         }
-
-        console.log(data);
-
         WinPos.Loyalty.saveLoyaltyCard(data);
     })
 
     $("#editLoyaltyCardForm").submit(function(event) {
         event.preventDefault();
         let data = WinPos.Common.getFormData(this);
-
-        console.log(data);
-
         WinPos.Loyalty.updateLoyaltyCard(data, $('#lc_card_id').val());
     })
 

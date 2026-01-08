@@ -664,7 +664,6 @@
 
         if (storedLogo) {
             WinPos.Common.CommonVariables.accountLogo = storedLogo;
-            console.log("✅ Loaded logo from cache");
         }else{
             try {
                 const logoUrl = window.origin + '/images/' + accountInfoSettings.POSID + '/' + accountInfoSettings.logo;

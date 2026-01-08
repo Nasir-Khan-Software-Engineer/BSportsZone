@@ -99,7 +99,6 @@ $(document).ready(function() {
     });
 
     $("#createNewService").click(function() {
-        debugger;
         $("#serviceAddForm")[0].reset();
         $('#imagePreview').css('background-image', '');
         $("#serviceBasicInfoTab").click();
@@ -125,7 +124,6 @@ $(document).ready(function() {
 }); // end jquery
 
 $(document).on('change', '#editImage', function() {
-    console.log(this);
     WinPos.Common.previewImage('#imagePreviewEdit', this);
 })
 

@@ -74,7 +74,6 @@ $(document).on('click', '.delete-sale', function(event) {
     WinPos.Datatable.selectRow(this);
     if (confirm("Deleting a sale will delete the payments history as well.\nClick OK to continue or Cancel.")) {
         let saleID = $(this).data('id');
-        console.log(saleID);
         WinPos.sale.deleteSale(saleID);
     }
 });

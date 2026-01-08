@@ -46,15 +46,29 @@ WinPos.Pos = (function (Urls) {
     }
 
     var addCartItem = function (service) {
+
+        console.log(service);
+
         const cartItem = cartObj.items.find((item) => item.id == service.id);
-        debugger;
+
+        if(service.type  && service.type == 'Product') {
+            if(service.stock == 0) {
+                alert('Product is out of stock');
+                return;
+            }
+            if(cartItem && cartItem.quantity == service.stock) {
+                alert('Product is out of stock. You can not add more.');
+                return;
+            }
+        }
+
         if (cartItem) {
             cartItem.quantity++;
         } else {
             // Get default staff from service if available
             const staffId = service.todays_staff ? service.staff_id : null;
             const staffName = service.todays_staff ? service.todays_staff.name : null;
-            
+
             cartObj.items.push({ 
                 id: service.id, 
                 name: service.name, 
@@ -63,7 +77,10 @@ WinPos.Pos = (function (Urls) {
                 quantity: 1,
                 staff_id: staffId,
                 staff_name: staffName,
-                type: service.type
+                type: service.type,
+                variation_id: service.variation_id ? service.variation_id : null,
+                tagline: service.tagline ? service.tagline : null,
+                stock: service.stock
             });
         }
 
@@ -84,13 +101,23 @@ WinPos.Pos = (function (Urls) {
 
         if (cartItem == null || cartItem == undefined) {
             toastr.error("Please insert valid service", "Invalid Service");
-            return;
+            return 0;
         }
 
         if (quantity == NaN || quantity <= 0) {
             toastr.error("Please insert valid quantity", "Invalid Quantity");
-            return;
+            return 0;
         }
+        
+
+
+        if(cartItem.type  && cartItem.type == 'Product') {
+            if(quantity > cartItem.stock) {
+                toastr.error("Product is out of stock", "Invalid Quantity");
+                return 0;
+            }
+        }
+
 
         if (cartItem) {
             cartItem.quantity = quantity;
@@ -98,6 +125,8 @@ WinPos.Pos = (function (Urls) {
 
         updateCartTotal();
         notify();
+
+        return quantity;
     }
 
     var addCartDiscount = function (discountType, discountAmountStr) {
@@ -145,7 +174,6 @@ WinPos.Pos = (function (Urls) {
     }
 
     var search = function (searchCriteria, categoryId, productOrService) {
-
         categoryId = (categoryId == null || categoryId == "") ? 0 : categoryId;
         productOrService = (productOrService == null || productOrService == "") ? 0 : productOrService;
 
@@ -185,7 +213,11 @@ WinPos.Pos = (function (Urls) {
                 services: cartObj.items.map(item => ({ 
                     id: item.id, 
                     quantity: item.quantity,
-                    staff_id: item.staff_id || null
+                    staff_id: item.staff_id || null,
+                    variation_id: item.variation_id || null,
+                    type: item.type,
+                    price: item.price,
+                    tagline: item.tagline
                 })),
                 discountType: cartObj.discountType,
                 discount: cartObj.discount,
@@ -282,7 +314,6 @@ WinPos.Pos = (function (Urls) {
         WinPos.PrintReceipt.print(dom);
         //$('.modal-body').html(dom);
         //$('#receiptPreviewModal').modal('show');
-        //console.log(dom);
     }
 
     var RenderSearchService = function (services) {
@@ -304,8 +335,11 @@ WinPos.Pos = (function (Urls) {
             // populate the grid view items
             var imgCon = '';
             const girdDev = $('<div>');
-            girdDev.addClass('grid-item recent-service d-flex flex-column align-items-center p-2');
-            girdDev.attr('style', 'background-color: #ccc;');
+            girdDev.addClass('grid-item d-flex flex-column align-items-center p-2');
+            girdDev.attr('style', 'background-color: #ccc; cursor: pointer;');
+            girdDev.attr('data-id', item.id);
+            girdDev.attr('data-stock', item.stock);
+
 
             if (item.image && item.image.trim() !== '') {
                 imgCon = $('<img>');
@@ -341,7 +375,9 @@ WinPos.Pos = (function (Urls) {
 
             girdDev.append(imgCon);
             girdDev.append(prodName);
-            girdDev.append(tagLine);
+            if(item.type == "Product"){
+                girdDev.append(tagLine);
+            }
             girdDev.append(prodCode);
             girdDev.append(price);
 
@@ -351,9 +387,14 @@ WinPos.Pos = (function (Urls) {
 
             // populate the list view items
             const listDiv = $('<div>');
-            listDiv.addClass('list-item recent-service list-group-item list-group-item-action d-none pos-page-font-size');
+            listDiv.addClass('list-item list-group-item list-group-item-action d-none pos-page-font-size');
             listDiv.attr('data-id', item.id);
-            listDiv.text(`${item.code} | ${item.name}`);
+            listDiv.attr('data-stock', item.stock);
+            if(item.type == "Product"){
+                listDiv.text(`${item.code} -> ${item.name} -> (${item.tagline} -> ${item.stock}) -> (${item.price}) Tk.`);
+            }else{
+                listDiv.text(`${item.code} -> ${item.name} -> (${item.price}) Tk.`);
+            }
 
             listDiv.on('click', () => {
                 WinPos.Pos.cart.addItem(item)
@@ -373,7 +414,6 @@ WinPos.Pos = (function (Urls) {
 
 
     var setTerminalCustomerForm = function (customer) {
-        console.log(customer)
         if (customer.id) {
 
             $("#terminalCustomerNameShow").text(customer.name);

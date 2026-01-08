@@ -1,88 +1,167 @@
 WinPos.sale = (function (Urls){
     var currentSalesDetails = {};
 
-    var showSaleModal = function (saleID){
-        WinPos.Common.getAjaxCall(Urls.showSaleModal.replace('saleID', saleID), function (response){
-            //debugger;
-            currentSalesDetails = response;
+    var showSaleModal = function (saleID) {
 
-            if(response.status === 'success'){
-                var sale = response.sale;
+        WinPos.Common.getAjaxCall(
+            Urls.showSaleModal.replace('saleID', saleID),
+            function (response) {
 
-                // Sale basic info
-                $('#POSID').text(sale.POSID);
-                $('#invoice_code').text(sale.invoice_code);
-                $('#created_by').text(response.created_by_user.name);
-                $('#updated_by').text(response.updated_by_user.name);
-                $('#formattedCreatedDate').text(sale.formattedCreatedDate);
-                $('#formattedUpdatedDate').text(sale.formattedUpdatedDate);
+                if (response.status !== 'success') {
+                    alert("Something went wrong");
+                    return;
+                }
 
+                currentSalesDetails = response;
+                const sale = response.sale;
 
-                $('#total_amount').text(sale.total_amount + ' Tk.');
-                let discountText = sale.discount_amount + ' Tk.';
+                /* =====================================================
+                * BASIC INFO
+                * ===================================================== */
+                $('#POSID').text(sale.POSID ?? '-');
+                $('#invoice_code').text(sale.invoice_code ?? '-');
+                $('#created_by').text(response.created_by_user?.name ?? '-');
+                $('#updated_by').text(response.updated_by_user?.name ?? '-');
+                $('#formattedCreatedDate').text(sale.formattedCreatedDate ?? '-');
+                $('#formattedUpdatedDate').text(sale.formattedUpdatedDate ?? '-');
 
+                $('#total_amount').text(`${Number(sale.total_amount || 0).toFixed(2)} Tk.`);
+
+                let discountText = `${Number(sale.discount_amount || 0).toFixed(2)} Tk.`;
                 if (sale.discount_type === 'fixed') {
                     discountText += ' (Fixed)';
                 } else if (sale.discount_type === 'percentage') {
-                    discountText += ' (' + sale.discount_value + '%)';
+                    discountText += ` (${sale.discount_value}%)`;
                 }
                 $('#discount_amount').text(discountText);
-                $('#adjustment_amount').text(sale.adjustmentAmt + ' Tk.');
 
-                $('#total_payable_amount').text(sale.total_payable_amount + ' Tk.');
+                $('#adjustment_amount').text(`${Number(sale.adjustmentAmt || 0).toFixed(2)} Tk.`);
+                $('#total_payable_amount').text(`${Number(sale.total_payable_amount || 0).toFixed(2)} Tk.`);
                 $('#sale_note').text(sale.note || '-');
 
-                // Items table
-                const serviceTableBody = $("#itemsTable tbody");
+                /* =====================================================
+                * SERVICE TABLE
+                * ===================================================== */
+                const serviceTableBody = $("#serviceItemsTable tbody");
                 serviceTableBody.html('');
 
-                sale.items.forEach(function (item) {
-                    let code = item.service ? item.service.code : '';
-                    let name = item.service ? item.service.name : '';
-                    let qty = item.quantity ?? 0;
-                    let price = item.selling_price ?? 0;
-                    let staffName = item.staff ? item.staff.name : 'None';
+                if (Array.isArray(response.serviceList) && response.serviceList.length) {
 
-                    let row = `
+                    response.serviceList.forEach(function (item) {
+
+                        const qty   = Number(item.quantity) || 0;
+                        const price = Number(item.selling_price) || 0;
+                        const total = qty * price;
+
+                        let row = `
+                            <tr>
+                                <td>${item.code ?? '-'}</td>
+                                <td>${item.name ?? '-'}</td>
+                                <td class="text-center">${item.staff_name ?? 'None'}</td>
+                                <td class="text-center">${qty}</td>
+                                <td class="text-end">${price.toFixed(2)} Tk.</td>
+                                <td class="text-end">${total.toFixed(2)} Tk.</td>
+                            </tr>
+                        `;
+                        serviceTableBody.append(row);
+                    });
+
+                } else {
+                    serviceTableBody.append(`
                         <tr>
-                            <td>${code}</td>
-                            <td>${name}</td>
-                            <td class="text-center">${staffName}</td>
-                            <td class="text-center">${qty}</td>
-                            <td class="text-right">${parseFloat(price).toFixed(2)} Tk.</td>
+                            <td colspan="6" class="text-center text-muted">
+                                No service items found
+                            </td>
                         </tr>
-                    `;
-                    serviceTableBody.append(row);
-                });
+                    `);
+                }
 
-                // Payments table
+                /* =====================================================
+                * PRODUCT TABLE
+                * ===================================================== */
+                const productTableBody = $("#productItemsTable tbody");
+                productTableBody.html('');
+
+                if (Array.isArray(response.productList) && response.productList.length) {
+
+                    response.productList.forEach(function (item) {
+
+                        const qty   = Number(item.quantity) || 0;
+                        const price = Number(item.selling_price) || 0;
+                        const total = qty * price;
+
+                        let row = `
+                            <tr>
+                                <td>${item.code ?? '-'}</td>
+                                <td>${item.name ?? '-'}</td>
+                                <td class="text-center">${qty}</td>
+                                <td class="text-end">${price.toFixed(2)} Tk.</td>
+                                <td class="text-end">${total.toFixed(2)} Tk.</td>
+                            </tr>
+                        `;
+                        productTableBody.append(row);
+                    });
+
+                } else {
+                    productTableBody.append(`
+                        <tr>
+                            <td colspan="5" class="text-center text-muted">
+                                No product items found
+                            </td>
+                        </tr>
+                    `);
+                }
+
+                /* =====================================================
+                * PAYMENT TABLE
+                * ===================================================== */
                 const paymentTableBody = $("#paymentsTableBody");
                 paymentTableBody.html('');
 
-                response.payments.forEach(function (payment) {
-                    let row = `
+                if (Array.isArray(response.payments) && response.payments.length) {
+
+                    response.payments.forEach(function (payment) {
+
+                        let row = `
+                            <tr>
+                                <td>${payment.payment_method}</td>
+                                <td class="text-center">${payment.payment_via}</td>
+                                <td class="text-end">
+                                    ${Number(payment.paid_amount || 0).toFixed(2)} Tk.
+                                </td>
+                                <td>${payment.transaction_id || '-'}</td>
+                                <td>${payment.note || '-'}</td>
+                                <td class="text-center">${payment.receivedBy}</td>
+                                <td class="text-center">
+                                    ${WinPos.Common.dataTableCreatedOnCell(
+                                        payment.formattedTime,
+                                        payment.formattedDate
+                                    )}
+                                </td>
+                            </tr>
+                        `;
+                        paymentTableBody.append(row);
+                    });
+
+                } else {
+                    paymentTableBody.append(`
                         <tr>
-                            <td>${payment.payment_method}</td>
-                            <td class="text-center align-middle">${payment.payment_via}</td>
-                            <td class="text-right align-middle">${parseFloat(payment.paid_amount).toFixed(2)} Tk.</td>
-                            <td class="text-right align-middle">${payment.transaction_id || ''}</td>
-                            <td class="align-middle">${payment.note || ''}</td>
-                            <td class="text-center align-middle">${payment.receivedBy}</td>
-                            <td class="text-center align-middle">${WinPos.Common.dataTableCreatedOnCell(payment.formattedTime, payment.formattedDate)}</td>
+                            <td colspan="7" class="text-center text-muted">
+                                No payments found
+                            </td>
                         </tr>
-                    `;
-                    paymentTableBody.append(row);
-                });
+                    `);
+                }
 
-                // Show modal
-                $("#showSaleBasicInfoTab").click();
+                /* =====================================================
+                * SHOW MODAL
+                * ===================================================== */
+                $("#showSaleBasicInfoTab").trigger('click');
                 WinPos.Common.showBootstrapModal('showSaleModal');
-
-            } else {
-                alert("Something went wrong");
             }
-        });
-    }
+        );
+    };
+
 
 
     var deleteSale = function (saleID){
@@ -128,8 +207,6 @@ WinPos.sale = (function (Urls){
         });
     }
     var printReceiptFunc = function(){
-        debugger;
-
         let data = {};
 
         const cartObj = {
@@ -145,13 +222,13 @@ WinPos.sale = (function (Urls){
 
         const items = currentSalesDetails.sale.items.map((item) => {
             return {
-                id: item.service.id,
-                name: item.service.name,
-                code: item.service.code,
-                price: parseFloat(item.service.price),
+                id: item.product_id,
+                name: item.product ? item.product.name : item.service.name,
+                code: item.product ? item.product.code : item.service.code,
+                price: parseFloat(item.selling_price),
                 quantity: parseInt(item.quantity),
-                discount: parseFloat(item.service.discount_value||0),
-                staff_name: item.staff ? item.staff.name : null
+                staff_name: item.staff ? item.staff.name : null,
+                tagline: item.variant_tagline ? item.variant_tagline : null
             };
         });
 
@@ -168,15 +245,11 @@ WinPos.sale = (function (Urls){
             cartObj.loyaltyCard.verifyCard = false;
         }     
 
-        console.log(cartObj);
-
         data.header = {};
         data.header.company_name = accountInfoSettings.companyName;
         data.header.company_phone = accountInfoSettings.primaryPhone;
         data.header.company_address = accountInfoSettings.address;
         data.header.company_pos_logo = WinPos.Common.CommonVariables.accountLogo;
-
-        //debugger;
 
         data.header.invoice_no = 'VC-87';
 

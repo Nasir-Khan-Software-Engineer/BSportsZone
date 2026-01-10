@@ -87,14 +87,12 @@
                                     @php
                                         $status = $item->status ?? 'reserved';
                                         $statusLabel = match($status) {
-                                            'inused' => 'In Used',
-                                            'nextplanned' => 'Next Planned',
+                                            'sellable' => 'Sellable',
                                             'reserved' => 'Reserved',
                                             default => ucfirst($status)
                                         };
                                         $statusBadge = match($status) {
-                                            'inused' => 'primary',
-                                            'nextplanned' => 'info',
+                                            'sellable' => 'success',
                                             'reserved' => 'secondary',
                                             default => 'secondary'
                                         };

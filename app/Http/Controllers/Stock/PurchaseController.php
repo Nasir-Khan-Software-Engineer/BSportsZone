@@ -194,7 +194,7 @@ class PurchaseController extends Controller
                 'purchase_items.*.product_variant_id' => 'required|exists:variations,id',
                 'purchase_items.*.cost_price' => 'required|numeric|min:0',
                 'purchase_items.*.purchased_qty' => 'required|integer|min:1',
-                'purchase_items.*.status' => 'nullable|in:reserved,nextplanned,inused',
+                'purchase_items.*.status' => 'nullable|in:reserved,sellable',
             ]);
 
             // Check for duplicate variants in the same purchase
@@ -314,7 +314,7 @@ class PurchaseController extends Controller
             $request->validate([
                 'cost_price' => 'required|numeric|min:0',
                 'purchased_qty' => 'required|integer|min:1',
-                'status' => 'nullable|in:reserved,nextplanned,inused',
+                'status' => 'nullable|in:reserved,sellable',
             ]);
 
             $purchaseItem = PurchaseItem::with('purchase')->findOrFail($id);
@@ -338,21 +338,6 @@ class PurchaseController extends Controller
             DB::transaction(function () use ($purchaseItem, $request) {
                 $variationId = $purchaseItem->product_variant_id;
                 $newStatus = $request->has('status') ? $request->status : $purchaseItem->status;
-                
-                // Enforce only one "inused" and one "nextplanned" per variation
-                if ($newStatus === 'inused') {
-                    // Set all other "inused" items for this variation to "reserved"
-                    PurchaseItem::where('product_variant_id', $variationId)
-                        ->where('id', '!=', $purchaseItem->id)
-                        ->where('status', 'inused')
-                        ->update(['status' => 'reserved']);
-                } elseif ($newStatus === 'nextplanned') {
-                    // Set all other "nextplanned" items for this variation to "reserved"
-                    PurchaseItem::where('product_variant_id', $variationId)
-                        ->where('id', '!=', $purchaseItem->id)
-                        ->where('status', 'nextplanned')
-                        ->update(['status' => 'reserved']);
-                }
                 
                 // Update purchase item
                 $purchaseItem->cost_price = (float)$request->cost_price;

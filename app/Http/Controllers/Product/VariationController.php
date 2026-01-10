@@ -422,12 +422,6 @@ class VariationController extends Controller
                 ->orderBy('created_at', 'desc')
                 ->get();
 
-            // Check if there are any "inused" purchase items with unallocated_qty > 0
-            $hasInUsedWithUnallocated = $purchaseItems->filter(function($item) {
-                $status = $item->status ?? 'reserved';
-                return $status === 'inused' && $item->unallocated_qty > 0;
-            })->count() > 0;
-
             // Calculate total sold items for this variation
             $soldItemsQty = Sales_items::where('variation_id', $id)
                 ->where('POSID', $POSID)
@@ -435,19 +429,13 @@ class VariationController extends Controller
                 ->sum('quantity');
 
             // Format the data for the frontend with enabled/disabled logic
-            $formattedItems = $purchaseItems->map(function($item) use ($variation, $hasInUsedWithUnallocated) {
+            $formattedItems = $purchaseItems->map(function($item) use ($variation) {
                 $status = $item->status ?? 'reserved'; // Default to reserved if null
                 $unallocatedQty = $item->unallocated_qty ?? 0;
                 
                 // Determine if this item should be enabled
-                $isEnabled = false;
-                if ($status === 'inused' && $unallocatedQty > 0) {
-                    // "inused" items are enabled if they have unallocated_qty > 0
-                    $isEnabled = true;
-                } elseif ($status === 'nextplanned' && !$hasInUsedWithUnallocated && $unallocatedQty > 0) {
-                    // "nextplanned" items are enabled only if no "inused" items have unallocated_qty
-                    $isEnabled = true;
-                }
+                // Only "sellable" items are enabled in the stock update modal
+                $isEnabled = ($status === 'sellable' && $unallocatedQty > 0);
                 
                 return [
                     'id' => $item->id,
@@ -458,8 +446,7 @@ class VariationController extends Controller
                     'cost_price' => $item->cost_price,
                     'selling_price' => $variation->selling_price,
                     'status' => match($status) {
-                        'inused' => 'In Used',
-                        'nextplanned' => 'Next Planned',
+                        'sellable' => 'Sellable',
                         'reserved' => 'Reserved',
                         default => ucfirst($status)
                     },
@@ -543,17 +530,7 @@ class VariationController extends Controller
 
                 // Update purchase item unallocated quantity
                 $purchaseItem->unallocated_qty -= $request->quantity;
-                
-                // Mark this purchase item as "inused" when stock is added
-                $purchaseItem->status = 'inused';
                 $purchaseItem->save();
-
-                // Enforce only one "inused" per variation
-                // Set all other "inused" items for this variation to "reserved"
-                PurchaseItem::where('product_variant_id', $variation->id)
-                    ->where('id', '!=', $purchaseItem->id)
-                    ->where('status', 'inused')
-                    ->update(['status' => 'reserved']);
             });
 
             return response()->json([

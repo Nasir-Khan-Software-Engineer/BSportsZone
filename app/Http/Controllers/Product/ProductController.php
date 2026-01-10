@@ -231,6 +231,7 @@ class ProductController extends Controller
         // Calculate total sales quantity for each variation
         $variationIds = $product->variations->pluck('id')->toArray();
         $salesQuantities = [];
+        $availableStockData = [];
         if (!empty($variationIds)) {
             $salesQuantities = Sales_items::whereIn('variation_id', $variationIds)
                 ->where('POSID', $POSID)
@@ -239,11 +240,19 @@ class ProductController extends Controller
                 ->groupBy('variation_id')
                 ->pluck('total_sales_qty', 'variation_id')
                 ->toArray();
+            
+            // Calculate available stock in warehouse for each variation using a single query
+            $availableStockData = PurchaseItem::whereIn('product_variant_id', $variationIds)
+                ->selectRaw('product_variant_id, SUM(unallocated_qty) as total_available_stock')
+                ->groupBy('product_variant_id')
+                ->pluck('total_available_stock', 'product_variant_id')
+                ->toArray();
         }
 
-        // Attach sales quantity to each variation
+        // Attach sales quantity and available stock to each variation
         foreach ($product->variations as $variation) {
             $variation->total_sales_qty = $salesQuantities[$variation->id] ?? 0;
+            $variation->available_stock_in_warehouse = $availableStockData[$variation->id] ?? 0;
         }
 
         return view('product.show', [

@@ -386,7 +386,7 @@ WinPos.Product = (function (Urls){
             html += '<td class="text-center align-middle">' + (item.purchase_date || 'N/A') + '</td>';
             html += '<td class="text-center align-middle">' + (item.invoice_number || 'N/A') + '</td>';
             html += '<td class="text-center align-middle">';
-            html += '<span class="badge badge-' + (item.status_raw === 'inused' ? 'primary' : item.status_raw === 'nextplanned' ? 'info' : item.status_raw === 'completed' ? 'success' : 'secondary') + '">';
+            html += '<span class="badge badge-' + (item.status_raw === 'sellable' ? 'success' : 'secondary') + '">';
             html += (item.status || 'N/A');
             html += '</span>';
             html += '</td>';

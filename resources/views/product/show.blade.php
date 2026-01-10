@@ -76,6 +76,7 @@
                                 <th class="text-center">Description</th>
                                 <th class="text-center">Selling Price</th>
                                 <th class="text-center">Stock</th>
+                                <th class="text-center">Available Stock in Warehouse</th>
                                 <th class="text-center">Sales</th>
                                 <th class="text-center">Status</th>
                             </tr>
@@ -87,6 +88,9 @@
                                 <td class="text-center">{{ $variation->description ?? '-' }}</td>
                                 <td class="text-center">TK {{ number_format($variation->selling_price, 2) }}</td>
                                 <td class="text-center">{{ $variation->stock }}</td>
+                                <td class="text-center">
+                                    {{ $variation->available_stock_in_warehouse ?? 0 }}
+                                </td>
                                 <td class="text-center">{{ $variation->total_sales_qty ?? 0 }}</td>
                                 <td class="text-center">
                                     <span class="badge badge-{{ $variation->status == 'active' ? 'success' : 'secondary' }}">

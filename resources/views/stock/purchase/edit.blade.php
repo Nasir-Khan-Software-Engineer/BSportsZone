@@ -106,8 +106,7 @@
                                     <td class="text-center">
                                         <select class="form-control form-control-sm rounded purchase-item-status" data-item-id="{{ $item->id }}" data-original-status="{{ $item->status ?? 'reserved' }}" {{ $item->is_editable ? '' : 'disabled' }}>
                                             <option value="reserved" {{ ($item->status ?? 'reserved') == 'reserved' ? 'selected' : '' }}>Reserved</option>
-                                            <option value="nextplanned" {{ ($item->status ?? 'reserved') == 'nextplanned' ? 'selected' : '' }}>Next Planned</option>
-                                            <option value="inused" {{ ($item->status ?? 'reserved') == 'inused' ? 'selected' : '' }}>In Used</option>
+                                            <option value="sellable" {{ ($item->status ?? 'reserved') == 'sellable' ? 'selected' : '' }}>Sellable</option>
                                         </select>
                                     </td>
                                     <td>

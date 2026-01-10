@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('purchased_qty'); // fixed, never changes
             $table->integer('unallocated_qty'); // warehouse stock
             $table->timestamps();
-            
+            $table->string('status')->default('reserved');
             $table->foreign('purchase_id')->references('id')->on('purchases')->onDelete('cascade');
             $table->foreign('product_variant_id')->references('id')->on('variations')->onDelete('restrict');
         });

@@ -275,22 +275,25 @@ WinPos.Purchase = (function (Urls){
             const isEditable = $(this).data('editable') === 'true' || $(this).data('editable') === true;
             
             if (variantId) {
-                let costPrice, purchasedQty;
+                let costPrice, purchasedQty, status;
                 
                 if (isEditable) {
                     costPrice = parseFloat($(this).find('.cost-price-input').val()) || 0;
                     purchasedQty = parseInt($(this).find('.purchased-qty-input').val()) || 0;
+                    status = $(this).find('.purchase-item-status').val() || 'reserved';
                 } else {
                     // For non-editable items, get from data attributes or existing values
-                    costPrice = parseFloat($(this).find('td:eq(1)').text().replace(/,/g, '')) || 0;
-                    purchasedQty = parseInt($(this).find('td:eq(2)').text()) || 0;
+                    costPrice = parseFloat($(this).find('td:eq(2)').text().replace(/,/g, '')) || 0;
+                    purchasedQty = parseInt($(this).find('td:eq(3)').text()) || 0;
+                    status = $(this).find('.purchase-item-status').val() || 'reserved';
                 }
 
                 if (purchasedQty > 0) {
                     items.push({
                         product_variant_id: variantId,
                         cost_price: costPrice,
-                        purchased_qty: purchasedQty
+                        purchased_qty: purchasedQty,
+                        status: status
                     });
                 }
             }
@@ -327,6 +330,7 @@ WinPos.Purchase = (function (Urls){
         
         let costPrice = parseFloat(row.find('.cost-price-input').val()) || 0;
         let purchasedQty = parseInt(row.find('.purchased-qty-input').val()) || 0;
+        let status = row.find('.purchase-item-status').val() || 'reserved';
         
         if (costPrice <= 0 || purchasedQty <= 0) {
             toastr.error('Please enter valid cost price and purchased quantity.');
@@ -335,7 +339,8 @@ WinPos.Purchase = (function (Urls){
         
         let formData = {
             cost_price: costPrice,
-            purchased_qty: purchasedQty
+            purchased_qty: purchasedQty,
+            status: status
         };
         
         WinPos.Common.putAjaxCallPost(Urls.updatePurchaseItem.replace('ITEM_ID', itemId), JSON.stringify(formData), function (response){
@@ -422,6 +427,24 @@ $(document).on('click', '.add-variant-btn', function() {
     const variantId = $(this).data('variant-id');
     const tagline = $(this).data('tagline');
     WinPos.Purchase.addVariantToPurchase(variantId, tagline);
+});
+
+// Handle purchase item status change
+$(document).on('change', '.purchase-item-status', function() {
+    const itemId = $(this).data('item-id');
+    const row = $('tr[data-item-id="' + itemId + '"]');
+    const isEditable = row.data('editable') === 'true' || row.data('editable') === true;
+    
+    if (!isEditable) {
+        toastr.error('Cannot update status. This item has allocated quantity.');
+        // Revert the change
+        const originalStatus = $(this).data('original-status') || 'reserved';
+        $(this).val(originalStatus);
+        return;
+    }
+    
+    // Update the purchase item with new status
+    WinPos.Purchase.updatePurchaseItem(itemId);
 });
 
 

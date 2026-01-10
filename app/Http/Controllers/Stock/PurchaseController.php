@@ -10,6 +10,7 @@ use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Variation;
 use App\Models\PurchaseItem;
+use App\Models\Sales_items;
 use Illuminate\Support\Facades\DB;
 
 class PurchaseController extends Controller
@@ -100,7 +101,7 @@ class PurchaseController extends Controller
                 'supplier_id' => 'required|exists:suppliers,id',
                 'product_id' => 'required|exists:products,id',
                 'description' => 'nullable|string',
-                'status' => 'nullable|in:draft,confirmed',
+                'status' => 'nullable|in:reserved,nextplanned,inused,completed',
                 'purchase_items' => 'required|array|min:1',
                 'purchase_items.*.product_variant_id' => 'required|exists:variations,id',
                 'purchase_items.*.cost_price' => 'required|numeric|min:0',
@@ -193,6 +194,7 @@ class PurchaseController extends Controller
                 'purchase_items.*.product_variant_id' => 'required|exists:variations,id',
                 'purchase_items.*.cost_price' => 'required|numeric|min:0',
                 'purchase_items.*.purchased_qty' => 'required|integer|min:1',
+                'purchase_items.*.status' => 'nullable|in:reserved,nextplanned,inused',
             ]);
 
             // Check for duplicate variants in the same purchase
@@ -260,6 +262,24 @@ class PurchaseController extends Controller
         $purchase->formattedTime = formatTime($purchase->created_at);
         $purchase->createdBy = $purchase->creator->name ?? 'N/A';
 
+        // Calculate sold quantities for each purchase item
+        $variationIds = $purchase->purchaseItems->pluck('product_variant_id')->toArray();
+        $soldQuantities = [];
+        if (!empty($variationIds)) {
+            $soldQuantities = Sales_items::whereIn('variation_id', $variationIds)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->selectRaw('variation_id, SUM(quantity) as total_sold_qty')
+                ->groupBy('variation_id')
+                ->pluck('total_sold_qty', 'variation_id')
+                ->toArray();
+        }
+
+        // Attach sold quantity to each purchase item
+        foreach ($purchase->purchaseItems as $item) {
+            $item->sold_qty = $soldQuantities[$item->product_variant_id] ?? 0;
+        }
+
         return view('stock.purchase.show', [
             'purchase' => $purchase
         ]);
@@ -293,6 +313,7 @@ class PurchaseController extends Controller
             $request->validate([
                 'cost_price' => 'required|numeric|min:0',
                 'purchased_qty' => 'required|integer|min:1',
+                'status' => 'nullable|in:reserved,nextplanned,inused',
             ]);
 
             $purchaseItem = PurchaseItem::with('purchase')->findOrFail($id);
@@ -314,10 +335,31 @@ class PurchaseController extends Controller
             }
 
             DB::transaction(function () use ($purchaseItem, $request) {
+                $variationId = $purchaseItem->product_variant_id;
+                $newStatus = $request->has('status') ? $request->status : $purchaseItem->status;
+                
+                // Enforce only one "inused" and one "nextplanned" per variation
+                if ($newStatus === 'inused') {
+                    // Set all other "inused" items for this variation to "reserved"
+                    PurchaseItem::where('product_variant_id', $variationId)
+                        ->where('id', '!=', $purchaseItem->id)
+                        ->where('status', 'inused')
+                        ->update(['status' => 'reserved']);
+                } elseif ($newStatus === 'nextplanned') {
+                    // Set all other "nextplanned" items for this variation to "reserved"
+                    PurchaseItem::where('product_variant_id', $variationId)
+                        ->where('id', '!=', $purchaseItem->id)
+                        ->where('status', 'nextplanned')
+                        ->update(['status' => 'reserved']);
+                }
+                
                 // Update purchase item
                 $purchaseItem->cost_price = (float)$request->cost_price;
                 $purchaseItem->purchased_qty = (int)$request->purchased_qty;
                 $purchaseItem->unallocated_qty = (int)$request->purchased_qty; // Reset unallocated to match purchased
+                if ($request->has('status')) {
+                    $purchaseItem->status = $request->status;
+                }
                 $purchaseItem->save();
 
                 // Recalculate purchase totals

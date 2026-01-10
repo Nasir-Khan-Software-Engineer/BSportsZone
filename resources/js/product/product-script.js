@@ -366,7 +366,9 @@ WinPos.Product = (function (Urls){
         let html = '<div class="table-responsive"><table class="table table-bordered table-hover mb-0">';
         html += '<thead class="thead-light">';
         html += '<tr>';
-        html += '<th class="text-center align-middle">Purchases Date</th>';
+        html += '<th class="text-center align-middle">Purchase Date</th>';
+        html += '<th class="text-center align-middle">Invoice Number</th>';
+        html += '<th class="text-center align-middle">Status</th>';
         html += '<th class="text-center align-middle">Cost Price</th>';
         html += '<th class="text-center align-middle">Available Stocks</th>';
         html += '<th class="text-center align-middle">Action</th>';
@@ -375,25 +377,38 @@ WinPos.Product = (function (Urls){
         html += '<tbody>';
         
         purchaseItems.forEach(function(item){
-            html += '<tr>';
+            let isEnabled = item.is_enabled === true;
+            let rowClass = isEnabled ? '' : 'table-secondary';
+            let disabledAttr = isEnabled ? '' : 'disabled';
+            let disabledClass = isEnabled ? '' : 'disabled';
+            
+            html += '<tr class="' + rowClass + '">';
             html += '<td class="text-center align-middle">' + (item.purchase_date || 'N/A') + '</td>';
+            html += '<td class="text-center align-middle">' + (item.invoice_number || 'N/A') + '</td>';
+            html += '<td class="text-center align-middle">';
+            html += '<span class="badge badge-' + (item.status_raw === 'inused' ? 'primary' : item.status_raw === 'nextplanned' ? 'info' : item.status_raw === 'completed' ? 'success' : 'secondary') + '">';
+            html += (item.status || 'N/A');
+            html += '</span>';
+            html += '</td>';
             html += '<td class="text-center align-middle">' + parseFloat(item.cost_price || 0).toFixed(2) + '</td>';
             html += '<td class="text-center align-middle">' + (item.available_stock || 0) + '</td>';
             html += '<td class="text-center align-middle">';
             html += '<div class="d-flex align-items-center justify-content-center gap-2">';
             html += '<input type="number" ';
-            html += 'class="form-control form-control-sm" ';
+            html += 'class="form-control form-control-sm ' + disabledClass + '" ';
             html += 'id="qtyInput_' + item.id + '" ';
             html += 'min="1" ';
             html += 'max="' + (item.available_stock || 0) + '" ';
             html += 'value="1" ';
+            html += disabledAttr + ' ';
             html += 'style="width: 80px;">';
             html += '<button type="button" ';
-            html += 'class="btn btn-sm btn-success add-stock-btn" ';
+            html += 'class="btn btn-sm btn-success add-stock-btn ' + disabledClass + '" ';
             html += 'data-purchase-item-id="' + item.id + '" ';
             html += 'data-variation-id="' + variation.id + '" ';
             html += 'data-cost-price="' + item.cost_price + '" ';
-            html += 'data-selling-price="' + variation.selling_price + '">';
+            html += 'data-selling-price="' + variation.selling_price + '" ';
+            html += disabledAttr + '>';
             html += '<i class="fa-solid fa-plus"></i> Add';
             html += '</button>';
             html += '</div>';
@@ -545,6 +560,61 @@ WinPos.Product = (function (Urls){
         });
     }
 
+    var productPurchasesTable = null;
+
+    var initProductPurchasesTable = function () {
+        // Fetch all purchases for the product
+        WinPos.Common.getAjaxCall(Urls.getProductPurchases, function (response) {
+            if (response.status === 'success') {
+                // Initialize DataTable with client-side pagination
+                productPurchasesTable = $('#productPurchasesTable').DataTable({
+                    data: response.purchases,
+                    pageLength: 10,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                    order: [[0, 'desc']],
+                    serverSide: false, // Client-side pagination
+                    processing: false,
+                    columns: [
+                        { data: 'id', name: 'id', orderable: true },
+                        { data: 'purchase_date', name: 'purchase_date', orderable: true },
+                        { 
+                            data: 'invoice_number', 
+                            name: 'invoice_number', 
+                            orderable: true,
+                            render: function(data, type, row) {
+                                if (data && data !== 'N/A') {
+                                    return '<a href="' + Urls.showPurchase.replace('purchaseID', row.id) + '" class="text-primary">' + data + '</a>';
+                                }
+                                return data || 'N/A';
+                            }
+                        },
+                        { data: 'name', name: 'name', orderable: true },
+                        { data: 'total_cost_price', name: 'total_cost_price', orderable: false },
+                        { data: 'total_qty', name: 'total_qty', orderable: false },
+                        { data: 'total_variations', name: 'total_variations', orderable: false },
+                        { data: 'supplier_name', name: 'supplier_name', orderable: false },
+                        { data: 'status', name: 'status', orderable: false }
+                    ],
+                    columnDefs: [
+                        {
+                            targets: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+                            className: 'text-center align-middle'
+                        }
+                    ]
+                });
+
+                // Add search functionality
+                $('#searchProductPurchases').on('keyup search input paste cut', function() {
+                    if (productPurchasesTable) {
+                        productPurchasesTable.search($(this).val()).draw();
+                    }
+                });
+            } else {
+                $('#productPurchasesTable tbody').html('<tr><td colspan="9" class="text-center">No purchases found for this product.</td></tr>');
+            }
+        });
+    }
+
     return {
         datatableConfiguration: datatableConfiguration,
         populateCreateForm: populateCreateForm,
@@ -560,7 +630,8 @@ WinPos.Product = (function (Urls){
         addStockFromPurchaseItem: addStockFromPurchaseItem,
         openPriceUpdateModal: openPriceUpdateModal,
         updateVariationPrice: updateVariationPrice,
-        createFreshVariant: createFreshVariant
+        createFreshVariant: createFreshVariant,
+        initProductPurchasesTable: initProductPurchasesTable
     }
 })(productUrls);
 
@@ -579,6 +650,11 @@ $(document).on('click', '.delete-product', function() {
 
 // Handle add stock from purchase item
 $(document).on('click', '.add-stock-btn', function() {
+    // Prevent action if button is disabled
+    if($(this).prop('disabled') || $(this).hasClass('disabled')){
+        return;
+    }
+    
     let purchaseItemId = $(this).data('purchase-item-id');
     let variationId = $(this).data('variation-id');
     let costPrice = parseFloat($(this).data('cost-price'));

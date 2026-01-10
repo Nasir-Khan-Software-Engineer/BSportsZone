@@ -76,6 +76,7 @@
                                 <th class="text-center">Description</th>
                                 <th class="text-center">Selling Price</th>
                                 <th class="text-center">Stock</th>
+                                <th class="text-center">Sales</th>
                                 <th class="text-center">Status</th>
                             </tr>
                         </thead>
@@ -86,6 +87,7 @@
                                 <td class="text-center">{{ $variation->description ?? '-' }}</td>
                                 <td class="text-center">TK {{ number_format($variation->selling_price, 2) }}</td>
                                 <td class="text-center">{{ $variation->stock }}</td>
+                                <td class="text-center">{{ $variation->total_sales_qty ?? 0 }}</td>
                                 <td class="text-center">
                                     <span class="badge badge-{{ $variation->status == 'active' ? 'success' : 'secondary' }}">
                                         {{ ucfirst($variation->status) }}
@@ -98,6 +100,35 @@
                 </div>
             </div>
             @endif
+
+            <!-- Purchases Table -->
+            <div class="card border mb-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Product Purchases</h5>
+                    <div class="d-flex gap-2 align-items-center">
+                        <input type="text" class="form-control form-control-sm" id="searchProductPurchases" placeholder="Search Purchases" style="width: 250px;">
+                    </div>
+                </div>
+                <div class="card-body p-1">
+                    <table class="table table-bordered" id="productPurchasesTable">
+                        <thead class="thead-light thm-tbl-header-bg thm-tbl-header-text-color">
+                            <tr>
+                                <th class="text-center align-middle" style="width: 5%;">ID</th>
+                                <th class="text-center align-middle" style="width: 12%;">Purchase Date</th>
+                                <th class="text-center align-middle" style="width: 12%;">Invoice Number</th>
+                                <th class="text-center align-middle" style="width: 15%;">Purchase Name</th>
+                                <th class="text-center align-middle" style="width: 12%;">Total Cost</th>
+                                <th class="text-center align-middle" style="width: 10%;">Total Quantity</th>
+                                <th class="text-center align-middle" style="width: 10%;">Total Variations</th>
+                                <th class="text-center align-middle" style="width: 12%;">Supplier</th>
+                                <th class="text-center align-middle" style="width: 10%;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -105,5 +136,17 @@
 @endsection
 
 @section('script')
+@vite(['resources/js/product/product-script.js'])
+<script>
+let productUrls = {
+    'getProductPurchases': "{{ route('product.get-purchases', ['product' => $product->id]) }}",
+    'showPurchase': "{{ route('stock.purchase.show', ['purchase' => 'purchaseID']) }}"
+};
+
+$(document).ready(function() {
+    // Initialize product purchases table with client-side pagination
+    WinPos.Product.initProductPurchasesTable();
+});
+</script>
 @endsection
 

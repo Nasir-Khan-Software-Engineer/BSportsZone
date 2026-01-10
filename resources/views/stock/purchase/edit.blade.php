@@ -91,6 +91,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center">Tag Line</th>
+                                    <th class="text-center">Status</th>
                                     <th class="text-center">Cost Price</th>
                                     <th class="text-center">Purchased Qty</th>
                                     <th class="text-center">Unallocated Qty</th>
@@ -102,6 +103,13 @@
                                 @foreach($purchase->purchaseItems as $item)
                                 <tr data-item-id="{{ $item->id }}" data-variant-id="{{ $item->product_variant_id }}" data-editable="{{ $item->is_editable ? 'true' : 'false' }}">
                                     <td>{{ $item->variation->tagline ?? '-' }}</td>
+                                    <td class="text-center">
+                                        <select class="form-control form-control-sm rounded purchase-item-status" data-item-id="{{ $item->id }}" data-original-status="{{ $item->status ?? 'reserved' }}" {{ $item->is_editable ? '' : 'disabled' }}>
+                                            <option value="reserved" {{ ($item->status ?? 'reserved') == 'reserved' ? 'selected' : '' }}>Reserved</option>
+                                            <option value="nextplanned" {{ ($item->status ?? 'reserved') == 'nextplanned' ? 'selected' : '' }}>Next Planned</option>
+                                            <option value="inused" {{ ($item->status ?? 'reserved') == 'inused' ? 'selected' : '' }}>In Used</option>
+                                        </select>
+                                    </td>
                                     <td>
                                         @if($item->is_editable)
                                             <input type="number" step="0.01" class="form-control form-control-sm rounded cost-price-input" value="{{ $item->cost_price }}" data-item-id="{{ $item->id }}">

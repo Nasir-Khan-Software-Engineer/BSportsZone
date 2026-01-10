@@ -13,6 +13,7 @@ use App\Models\Unit;
 use App\Models\Supplier;
 use App\Models\Shop;
 use App\Models\PurchaseItem;
+use App\Models\Purchase;
 use App\Models\Sales_items;
 use Illuminate\Support\Facades\DB;
 use Exception;
@@ -227,9 +228,80 @@ class ProductController extends Controller
             return ($item->selling_price - $item->discount) * $item->quantity;
         });
 
+        // Calculate total sales quantity for each variation
+        $variationIds = $product->variations->pluck('id')->toArray();
+        $salesQuantities = [];
+        if (!empty($variationIds)) {
+            $salesQuantities = Sales_items::whereIn('variation_id', $variationIds)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->selectRaw('variation_id, SUM(quantity) as total_sales_qty')
+                ->groupBy('variation_id')
+                ->pluck('total_sales_qty', 'variation_id')
+                ->toArray();
+        }
+
+        // Attach sales quantity to each variation
+        foreach ($product->variations as $variation) {
+            $variation->total_sales_qty = $salesQuantities[$variation->id] ?? 0;
+        }
+
         return view('product.show', [
             'product' => $product
         ]);
+    }
+
+    public function getProductPurchases($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            // Verify product exists and belongs to the user's POSID
+            $product = Product::where('POSID', $POSID)
+                ->where('id', $id)
+                ->where('type', 'Product')
+                ->first();
+
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.'
+                ], 404);
+            }
+
+            // Get all purchases for this product
+            $purchases = Purchase::where('pos_id', $POSID)
+                ->where('product_id', $id)
+                ->with(['supplier', 'product', 'creator', 'purchaseItems'])
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            // Format the data
+            $formattedPurchases = $purchases->map(function($purchase) {
+                return [
+                    'id' => $purchase->id,
+                    'purchase_date' => formatDate($purchase->purchase_date),
+                    'invoice_number' => $purchase->invoice_number ?? 'N/A',
+                    'name' => $purchase->name,
+                    'product_name' => $purchase->product->name ?? '-',
+                    'total_cost_price' => number_format($purchase->total_cost_price, 2),
+                    'total_qty' => $purchase->total_qty,
+                    'total_variations' => $purchase->purchaseItems->count(),
+                    'supplier_name' => $purchase->supplier->name ?? '-',
+                    'status' => ucfirst($purchase->status ?? 'draft'),
+                ];
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'purchases' => $formattedPurchases
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
+        }
     }
 
     public function store(Request $request)

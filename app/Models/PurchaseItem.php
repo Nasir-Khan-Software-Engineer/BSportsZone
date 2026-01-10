@@ -16,6 +16,7 @@ class PurchaseItem extends Model
         'cost_price',
         'purchased_qty',
         'unallocated_qty',
+        'status',
     ];
 
     protected $casts = [

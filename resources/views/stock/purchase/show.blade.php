@@ -71,24 +71,47 @@
                         <thead>
                             <tr>
                                 <th class="text-center">Tag Line</th>
+                                <th class="text-center">Status</th>
                                 <th class="text-center">Cost Price</th>
                                 <th class="text-center">Purchased Qty</th>
                                 <th class="text-center">Unallocated Qty</th>
                                 <th class="text-center">Allocated Qty</th>
+                                <th class="text-center">Sold Qty</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($purchase->purchaseItems as $item)
                             <tr>
                                 <td>{{ $item->variation->tagline ?? '-' }}</td>
+                                <td class="text-center">
+                                    @php
+                                        $status = $item->status ?? 'reserved';
+                                        $statusLabel = match($status) {
+                                            'inused' => 'In Used',
+                                            'nextplanned' => 'Next Planned',
+                                            'reserved' => 'Reserved',
+                                            default => ucfirst($status)
+                                        };
+                                        $statusBadge = match($status) {
+                                            'inused' => 'primary',
+                                            'nextplanned' => 'info',
+                                            'reserved' => 'secondary',
+                                            default => 'secondary'
+                                        };
+                                    @endphp
+                                    <span class="badge badge-{{ $statusBadge }}">
+                                        {{ $statusLabel }}
+                                    </span>
+                                </td>
                                 <td class="text-center">{{ number_format($item->cost_price, 2) }}</td>
                                 <td class="text-center">{{ $item->purchased_qty }}</td>
                                 <td class="text-center">{{ $item->unallocated_qty }}</td>
                                 <td class="text-center">{{ $item->purchased_qty - $item->unallocated_qty }}</td>
+                                <td class="text-center">{{ $item->sold_qty ?? 0 }}</td>
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="5" class="text-center">No items found.</td>
+                                <td colspan="7" class="text-center">No items found.</td>
                             </tr>
                             @endforelse
                         </tbody>

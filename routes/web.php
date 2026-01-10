@@ -212,6 +212,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::controller(ProductController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/datatable', 'datatable')->name('datatable');
+            Route::get('/{product}/purchases', 'getProductPurchases')->name('get-purchases');
             Route::get('/{product}/edit', 'edit')->name('edit');
             Route::get('/{product}', 'show')->name('show');
             Route::post('/store', 'store')->name('store');

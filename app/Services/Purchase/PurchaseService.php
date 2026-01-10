@@ -109,20 +109,28 @@ class PurchaseService implements IPurchaseService
                 
                 if ($existingItem && $existingItem->isEditable()) {
                     // Update existing editable item
-                    $existingItem->update([
+                    $updateData = [
                         'cost_price' => $item['cost_price'],
                         'purchased_qty' => $item['purchased_qty'],
                         'unallocated_qty' => $item['purchased_qty'],
-                    ]);
+                    ];
+                    if (isset($item['status'])) {
+                        $updateData['status'] = $item['status'];
+                    }
+                    $existingItem->update($updateData);
                 } else {
                     // Create new item
-                    PurchaseItem::create([
+                    $createData = [
                         'purchase_id' => $purchase->id,
                         'product_variant_id' => $item['product_variant_id'],
                         'cost_price' => $item['cost_price'],
                         'purchased_qty' => $item['purchased_qty'],
                         'unallocated_qty' => $item['purchased_qty'],
-                    ]);
+                    ];
+                    if (isset($item['status'])) {
+                        $createData['status'] = $item['status'];
+                    }
+                    PurchaseItem::create($createData);
                 }
 
                 $totalQty += $item['purchased_qty'];

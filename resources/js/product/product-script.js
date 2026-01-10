@@ -424,7 +424,7 @@ WinPos.Product = (function (Urls){
 
     var addStockFromPurchaseItem = function (variationId, purchaseItemId, quantity){
         let formData = {
-            purchase_item_id: purchaseItemId,
+            current_purchase_item_id: purchaseItemId,
             quantity: quantity
         };
         

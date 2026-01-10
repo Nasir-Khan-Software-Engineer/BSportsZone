@@ -270,7 +270,7 @@ class ProductController extends Controller
             }
 
             // Get all purchases for this product
-            $purchases = Purchase::where('pos_id', $POSID)
+            $purchases = Purchase::where('POSID', $POSID)
                 ->where('product_id', $id)
                 ->with(['supplier', 'product', 'creator', 'purchaseItems'])
                 ->orderBy('created_at', 'desc')

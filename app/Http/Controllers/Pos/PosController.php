@@ -127,75 +127,21 @@ class PosController extends Controller
         $sales->save();
         // end storing sales
 
+        $requestProducts = collect($request->services)
+                        ->where('type', 'Product')
+                        ->values();
 
-        $serviceIds = array_column($request->services, 'id');
-        $services = Product::select('products.id')
-            ->where('products.POSID', $POSID)
-            ->whereIn('products.id', $serviceIds)
-            ->get();
+        $requestServices = collect($request->services)
+                        ->where('type', 'Service')
+                        ->values();
 
-        $salesItems = [];
-        $now = now();
-        
-        foreach($services as $service){
-            $salesItemObj = [];
-
-            $serviceData = collect($request->services)->firstWhere('id', (int) $service->id) ?? [];
-
-            $staffId = isset($serviceData['staff_id']) && !empty($serviceData['staff_id']) 
-                ? (int)$serviceData['staff_id'] 
-                : null;
-
-            $salesItemObj['POSID'] = $POSID;
-            $salesItemObj['sales_id'] = $sales->id;
-            $salesItemObj['product_id'] = $service->id;
-            $salesItemObj['staff_id'] = $staffId;
-            $salesItemObj['product_price'] = 0; // need to update from the purchases
-            $salesItemObj['selling_price'] = $serviceData['price'];
-            $salesItemObj['quantity'] = $serviceData['quantity'];
-            $salesItemObj['created_at'] = $now;
-            $salesItemObj['updated_at'] = $now;
-
-            $salesItemObj['variation_id'] = $serviceData['variation_id'];
-            $salesItemObj['variant_tagline'] = $serviceData['tagline'];
-            $salesItemObj['type'] = $serviceData['type'];
-
-            array_push($salesItems, $salesItemObj);
-
+        if(!$requestProducts->isEmpty()){
+            $this->storeProductItemWithVariation($POSID ,$sales, $requestProducts);
         }
 
-        Sales_items::insert($salesItems);
-
-
-        // reduce the stock
-        $serviceRequest = collect($request->services);
-        foreach ($serviceRequest as $item) {
-            if ($item['type'] != "Product") {
-                continue;
-            }
-
-            $variation = Variation::where('product_id', $item['id'])
-                ->where('id', $item['variation_id'])
-                ->first();
-
-            if (!$variation) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Variation not found.'
-                ]);
-            }
-
-            if($item['quantity'] > $variation->stock){
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'Stock not available.'
-                ]);
-            }
-
-            $variation->decrement('stock', $item['quantity']);
+        if(!$requestServices->isEmpty()){
+            $this->storeServiceItem($POSID, $sales, $requestServices);
         }
-        // end product reduce stock
-
 
 
         // Send SMS after items are inserted (so quantity can be calculated)
@@ -495,6 +441,102 @@ class PosController extends Controller
                 'status' => 'error',
                 'message' => $e->getMessage()
             ], 500);
+        }
+    }
+
+
+    private function storeProductItemWithVariation($POSID, $sale, $items)
+    {
+        $variationIds = $items->pluck('variation_id')->toArray();
+
+        $productVariations = Variation::where('POSID', $POSID)
+            ->whereIn('id', $variationIds)
+            ->get();
+
+        $salesItems = [];
+        
+        foreach($productVariations as $variation){
+
+            $reqiestedData = $items->firstWhere('variation_id', (int) $variation->id) ?? [];
+
+            if($reqiestedData['quantity'] > $variation->stock){
+                return false;
+            }
+
+            $salesItemObj = [];
+
+            $salesItemObj['POSID'] = $POSID;
+            $salesItemObj['sales_id'] = $sale->id;
+            $salesItemObj['product_id'] = $variation->product_id;
+
+            $salesItemObj['product_price'] = 0; // need to update from the purchases
+            
+            $salesItemObj['selling_price'] = $variation->selling_price;
+            $salesItemObj['quantity'] = $reqiestedData['quantity'];
+            
+            $salesItemObj['variation_id'] = $variation->id;
+            $salesItemObj['variant_tagline'] = $variation->tagline;
+            $salesItemObj['type'] = "Product";
+            
+            $salesItemObj['updated_at'] = now();
+            $salesItemObj['created_at'] = now();
+
+            array_push($salesItems, $salesItemObj);
+
+            // need to reduce the stock
+            $variation->decrement('stock', $reqiestedData['quantity']);
+
+        }
+
+        if (count($salesItems) > 0) {
+            Sales_items::insert($salesItems);
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+    private function storeServiceItem($POSID, $sales, $requestServices){
+
+        $serviceIds = $requestServices->pluck('id')->toArray();
+
+        $services = Product::where('POSID', $POSID)
+            ->where('type', 'Service')
+            ->whereIn('id', $serviceIds)
+            ->get();
+
+        $salesItems = [];
+        $now = now();
+        
+        foreach($services as $service){
+            $salesItemObj = [];
+
+            $serviceData = $requestServices->firstWhere('id', (int) $service->id) ?? [];
+
+            $staffId = isset($serviceData['staff_id']) && !empty($serviceData['staff_id']) 
+                ? (int)$serviceData['staff_id'] 
+                : null;
+
+            $salesItemObj['POSID'] = $POSID;
+            $salesItemObj['sales_id'] = $sales->id;
+            $salesItemObj['product_id'] = $service->id;
+            $salesItemObj['staff_id'] = $staffId;
+            $salesItemObj['product_price'] = 0; // need to update from the purchases
+            $salesItemObj['selling_price'] = $service->price;
+            $salesItemObj['quantity'] = $serviceData['quantity'];
+            $salesItemObj['created_at'] = now();
+            $salesItemObj['updated_at'] = now();
+            $salesItemObj['type'] = "Service";
+            array_push($salesItems, $salesItemObj);
+
+        }
+
+        if(count($salesItems) > 0){
+            Sales_items::insert($salesItems);
+            return true;
+        }else{
+            return false;
         }
     }
 

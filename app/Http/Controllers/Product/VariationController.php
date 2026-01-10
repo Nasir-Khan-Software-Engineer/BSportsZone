@@ -40,6 +40,7 @@ class VariationController extends Controller
         }
 
         $variations = Variation::where('product_id', $productId)
+            ->where('POSID', $POSID)
             ->orderBy('id', 'desc')
             ->get();
 
@@ -76,12 +77,13 @@ class VariationController extends Controller
         }
 
         $query = Variation::where('product_id', $productId)
+            ->where('POSID', $POSID)
             ->where(function($query) use ($searchCriteria) {
                 $query->where('description', 'like', "%{$searchCriteria}%")
                       ->orWhere('status', 'like', "%{$searchCriteria}%");
             });
 
-        $totalRecord = Variation::where('product_id', $productId)->count();
+        $totalRecord = Variation::where('POSID', $POSID)->where('product_id', $productId)->count();
         $filteredRecord = $query->count();
 
         // Handle sorting
@@ -112,6 +114,7 @@ class VariationController extends Controller
     {
         $POSID = auth()->user()->POSID;
         $variation = Variation::with('product')
+            ->where('POSID', $POSID)
             ->where('id', $id)
             ->first();
 
@@ -165,6 +168,7 @@ class VariationController extends Controller
             $status = $request->status ?? 'active';
             if ($status === 'active') {
                 $existingActive = Variation::where('tagline', $request->tagline)
+                    ->where('POSID', $POSID)
                     ->where('status', 'active')
                     ->exists();
                 
@@ -180,6 +184,7 @@ class VariationController extends Controller
             }
 
             $variation = new Variation();
+            $variation->POSID = $POSID;
             $variation->product_id = $request->product_id;
             $variation->tagline = $request->tagline;
             $variation->description = $request->description;
@@ -227,6 +232,7 @@ class VariationController extends Controller
 
             $variation = Variation::with('product')
                 ->where('id', $id)
+                ->where('POSID', $POSID)
                 ->first();
 
             if (!$variation) {
@@ -277,6 +283,7 @@ class VariationController extends Controller
             if ($status === 'active') {
                 $taglineToCheck = $request->tagline ?? $variation->tagline;
                 $existingActive = Variation::where('tagline', $taglineToCheck)
+                    ->where('POSID', $POSID)
                     ->where('status', 'active')
                     ->where('id', '!=', $id)
                     ->exists();
@@ -328,6 +335,7 @@ class VariationController extends Controller
         try {
             $POSID = auth()->user()->POSID;
             $variation = Variation::with('product')
+                ->where('POSID', $POSID)
                 ->where('id', $id)
                 ->first();
 
@@ -389,6 +397,7 @@ class VariationController extends Controller
         try {
             $POSID = auth()->user()->POSID;
             $variation = Variation::with('product')
+                ->where('POSID', $POSID)
                 ->where('id', $id)
                 ->first();
 
@@ -485,11 +494,12 @@ class VariationController extends Controller
             $POSID = auth()->user()->POSID;
             
             $request->validate([
-                'purchase_item_id' => 'required|exists:purchase_items,id',
+                'current_purchase_item_id' => 'required|exists:purchase_items,id',
                 'quantity' => 'required|integer|min:1',
             ]);
 
             $variation = Variation::with('product')
+                ->where('POSID', $POSID)
                 ->where('id', $id)
                 ->first();
 
@@ -508,7 +518,7 @@ class VariationController extends Controller
                 ], 403);
             }
 
-            $purchaseItem = PurchaseItem::findOrFail($request->purchase_item_id);
+            $purchaseItem = PurchaseItem::findOrFail($request->current_purchase_item_id);
 
             // Verify purchase item belongs to this variation
             if ($purchaseItem->product_variant_id != $id) {
@@ -573,6 +583,7 @@ class VariationController extends Controller
         try {
             $POSID = auth()->user()->POSID;
             $variation = Variation::with('product')
+                ->where('POSID', $POSID)
                 ->where('id', $id)
                 ->first();
 
@@ -681,6 +692,7 @@ class VariationController extends Controller
 
             // Create new variation with same data
             $newVariation = new Variation();
+            $newVariation->POSID = $POSID;
             $newVariation->product_id = $variation->product_id;
             $newVariation->tagline = $newTagline;
             $newVariation->description = $variation->description;

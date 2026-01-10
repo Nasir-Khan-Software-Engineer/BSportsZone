@@ -9,7 +9,7 @@ class PurchaseRepository implements IPurchaseRepository
 {
     public function getAllPurchases($POSID, $search = '', $start = 0, $length = 10, $orderColumn = 0, $orderDir = 'desc')
     {
-        $query = Purchase::where('pos_id', $POSID)
+        $query = Purchase::where('POSID', $POSID)
             ->with(['supplier', 'product', 'creator', 'purchaseItems.variation'])
             ->where(function($q) use ($search) {
                 if ($search) {
@@ -42,7 +42,7 @@ class PurchaseRepository implements IPurchaseRepository
 
     public function getPurchaseById($POSID, $id)
     {
-        return Purchase::where('pos_id', $POSID)
+        return Purchase::where('POSID', $POSID)
             ->where('id', $id)
             ->with(['supplier', 'product', 'creator', 'purchaseItems.variation'])
             ->first();
@@ -50,7 +50,7 @@ class PurchaseRepository implements IPurchaseRepository
 
     public function getPurchaseWithItems($POSID, $id)
     {
-        return Purchase::where('pos_id', $POSID)
+        return Purchase::where('POSID', $POSID)
             ->where('id', $id)
             ->with(['supplier', 'product', 'product.variations', 'creator', 'purchaseItems.variation'])
             ->first();
@@ -74,7 +74,7 @@ class PurchaseRepository implements IPurchaseRepository
 
     public function getTotalPurchases($POSID, $search = '')
     {
-        $query = Purchase::where('pos_id', $POSID);
+        $query = Purchase::where('POSID', $POSID);
         
         if ($search) {
             $query->where(function($q) use ($search) {

@@ -46,10 +46,16 @@ WinPos.Pos = (function (Urls) {
     }
 
     var addCartItem = function (service) {
-
+        debugger;
         console.log(service);
 
-        const cartItem = cartObj.items.find((item) => item.id == service.id);
+        let cartItem;
+
+        if(service.type && service.type == 'Product') {
+            cartItem = cartObj.items.find((item) => item.id == service.id && item.variation_id == service.variation_id);
+        }else{
+            cartItem = cartObj.items.find((item) => item.id == service.id);
+        }
 
         if(service.type  && service.type == 'Product') {
             if(service.stock == 0) {
@@ -88,15 +94,29 @@ WinPos.Pos = (function (Urls) {
         notify();
     }
 
-    var removeCartItem = function (serviceId) {
-        cartObj.items = cartObj.items.filter((item) => item.id != serviceId);
+    var removeCartItem = function (serviceId,type = null,variation_id = null) {
+        debugger;
+        if(type && type == 'Product') {
+            cartObj.items = cartObj.items.filter(item => 
+                !(item.id == serviceId && item.variation_id == variation_id)
+            );
+        }
+        else{
+            cartObj.items = cartObj.items.filter((item) => item.id != serviceId);
+        }
 
         updateCartTotal();
         notify();
     }
 
-    var updateCartQuantity = function (serviceId, qty) {
-        const cartItem = cartObj.items.find((item) => item.id == serviceId);
+    var updateCartQuantity = function (serviceId, qty, type = null, variation_id = null) {
+        let cartItem;
+        if(type && type == 'Product') {
+            cartItem = cartObj.items.find((item) => item.id == serviceId && item.variation_id == variation_id);
+        }else{
+            cartItem = cartObj.items.find((item) => item.id == serviceId);
+        }
+
         const quantity = parseInt(qty);
 
         if (cartItem == null || cartItem == undefined) {
@@ -108,8 +128,6 @@ WinPos.Pos = (function (Urls) {
             toastr.error("Please insert valid quantity", "Invalid Quantity");
             return 0;
         }
-        
-
 
         if(cartItem.type  && cartItem.type == 'Product') {
             if(quantity > cartItem.stock) {
@@ -117,7 +135,6 @@ WinPos.Pos = (function (Urls) {
                 return 0;
             }
         }
-
 
         if (cartItem) {
             cartItem.quantity = quantity;

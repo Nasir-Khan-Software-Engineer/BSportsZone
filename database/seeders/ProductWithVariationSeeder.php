@@ -88,6 +88,7 @@ class ProductWithVariationSeeder extends Seeder
                 $taglineCounter++;
 
                 $variation = new Variation();
+                $variation->POSID = $POSID;
                 $variation->product_id = $product->id;
                 $variation->tagline = $uniqueTagline;
                 $variation->description = 'Variation description for ' . $sizeTag . ' of ' . $product->name;

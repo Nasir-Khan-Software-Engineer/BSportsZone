@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('variations', function (Blueprint $table) {
             $table->id();
+            $table->integer('POSID');
             $table->unsignedBigInteger('product_id');
-            $table->unsignedBigInteger('purchase_item_id')->nullable();
+            $table->unsignedBigInteger('current_purchase_item_id')->nullable();
             $table->string('tagline');
             $table->text('description')->nullable();
             $table->double('selling_price')->default(0);

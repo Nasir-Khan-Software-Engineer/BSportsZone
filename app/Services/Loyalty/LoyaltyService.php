@@ -82,7 +82,7 @@ class LoyaltyService implements ILoyaltyService{
 
         return [
             'customer_id' => $customerId,
-            'pos_id' => $posId,
+            'POSID' => $posId,
             'total_cards' => $cardsWithStatus->count(),
             'cards' => $cardsWithStatus,
             'settings' => $settings

@@ -64,7 +64,7 @@ class PurchaseService implements IPurchaseService
     public function updatePurchase($purchaseData, $purchaseItems)
     {
         return DB::transaction(function () use ($purchaseData, $purchaseItems) {
-            $purchase = $this->purchaseRepository->getPurchaseById($purchaseData['pos_id'], $purchaseData['id']);
+            $purchase = $this->purchaseRepository->getPurchaseById($purchaseData['POSID'], $purchaseData['id']);
             
             if (!$purchase) {
                 return null;

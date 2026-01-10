@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->integer('pos_id')->nullable();
+            $table->integer('POSID')->nullable();
             $table->date('purchase_date');
             $table->string('invoice_number')->nullable();
             $table->string('name'); // purchase title / reference name

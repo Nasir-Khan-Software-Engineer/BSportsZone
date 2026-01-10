@@ -101,7 +101,7 @@ class PurchaseController extends Controller
                 'supplier_id' => 'required|exists:suppliers,id',
                 'product_id' => 'required|exists:products,id',
                 'description' => 'nullable|string',
-                'status' => 'nullable|in:reserved,nextplanned,inused,completed',
+                'status' => 'nullable|in:draft,confirmed',
                 'purchase_items' => 'required|array|min:1',
                 'purchase_items.*.product_variant_id' => 'required|exists:variations,id',
                 'purchase_items.*.cost_price' => 'required|numeric|min:0',
@@ -119,7 +119,7 @@ class PurchaseController extends Controller
             }
 
             $purchaseData = [
-                'pos_id' => $POSID,
+                'POSID' => $POSID,
                 'purchase_date' => $request->purchase_date,
                 'invoice_number' => $request->invoice_number,
                 'name' => $request->name,
@@ -217,7 +217,7 @@ class PurchaseController extends Controller
 
             $purchaseData = [
                 'id' => $id,
-                'pos_id' => $POSID,
+                'POSID' => $POSID,
                 'purchase_date' => $request->purchase_date,
                 'invoice_number' => $request->invoice_number,
                 'name' => $request->name,
@@ -290,6 +290,7 @@ class PurchaseController extends Controller
         try {
             $productId = $request->input('product_id');
             $variations = Variation::where('product_id', $productId)
+                ->where('POSID', auth()->user()->POSID)
                 ->where('status', 'active')
                 ->get();
 
@@ -319,7 +320,7 @@ class PurchaseController extends Controller
             $purchaseItem = PurchaseItem::with('purchase')->findOrFail($id);
 
             // Verify purchase belongs to the user's POSID
-            if ($purchaseItem->purchase->pos_id != $POSID) {
+            if ($purchaseItem->purchase->POSID != $POSID) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized access.'
@@ -404,7 +405,7 @@ class PurchaseController extends Controller
             $purchaseItem = PurchaseItem::with('purchase')->findOrFail($id);
 
             // Verify purchase belongs to the user's POSID
-            if ($purchaseItem->purchase->pos_id != $POSID) {
+            if ($purchaseItem->purchase->POSID != $POSID) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Unauthorized access.'

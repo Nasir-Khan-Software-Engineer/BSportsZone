@@ -208,7 +208,7 @@
                 <div class="col" style="overflow-y: auto; overflow-x: hidden; height: 80vh;">
                     <div id="searchServiceContainer" class="grid-view">
                         @foreach($recentServices as $recProd)
-                        <div data-stock="{{ $recProd->stock }}" data-toggle="tooltip" data-placement="top" title="{{ $recProd->name }}" class="grid-item recent-service d-flex flex-column align-items-center p-2"
+                        <div data-type="{{ $recProd->type }}" data-variation-id="{{ $recProd->variation_id }}" data-stock="{{ $recProd->stock }}" data-toggle="tooltip" data-placement="top" title="{{ $recProd->name }}" class="grid-item recent-service d-flex flex-column align-items-center p-2"
                             style="background-color: #ccc;" data-id="{{ $recProd->id }}">
                             @if(!empty($recProd->image))
                             <img src="{{ asset("images/{$recProd->POSID}/services/{$recProd->image}") }}" class="rounded" style="width: 100px; height: 50px; object-fit: cover;">
@@ -318,21 +318,34 @@ $(document).ready(function() {
 
     $(document).on('click', '.remove-cart-service', function() {
         const prodId = $(this).attr('data-id');
-        WinPos.Pos.cart.remove(prodId);
+        const type = $(this).attr('data-type');
+        const variationId = $(this).attr('data-variation-id');
+        WinPos.Pos.cart.remove(prodId, type, variationId);
     });
 
     $(document).on('blur change', '.cart-qty-input', function() {
         const prodId = $(this).attr('data-id');
         const qty = $(this).val();
+        const type = $(this).attr('data-type');
+        const variationId = $(this).attr('data-variation-id');
 
-        WinPos.Pos.cart.updateQuantity(prodId, qty);
+        WinPos.Pos.cart.updateQuantity(prodId, qty, type, variationId);
     });
 
     $(document).on('click', '.recent-service', function() {
-        const prod = recentServices.find((item) => item.id == $(this).attr('data-id'));
+        let id = $(this).attr('data-id');
+        let type = $(this).attr('data-type');
+        let variationId = $(this).attr('data-variation-id');
+        let product;
 
-        if (prod) {
-            WinPos.Pos.cart.addItem(prod);
+        if(type == "Product"){
+            product = recentServices.find((item) => item.id == id && item.variation_id == variationId);
+        }else{
+            product = recentServices.find((item) => item.id == id);
+        }
+
+        if (product) {
+            WinPos.Pos.cart.addItem(product);
         }
     });
 
@@ -667,13 +680,13 @@ function renderCart(cart) {
             
         }else{
             dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + ' (' + item.tagline + ')</td>');
-            dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input max="' + item.stock + '" type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '"></td>');
+            dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input max="' + item.stock + '" type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '" data-type="' + item.type + '" data-variation-id="' + item.variation_id + '"></td>');
         }
         
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + item.price.toFixed(2) + ' Tk.</td>');
         dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + ((item.price) * item.quantity).toFixed(2) + ' Tk.</td>');
         dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><button type="button" class="btn thm-btn-bg thm-btn-text-color btn-sm remove-cart-service pos-page-font-size" data-id="' +
-            item.id + '"><i class="fa fa-solid fa-times"></i></button></td>')
+            item.id + '" data-type="' + item.type + '" data-variation-id="' + item.variation_id + '"><i class="fa fa-solid fa-times"></i></button></td>')
         dom.push('</tr>');
     });
 

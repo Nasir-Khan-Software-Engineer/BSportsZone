@@ -91,6 +91,22 @@ class ProductWithVariationSeeder extends Seeder
                 $variation->selling_price = 0;
                 $variation->stock = 0;
                 $variation->status = 'active';
+                
+                // Random discount (50% chance of having discount)
+                if(rand(0, 1) === 1){
+                    $discountType = rand(0, 1) === 1 ? 'percentage' : 'fixed';
+                    if($discountType === 'percentage'){
+                        $variation->discount_type = 'percentage';
+                        $variation->discount_value = rand(5, 50); // 5% to 50%
+                    } else {
+                        $variation->discount_type = 'fixed';
+                        $variation->discount_value = rand(10, 100); // 10tk to 100tk
+                    }
+                } else {
+                    $variation->discount_type = null;
+                    $variation->discount_value = null;
+                }
+                
                 $variation->save();
             }
         }

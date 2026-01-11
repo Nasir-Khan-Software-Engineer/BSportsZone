@@ -88,7 +88,7 @@ class ProductController extends Controller
             $product->formattedTime = formatTime($product->created_at);
             $product->variations_count = $product->variations->count();
             
-            // Calculate salable stocks (sum of all active variations' stock)
+            // Calculate salable stocks (sum of all active variations' stock, excluding closed)
             $product->salable_stocks = $product->variations->where('status', 'active')->sum('stock');
             
             // Calculate warehouse stocks (sum of all purchase items' unallocated_qty for all variations)
@@ -114,7 +114,7 @@ class ProductController extends Controller
                 $product->cost_price_range = '-';
             }
             
-            // Calculate selling price range (from variations)
+            // Calculate selling price range (from variations, excluding closed)
             $sellingPrices = $product->variations->where('status', 'active')->pluck('selling_price')->filter(function($price) {
                 return $price > 0;
             })->toArray();

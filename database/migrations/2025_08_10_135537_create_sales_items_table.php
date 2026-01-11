@@ -25,6 +25,8 @@ return new class extends Migration
             $table->decimal('selling_price', $precision = 8, $scale = 2)->default(0);
             $table->integer('quantity')->default(1);
             $table->string('description')->nullable();
+            $table->string('discount_type')->nullable()->comment('fixed or percentage');
+            $table->decimal('discount_value', $precision = 8, $scale = 2)->nullable();
             $table->timestamps();
             $table->softDeletes();
 

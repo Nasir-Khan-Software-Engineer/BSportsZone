@@ -102,9 +102,10 @@
                                 <th class="text-center align-middle" style="width: 18%;">Description</th>
                                 <th class="text-center align-middle" style="width: 10%;">Selling Price</th>
                                 <th class="text-center align-middle" style="width: 10%;">Stock</th>
-                                <th class="text-center align-middle" style="width: 12%;">Available Stock in Warehouse</th>
+                                <th class="text-center align-middle" style="width: 8%;">Available Stock in Warehouse</th>
+                                <th class="text-center align-middle" style="width: 10%;">Discount</th>
                                 <th class="text-center align-middle" style="width: 8%;">Status</th>
-                                <th class="text-center align-middle" style="width: 15%;">Action</th>
+                                <th class="text-center align-middle" style="width: 10%;">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -112,16 +113,22 @@
                                 @foreach($product->variations as $variation)
                                 @php
                                     $isEditable = $variation->status == 'active' && !($variation->has_sales_items ?? false);
+                                    $isClosed = $variation->status == 'closed';
+                                    $isInactive = $variation->status == 'inactive';
                                 @endphp
-                                <tr data-variation-id="{{ $variation->id }}" class="{{ $variation->status == 'inactive' ? 'table-secondary' : '' }}" data-has-sales="{{ $variation->has_sales_items ? 'true' : 'false' }}" data-is-editable="{{ $isEditable ? 'true' : 'false' }}">
+                                <tr data-variation-id="{{ $variation->id }}" class="{{ ($isInactive || $isClosed) ? 'table-secondary' : '' }}" data-has-sales="{{ $variation->has_sales_items ? 'true' : 'false' }}" data-status="{{ $variation->status }}" data-full-description="{{ $variation->description ?? '' }}" data-discount-type="{{ $variation->discount_type ?? '' }}" data-discount-value="{{ $variation->discount_value ?? '' }}">
                                     <td>
-                                        <input type="text" class="form-control form-control-sm variation-tagline" value="{{ $variation->tagline }}" data-variation-id="{{ $variation->id }}" readonly>
+                                        {{ $variation->tagline }}
                                     </td>
                                     <td>
-                                        <input type="text" class="form-control form-control-sm variation-description" value="{{ $variation->description ?? '' }}" data-variation-id="{{ $variation->id }}" readonly>
+                                        @php
+                                            $description = $variation->description ?? '';
+                                            $displayDescription = strlen($description) > 50 ? substr($description, 0, 50) . '...' : $description;
+                                        @endphp
+                                        {{ $displayDescription ?: '-' }}
                                     </td>
                                     <td>
-                                        @if($variation->status == 'active')
+                                        @if($variation->status != 'closed')
                                         <div class="d-flex align-items-center gap-1">
                                             <button type="button" class="btn btn-sm btn-outline-danger price-decrease-btn" data-variation-id="{{ $variation->id }}" title="Decrease Price">
                                                 <i class="fa-solid fa-minus"></i>
@@ -136,7 +143,7 @@
                                         @endif
                                     </td>
                                     <td>
-                                        @if($variation->status == 'active')
+                                        @if($variation->status != 'closed')
                                         <div class="d-flex align-items-center gap-1">
                                             <button type="button" class="btn btn-sm btn-outline-danger stock-decrease-btn" data-variation-id="{{ $variation->id }}" title="Decrease Stock">
                                                 <i class="fa-solid fa-minus"></i>
@@ -153,19 +160,35 @@
                                     <td class="text-center align-middle">
                                         <span class="badge badge-info">{{ $variation->available_stock_in_warehouse ?? 0 }}</span>
                                     </td>
-                                    <td>
-                                        <select class="form-control form-control-sm variation-status" data-variation-id="{{ $variation->id }}" data-original-status="{{ $variation->status }}" data-original-tagline="{{ $variation->tagline }}">
-                                            <option value="active" {{ $variation->status == 'active' ? 'selected' : '' }}>Active</option>
-                                            <option value="inactive" {{ $variation->status == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                                        </select>
+                                    <td class="text-center align-middle">
+                                        @if($variation->discount_type && $variation->discount_value)
+                                            @if($variation->discount_type == 'percentage')
+                                                {{ number_format($variation->discount_value, 2) }}%
+                                            @else
+                                                {{ number_format($variation->discount_value, 2) }}tk
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-center align-middle">
+                                        @if($variation->status == 'closed')
+                                            <span class="badge badge-secondary">Closed</span>
+                                        @elseif($variation->status == 'active')
+                                            <span class="badge badge-success">Active</span>
+                                        @else
+                                            <span class="badge badge-secondary">Inactive</span>
+                                        @endif
                                     </td>
                                     <td class="text-center">
-                                        @if($variation->status == 'active')
-                                        <button type="button" class="btn btn-sm btn-primary edit-variation" data-variation-id="{{ $variation->id }}" title="Edit Variation"><i class="fa-solid fa-pen-to-square"></i></button>
-                                        <button type="button" class="btn btn-sm btn-success save-variation" data-variation-id="{{ $variation->id }}" style="display: none;"><i class="fa-solid fa-save"></i></button>
-                                        <button type="button" class="btn btn-sm btn-danger delete-variation" data-variation-id="{{ $variation->id }}"><i class="fa-solid fa-trash"></i></button>
+                                        @if($variation->status == 'closed')
+                                        <span class="badge badge-secondary">Closed</span>
                                         @else
-                                        <button type="button" class="btn btn-sm btn-info show-variation" data-variation-id="{{ $variation->id }}" title="Show Variation"><i class="fa-solid fa-eye"></i></button>
+                                        @php
+                                            $canDelete = $variation->status == 'active' && $variation->stock == 0 && !($variation->has_sales_items ?? false);
+                                        @endphp
+                                        <button type="button" class="btn btn-sm btn-primary edit-variation" data-variation-id="{{ $variation->id }}" title="Edit Variation"><i class="fa-solid fa-pen-to-square"></i></button>
+                                        <button type="button" class="btn btn-sm btn-danger delete-variation" data-variation-id="{{ $variation->id }}" data-can-delete="{{ $canDelete ? 'true' : 'false' }}" {{ !$canDelete ? 'disabled' : '' }} title="{{ !$canDelete ? 'Cannot delete: ' . ($variation->status != 'active' ? 'Variation is not active' : ($variation->stock > 0 ? 'Variation has stock' : 'Variation has sales')) : 'Delete Variation' }}"><i class="fa-solid fa-trash"></i></button>
                                         @endif
                                     </td>
                                 </tr>
@@ -203,6 +226,19 @@
                     <div class="form-group">
                         <label for="variationDescription">Description</label>
                         <textarea class="form-control rounded" name="description" id="variationDescription" rows="3" placeholder="Variation description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="variationDiscountType">Discount Type</label>
+                        <select class="form-control rounded" name="discount_type" id="variationDiscountType">
+                            <option value="">No Discount</option>
+                            <option value="fixed">Fixed</option>
+                            <option value="percentage">Percentage</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="variationDiscountValue">Discount Value</label>
+                        <input type="number" step="0.01" min="0" class="form-control rounded" name="discount_value" id="variationDiscountValue" placeholder="0.00">
+                        <small class="form-text text-muted" id="addDiscountValueHelp">Enter discount value based on selected type</small>
                     </div>
                     <div class="form-group">
                         <label for="variationStatus">Status</label>
@@ -295,6 +331,57 @@
     </div>
 </div>
 
+<!-- Edit Variation Modal -->
+<div class="modal fade" id="editVariationModal" tabindex="-1" role="dialog" aria-labelledby="editVariationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content rounded">
+            <div class="modal-header rounded">
+                <h5 class="modal-title" id="editVariationModalLabel">Edit Variation</h5>
+                <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="editVariationForm">
+                    <input type="hidden" id="editVariationId" name="variation_id">
+                    <div class="form-group">
+                        <label for="editVariationTagline">Tagline*</label>
+                        <input required type="text" class="form-control rounded" name="tagline" id="editVariationTagline" placeholder="e.g., M Size, L Size, XL Size">
+                    </div>
+                    <div class="form-group">
+                        <label for="editVariationDescription">Description</label>
+                        <textarea class="form-control rounded" name="description" id="editVariationDescription" rows="3" placeholder="Variation description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVariationDiscountType">Discount Type</label>
+                        <select class="form-control rounded" name="discount_type" id="editVariationDiscountType">
+                            <option value="">No Discount</option>
+                            <option value="fixed">Fixed</option>
+                            <option value="percentage">Percentage</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVariationDiscountValue">Discount Value</label>
+                        <input type="number" step="0.01" min="0" class="form-control rounded" name="discount_value" id="editVariationDiscountValue" placeholder="0.00">
+                        <small class="form-text text-muted" id="discountValueHelp">Enter discount value based on selected type</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="editVariationStatus">Status</label>
+                        <select class="form-control rounded" name="status" id="editVariationStatus">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Close</button>
+                <button type="button" id="updateVariationBtn" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Update Variation</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Price Update Modal -->
 <div class="modal fade" id="priceUpdateModal" tabindex="-1" role="dialog" aria-labelledby="priceUpdateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
@@ -357,7 +444,16 @@ $(document).ready(function() {
     $("#addNewVariation").on('click', function() {
         $("#addVariationForm")[0].reset();
         $("#variationProductId").val(productId);
+        // Reset discount fields
+        $('#variationDiscountType').val('');
+        $('#variationDiscountValue').val('');
+        WinPos.Product.updateAddDiscountFields();
         WinPos.Common.showBootstrapModal("addVariationModal");
+    });
+    
+    // Handle discount type change in add modal
+    $(document).on('change', '#variationDiscountType', function() {
+        WinPos.Product.updateAddDiscountFields();
     });
 
     // Save variation
@@ -365,91 +461,37 @@ $(document).ready(function() {
         WinPos.Product.saveVariation();
     });
 
-    // Edit variation
+    // Edit variation - open modal
     $(document).on('click', '.edit-variation', function() {
         let variationId = $(this).data('variation-id');
         let row = $('tr[data-variation-id="' + variationId + '"]');
-        let isEditable = row.data('is-editable') === true || row.data('is-editable') === 'true';
-        let hasSales = row.data('has-sales') === true || row.data('has-sales') === 'true';
+        let status = row.data('status');
         
-        // Check if variation is inactive
-        if(row.hasClass('table-secondary')){
-            toastr.error('Cannot edit inactive variant.');
+        // Check if variation is closed
+        if(status === 'closed'){
+            toastr.error('Cannot edit closed variation.');
             return;
         }
         
-        // Check if variation can be edited
-        if(!isEditable){
-            if(hasSales){
-                toastr.error('Cannot edit variation. This variation has sales items associated with it.');
-            } else {
-                toastr.error('Cannot edit this variation.');
-            }
-            return;
-        }
-        
-        // Make inputs editable - remove readonly attribute and property
-        row.find('.variation-tagline').removeAttr('readonly').prop('readonly', false);
-        row.find('.variation-description').removeAttr('readonly').prop('readonly', false);
-        
-        // Add visual indication that fields are editable
-        row.find('.variation-tagline, .variation-description').addClass('editing');
-        
-        // Status dropdown is always enabled (can always change status)
-        // No need to enable/disable it here
-        
-        // Show save button, hide edit button
-        row.find('.edit-variation').hide();
-        row.find('.save-variation').show();
-        
-        // Focus on tagline input
-        setTimeout(function(){
-            row.find('.variation-tagline').focus().select();
-        }, 100);
+        // Load variation data and open modal
+        WinPos.Product.openEditVariationModal(variationId);
     });
 
-    // Save variation from table
-    $(document).on('click', '.save-variation', function() {
+    // Update variation from modal
+    $(document).on('click', '#updateVariationBtn', function() {
+        WinPos.Product.updateVariationFromModal();
+    });
+    
+    // Handle discount type change
+    $(document).on('change', '#editVariationDiscountType', function() {
+        WinPos.Product.updateDiscountFields();
+    });
+
+
+    // Delete variation - only handle clicks on enabled buttons
+    $(document).on('click', '.delete-variation:not(:disabled)', function() {
         let variationId = $(this).data('variation-id');
-        WinPos.Product.updateVariationFromTable(variationId);
-    });
-
-    // Save status change automatically
-    $(document).on('change', '.variation-status', function() {
-        let variationId = $(this).data('variation-id');
-        let newStatus = $(this).val();
-        let originalStatus = $(this).data('original-status');
-        let row = $('tr[data-variation-id="' + variationId + '"]');
-        let hasSales = row.data('has-sales') === true || row.data('has-sales') === 'true';
-        
-        // If status hasn't changed, do nothing
-        if(newStatus === originalStatus){
-            return;
-        }
-        
-        // If variation has sales items, only save status (status-only update)
-        if(hasSales){
-            WinPos.Product.updateVariationStatusOnly(variationId, newStatus);
-        } else {
-            // If variation doesn't have sales, check if we're in edit mode
-            // If save button is visible, don't auto-save (let user click save)
-            // If save button is hidden, auto-save the status change
-            if(row.find('.save-variation').is(':visible')){
-                // In edit mode, don't auto-save - let user click save button
-                return;
-            } else {
-                // Not in edit mode, auto-save status change
-                WinPos.Product.updateVariationStatusOnly(variationId, newStatus);
-            }
-        }
-    });
-
-    // Delete variation
-    $(document).on('click', '.delete-variation', function() {
-        if (confirm("Are you sure you want to delete this variation?")) {
-            let variationId = $(this).data('variation-id');
-            WinPos.Product.deleteVariation(variationId);
-        }
+        WinPos.Product.deleteVariation(variationId);
     });
 
     // Show variation (for inactive variants - placeholder for future use)
@@ -463,9 +505,10 @@ $(document).ready(function() {
     $(document).on('click', '.stock-increase-btn', function() {
         let variationId = $(this).data('variation-id');
         let row = $('tr[data-variation-id="' + variationId + '"]');
-        // Check if variation is inactive
-        if(row.hasClass('table-secondary')){
-            toastr.error('Cannot update stock for inactive variant.');
+        let status = row.data('status');
+        // Check if variation is closed
+        if(status === 'closed'){
+            toastr.error('Cannot update stock for closed variant.');
             return;
         }
         WinPos.Product.openStockUpdateModal(variationId, 'add');
@@ -474,9 +517,10 @@ $(document).ready(function() {
     $(document).on('click', '.stock-decrease-btn', function() {
         let variationId = $(this).data('variation-id');
         let row = $('tr[data-variation-id="' + variationId + '"]');
-        // Check if variation is inactive
-        if(row.hasClass('table-secondary')){
-            toastr.error('Cannot update stock for inactive variant.');
+        let status = row.data('status');
+        // Check if variation is closed
+        if(status === 'closed'){
+            toastr.error('Cannot update stock for closed variant.');
             return;
         }
         WinPos.Product.openStockUpdateModal(variationId, 'move');
@@ -486,9 +530,10 @@ $(document).ready(function() {
     $(document).on('click', '.price-increase-btn, .price-decrease-btn', function() {
         let variationId = $(this).data('variation-id');
         let row = $('tr[data-variation-id="' + variationId + '"]');
-        // Check if variation is inactive
-        if(row.hasClass('table-secondary')){
-            toastr.error('Cannot update price for inactive variant.');
+        let status = row.data('status');
+        // Check if variation is closed
+        if(status === 'closed'){
+            toastr.error('Cannot update price for closed variant.');
             return;
         }
         WinPos.Product.openPriceUpdateModal(variationId);

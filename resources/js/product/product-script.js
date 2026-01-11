@@ -143,6 +143,29 @@ WinPos.Product = (function (Urls){
     var saveVariation = function (){
         let formData = WinPos.Common.getFormData("#addVariationForm");
         
+        // Validate discount if type is selected
+        let discountType = $('#variationDiscountType').val();
+        let discountValue = $('#variationDiscountValue').val();
+        
+        if(discountType && (!discountValue || parseFloat(discountValue) <= 0)){
+            toastr.error('Please enter a valid discount value.');
+            return;
+        }
+        
+        if(discountType === 'percentage' && parseFloat(discountValue) > 100){
+            toastr.error('Percentage discount cannot exceed 100%.');
+            return;
+        }
+        
+        // If no discount type, clear discount value
+        if(!discountType){
+            formData.discount_type = null;
+            formData.discount_value = null;
+        } else {
+            formData.discount_type = discountType;
+            formData.discount_value = discountValue ? parseFloat(discountValue) : null;
+        }
+        
         WinPos.Common.postAjaxCall(Urls.storeVariation, JSON.stringify(formData), function (response){
             if(response.status === 'success'){
                 toastr.success(response.message);
@@ -154,37 +177,158 @@ WinPos.Product = (function (Urls){
             }
         });
     }
-
-    var updateVariationFromTable = function (variationId){
-        let row = $('tr[data-variation-id="' + variationId + '"]');
+    
+    var updateAddDiscountFields = function(){
+        let discountType = $('#variationDiscountType').val();
+        let discountValueInput = $('#variationDiscountValue');
+        let helpText = $('#addDiscountValueHelp');
         
-        // Check if variation is inactive (only check table-secondary class)
-        if(row.hasClass('table-secondary')){
-            toastr.error('Cannot update inactive variant.');
+        if(discountType === ''){
+            discountValueInput.prop('disabled', true);
+            discountValueInput.val('');
+            helpText.text('Select discount type first');
+        } else if(discountType === 'percentage'){
+            discountValueInput.prop('disabled', false);
+            discountValueInput.attr('max', '100');
+            discountValueInput.attr('step', '0.01');
+            helpText.text('Enter percentage (max 100%)');
+        } else if(discountType === 'fixed'){
+            discountValueInput.prop('disabled', false);
+            discountValueInput.removeAttr('max'); // No max for fixed when creating (selling price is 0 initially)
+            discountValueInput.attr('step', '0.01');
+            helpText.text('Enter fixed amount in tk');
+        }
+    }
+
+    var openEditVariationModal = function (variationId){
+        // Get variation data from the table row
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        let status = row.data('status') || 'active';
+        
+        // Check if variation is closed
+        if(status === 'closed'){
+            toastr.error('Cannot edit closed variation.');
             return;
         }
         
+        // Get full description from data attribute or fetch from backend
+        // For now, get from the row - we'll need to store full description in data attribute
+        let tagline = row.find('td:eq(0)').text().trim();
+        let descriptionText = row.find('td:eq(1)').text().trim();
+        // Remove the "..." if it was truncated
+        if(descriptionText.endsWith('...')){
+            descriptionText = descriptionText.slice(0, -3);
+        }
+        if(descriptionText === '-') descriptionText = '';
+        
+        // Get full description from data attribute if available, otherwise use truncated version
+        let fullDescription = row.data('full-description') || descriptionText;
+        
+        // Get discount data from data attributes
+        let discountType = row.data('discount-type') || '';
+        let discountValue = row.data('discount-value') || '';
+        
+        // Populate modal with current variation data
+        $('#editVariationId').val(variationId);
+        $('#editVariationTagline').val(tagline);
+        $('#editVariationDescription').val(fullDescription);
+        $('#editVariationStatus').val(status);
+        $('#editVariationDiscountType').val(discountType);
+        $('#editVariationDiscountValue').val(discountValue);
+        
+        // Update discount value help text and max based on type
+        updateDiscountFields();
+        
+        // Disable status dropdown if variation is closed (shouldn't happen, but safety check)
+        if(status === 'closed'){
+            $('#editVariationStatus').prop('disabled', true);
+        } else {
+            $('#editVariationStatus').prop('disabled', false);
+        }
+        
+        // Open modal
+        WinPos.Common.showBootstrapModal("editVariationModal");
+    }
+    
+    var updateDiscountFields = function(){
+        let discountType = $('#editVariationDiscountType').val();
+        let discountValueInput = $('#editVariationDiscountValue');
+        let helpText = $('#discountValueHelp');
+        let sellingPrice = parseFloat($('tr[data-variation-id="' + $('#editVariationId').val() + '"]').find('.variation-selling-price').val() || 0);
+        
+        if(discountType === ''){
+            discountValueInput.prop('disabled', true);
+            discountValueInput.val('');
+            helpText.text('Select discount type first');
+        } else if(discountType === 'percentage'){
+            discountValueInput.prop('disabled', false);
+            discountValueInput.attr('max', '100');
+            discountValueInput.attr('step', '0.01');
+            helpText.text('Enter percentage (max 100%)');
+        } else if(discountType === 'fixed'){
+            discountValueInput.prop('disabled', false);
+            discountValueInput.attr('max', sellingPrice);
+            discountValueInput.attr('step', '0.01');
+            helpText.text('Enter fixed amount (max ' + sellingPrice.toFixed(2) + 'tk)');
+        }
+    }
+
+    var updateVariationFromModal = function (){
+        let variationId = $('#editVariationId').val();
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        
+        // Get current selling price and stock from the table (not from modal)
+        let sellingPrice = parseFloat(row.find('.variation-selling-price').val() || 0);
+        let stock = parseInt(row.find('.variation-stock').val() || 0);
+        
+        // Get discount data
+        let discountType = $('#editVariationDiscountType').val();
+        let discountValue = $('#editVariationDiscountValue').val();
+        
+        // Validate discount
+        if(discountType && (!discountValue || parseFloat(discountValue) <= 0)){
+            toastr.error('Please enter a valid discount value.');
+            return;
+        }
+        
+        if(discountType === 'percentage' && parseFloat(discountValue) > 100){
+            toastr.error('Percentage discount cannot exceed 100%.');
+            return;
+        }
+        
+        if(discountType === 'fixed' && parseFloat(discountValue) > sellingPrice){
+            toastr.error('Fixed discount cannot exceed selling price.');
+            return;
+        }
+        
+        // If no discount type, clear discount value
+        if(!discountType){
+            discountValue = null;
+        }
+        
         let formData = {
-            tagline: row.find('.variation-tagline').val(),
-            description: row.find('.variation-description').val(),
-            selling_price: row.find('.variation-selling-price').val(),
-            stock: row.find('.variation-stock').val(),
-            status: row.find('.variation-status').val()
+            tagline: $('#editVariationTagline').val(),
+            description: $('#editVariationDescription').val(),
+            selling_price: sellingPrice,
+            stock: stock,
+            status: $('#editVariationStatus').val(),
+            discount_type: discountType || null,
+            discount_value: discountValue ? parseFloat(discountValue) : null
         };
+        
+        // Validation
+        if(!formData.tagline || formData.tagline.trim() === ''){
+            toastr.error('Tagline is required.');
+            return;
+        }
         
         WinPos.Common.putAjaxCallPost(Urls.updateVariation.replace("variationID", variationId), JSON.stringify(formData), function (response){
             if(response.status === 'success'){
                 toastr.success(response.message);
-                // Make inputs readonly again
-                row.find('.variation-tagline').prop('readonly', true).attr('readonly', 'readonly');
-                row.find('.variation-description').prop('readonly', true).attr('readonly', 'readonly');
-                // Remove editing class
-                row.find('.variation-tagline, .variation-description').removeClass('editing');
-                // Status dropdown is always enabled (can always change status)
-                // No need to disable it
-                // Show edit button, hide save button
-                row.find('.edit-variation').show();
-                row.find('.save-variation').hide();
+                // Close modal
+                WinPos.Common.hideBootstrapModal("editVariationModal");
+                // Reload page to reflect changes
+                location.reload();
             }else{
                 WinPos.Common.showValidationErrors(response.errors);
             }
@@ -225,13 +369,13 @@ WinPos.Product = (function (Urls){
                 toastr.success(response.message);
                 // Update the original status data attribute
                 row.find('.variation-status').data('original-status', newStatus);
-                // Update row class if status changed to inactive
-                if(newStatus === 'inactive'){
+                // Update row class if status changed to inactive or closed
+                if(newStatus === 'inactive' || newStatus === 'closed'){
                     row.addClass('table-secondary');
                     // Make fields readonly
                     row.find('.variation-tagline').prop('readonly', true).attr('readonly', 'readonly');
                     row.find('.variation-description').prop('readonly', true).attr('readonly', 'readonly');
-                    // Status dropdown should remain enabled (can always change status)
+                    // Status dropdown should remain enabled (can always change status, except closed)
                 } else {
                     row.removeClass('table-secondary');
                     // Status dropdown should remain enabled
@@ -269,10 +413,17 @@ WinPos.Product = (function (Urls){
 
     var deleteVariation = function (variationId){
         let row = $('tr[data-variation-id="' + variationId + '"]');
+        let deleteBtn = row.find('.delete-variation');
+        let canDelete = deleteBtn.data('can-delete') === true || deleteBtn.data('can-delete') === 'true';
         
-        // Check if variation is inactive (only check table-secondary class, not disabled status)
-        if(row.hasClass('table-secondary')){
-            toastr.error('Cannot delete inactive variant.');
+        // Check if delete is allowed
+        if(!canDelete){
+            toastr.error('Cannot delete this variation. Only active variations with no stock and no sales can be deleted.');
+            return;
+        }
+        
+        // Confirm deletion
+        if (!confirm("Are you sure you want to delete this variation?")) {
             return;
         }
         
@@ -597,16 +748,31 @@ WinPos.Product = (function (Urls){
     }
 
     var updateVariationPrice = function (variationId, newPrice){
-        let formData = {
-            selling_price: newPrice
-        };
-        
         // Get current variation data from table
         let row = $('tr[data-variation-id="' + variationId + '"]');
-        formData.tagline = row.find('.variation-tagline').val();
-        formData.description = row.find('.variation-description').val();
-        formData.stock = row.find('.variation-stock').val();
-        formData.status = row.find('.variation-status').val();
+        
+        // Get data from table cells and data attributes
+        let tagline = row.find('td:eq(0)').text().trim();
+        let descriptionText = row.find('td:eq(1)').text().trim();
+        if(descriptionText.endsWith('...')){
+            descriptionText = descriptionText.slice(0, -3);
+        }
+        if(descriptionText === '-') descriptionText = '';
+        let fullDescription = row.data('full-description') || descriptionText;
+        let stock = parseInt(row.find('.variation-stock').val() || 0);
+        let status = row.data('status') || 'active';
+        let discountType = row.data('discount-type') || '';
+        let discountValue = row.data('discount-value') || '';
+        
+        let formData = {
+            tagline: tagline,
+            description: fullDescription,
+            selling_price: newPrice,
+            stock: stock,
+            status: status,
+            discount_type: discountType || null,
+            discount_value: discountValue ? parseFloat(discountValue) : null
+        };
         
         WinPos.Common.putAjaxCallPost(Urls.updateVariation.replace("variationID", variationId), JSON.stringify(formData), function (response){
             if(response.status === 'success'){
@@ -615,6 +781,8 @@ WinPos.Product = (function (Urls){
                 row.find('.variation-selling-price').val(newPrice);
                 // Close modal
                 WinPos.Common.hideBootstrapModal("priceUpdateModal");
+                // Reload page to reflect changes
+                location.reload();
             }else{
                 WinPos.Common.showValidationErrors(response.errors);
             }
@@ -698,7 +866,10 @@ WinPos.Product = (function (Urls){
         deleteProduct: deleteProduct,
         loadProductDetails: loadProductDetails,
         saveVariation: saveVariation,
-        updateVariationFromTable: updateVariationFromTable,
+        openEditVariationModal: openEditVariationModal,
+        updateVariationFromModal: updateVariationFromModal,
+        updateDiscountFields: updateDiscountFields,
+        updateAddDiscountFields: updateAddDiscountFields,
         updateVariationStatusOnly: updateVariationStatusOnly,
         deleteVariation: deleteVariation,
         openStockUpdateModal: openStockUpdateModal,

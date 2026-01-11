@@ -148,8 +148,36 @@ class VariationController extends Controller
                 'product_id' => 'required|exists:products,id',
                 'tagline' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
-                'status' => 'nullable|string|in:active,inactive'
+                'status' => 'nullable|string|in:active,inactive,closed',
+                'discount_type' => 'nullable|string|in:fixed,percentage',
+                'discount_value' => 'nullable|numeric|min:0',
             ]);
+            
+            // Validate discount value based on type
+            if ($request->has('discount_type') && $request->discount_type) {
+                if (!$request->has('discount_value') || $request->discount_value === null) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Discount value is required when discount type is selected.',
+                        'errors' => [
+                            'discount_value' => ['Discount value is required when discount type is selected.']
+                        ]
+                    ], 422);
+                }
+                
+                if ($request->discount_type === 'percentage' && $request->discount_value > 100) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Percentage discount cannot exceed 100%.',
+                        'errors' => [
+                            'discount_value' => ['Percentage discount cannot exceed 100%.']
+                        ]
+                    ], 422);
+                }
+            } else {
+                // If no discount type, ensure discount value is also null
+                $request->merge(['discount_value' => null]);
+            }
 
             // Verify product exists and belongs to the user's POSID
             $product = Product::where('POSID', $POSID)
@@ -191,6 +219,8 @@ class VariationController extends Controller
             $variation->selling_price = 0;
             $variation->stock = 0;
             $variation->status = $status;
+            $variation->discount_type = $request->discount_type ?? null;
+            $variation->discount_value = $request->discount_value ? (float)$request->discount_value : null;
 
             $variation->save();
 
@@ -227,8 +257,46 @@ class VariationController extends Controller
                 'description' => 'nullable|string|max:1000',
                 'selling_price' => 'required|numeric|min:0',
                 'stock' => 'required|integer|min:0',
-                'status' => 'nullable|string|in:active,inactive'
+                'status' => 'nullable|string|in:active,inactive,closed',
+                'discount_type' => 'nullable|string|in:fixed,percentage',
+                'discount_value' => 'nullable|numeric|min:0',
             ]);
+            
+            // Validate discount value based on type
+            if ($request->has('discount_type') && $request->discount_type) {
+                if (!$request->has('discount_value') || $request->discount_value === null) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Discount value is required when discount type is selected.',
+                        'errors' => [
+                            'discount_value' => ['Discount value is required when discount type is selected.']
+                        ]
+                    ], 422);
+                }
+                
+                if ($request->discount_type === 'percentage' && $request->discount_value > 100) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Percentage discount cannot exceed 100%.',
+                        'errors' => [
+                            'discount_value' => ['Percentage discount cannot exceed 100%.']
+                        ]
+                    ], 422);
+                }
+                
+                if ($request->discount_type === 'fixed' && $request->discount_value > $request->selling_price) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Fixed discount cannot exceed selling price.',
+                        'errors' => [
+                            'discount_value' => ['Fixed discount cannot exceed selling price.']
+                        ]
+                    ], 422);
+                }
+            } else {
+                // If no discount type, ensure discount value is also null
+                $request->merge(['discount_value' => null]);
+            }
 
             $variation = Variation::with('product')
                 ->where('id', $id)
@@ -304,6 +372,8 @@ class VariationController extends Controller
             $variation->selling_price = (float)$request->selling_price;
             $variation->stock = (int)$request->stock;
             $variation->status = $status;
+            $variation->discount_type = $request->discount_type ?? null;
+            $variation->discount_value = $request->discount_value ? (float)$request->discount_value : null;
 
             $variation->save();
 
@@ -354,14 +424,19 @@ class VariationController extends Controller
                 ], 403);
             }
 
-            // Check if variation has purchase items (any purchase items, not just unallocated)
-            $purchaseItemsCount = PurchaseItem::where('product_variant_id', $id)
-                ->count();
-
-            if ($purchaseItemsCount > 0) {
+            // Check if variation is active
+            if ($variation->status !== 'active') {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Cannot delete variation. This variation has ' . $purchaseItemsCount . ' purchase item(s) associated with it.'
+                    'message' => 'Only active variations can be deleted.'
+                ], 422);
+            }
+
+            // Check if variation has stock
+            if ($variation->stock > 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Cannot delete variation. This variation has ' . $variation->stock . ' stock remaining.'
                 ], 422);
             }
 
@@ -689,8 +764,8 @@ class VariationController extends Controller
             $newVariation->status = 'active';
             $newVariation->save();
 
-            // Mark original variation as inactive
-            $variation->status = 'inactive';
+            // Mark original variation as closed
+            $variation->status = 'closed';
             $variation->stock = 0; // Clear stock from original
             $variation->save();
 
@@ -700,7 +775,7 @@ class VariationController extends Controller
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Fresh variant created successfully. Original variant marked as inactive.',
+                'message' => 'Fresh variant created successfully. Original variant marked as closed.',
                 'variation' => $newVariation
             ]);
         } catch (Exception $exception) {

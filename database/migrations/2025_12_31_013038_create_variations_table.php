@@ -21,6 +21,8 @@ return new class extends Migration
             $table->double('selling_price')->default(0);
             $table->integer('stock')->default(1);
             $table->string('status')->default('active');
+            $table->string('discount_type')->nullable()->comment('fixed or percentage');
+            $table->double('discount_value')->nullable();
             $table->timestamps();
             
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');

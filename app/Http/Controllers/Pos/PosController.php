@@ -451,6 +451,7 @@ class PosController extends Controller
 
         $productVariations = Variation::where('POSID', $POSID)
             ->whereIn('id', $variationIds)
+            ->where('status', '!=', 'closed')
             ->get();
 
         $salesItems = [];

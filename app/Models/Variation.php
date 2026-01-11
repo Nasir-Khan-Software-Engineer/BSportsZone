@@ -18,11 +18,14 @@ class Variation extends Model
         'selling_price',
         'stock',
         'status',
+        'discount_type',
+        'discount_value',
     ];
 
     protected $casts = [
         'selling_price' => 'double',
         'stock' => 'integer',
+        'discount_value' => 'double',
     ];
 
     public function product(): BelongsTo
@@ -38,5 +41,10 @@ class Variation extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+    
+    public function scopeNotClosed($query)
+    {
+        return $query->where('status', '!=', 'closed');
     }
 }

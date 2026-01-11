@@ -226,6 +226,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::post('/store', 'store')->name('variation.store');
             Route::get('/{variation}/purchase-items', 'getPurchaseItems')->name('variation.purchase-items');
             Route::post('/{variation}/add-stock', 'addStockFromPurchaseItem')->name('variation.add-stock');
+            Route::post('/{variation}/move-stock', 'moveStockToPurchase')->name('variation.move-stock');
             Route::get('/{variation}/price-update-info', 'getPriceUpdateInfo')->name('variation.price-update-info');
             Route::post('/{variation}/create-fresh-variant', 'createFreshVariant')->name('variation.create-fresh-variant');
             Route::get('/{variation}', 'show')->name('variation.show');

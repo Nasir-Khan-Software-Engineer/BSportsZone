@@ -428,14 +428,15 @@ class VariationController extends Controller
                 ->where('type', 'Product')
                 ->sum('quantity');
 
-            // Format the data for the frontend with enabled/disabled logic
-            $formattedItems = $purchaseItems->map(function($item) use ($variation) {
-                $status = $item->status ?? 'reserved'; // Default to reserved if null
+            // Format the data for the frontend - only show sellable items
+            $formattedItems = $purchaseItems->filter(function($item) {
+                $status = $item->status ?? 'reserved';
+                return $status === 'sellable';
+            })->map(function($item) use ($variation) {
+                $status = $item->status ?? 'reserved';
                 $unallocatedQty = $item->unallocated_qty ?? 0;
-                
-                // Determine if this item should be enabled
-                // Only "sellable" items are enabled in the stock update modal
-                $isEnabled = ($status === 'sellable' && $unallocatedQty > 0);
+                $purchasedQty = $item->purchased_qty ?? 0;
+                $allocatedQty = $purchasedQty - $unallocatedQty;
                 
                 return [
                     'id' => $item->id,
@@ -443,6 +444,9 @@ class VariationController extends Controller
                     'invoice_number' => $item->purchase->invoice_number ?? 'N/A',
                     'purchase_date' => $item->purchase->purchase_date ? formatDate($item->purchase->purchase_date) : 'N/A',
                     'available_stock' => $unallocatedQty,
+                    'purchased_qty' => $purchasedQty,
+                    'unallocated_qty' => $unallocatedQty,
+                    'allocated_qty' => $allocatedQty,
                     'cost_price' => $item->cost_price,
                     'selling_price' => $variation->selling_price,
                     'status' => match($status) {
@@ -451,10 +455,8 @@ class VariationController extends Controller
                         default => ucfirst($status)
                     },
                     'status_raw' => $status,
-                    'is_enabled' => $isEnabled,
-                    'sold_items' => 0, // Placeholder as per PRD - will be updated later
                 ];
-            });
+            })->values()->toArray();
 
             return response()->json([
                 'status' => 'success',
@@ -512,6 +514,15 @@ class VariationController extends Controller
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Invalid purchase item for this variation.'
+                ], 400);
+            }
+
+            // Verify purchase item is sellable
+            $status = $purchaseItem->status ?? 'reserved';
+            if ($status !== 'sellable') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Only sellable purchase items can be added to product.'
                 ], 400);
             }
 
@@ -691,6 +702,106 @@ class VariationController extends Controller
                 'status' => 'success',
                 'message' => 'Fresh variant created successfully. Original variant marked as inactive.',
                 'variation' => $newVariation
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong.',
+            ], 500);
+        }
+    }
+
+    public function moveStockToPurchase(Request $request, $id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $request->validate([
+                'current_purchase_item_id' => 'required|exists:purchase_items,id',
+                'quantity' => 'required|integer|min:1',
+            ]);
+
+            $variation = Variation::with('product')
+                ->where('POSID', $POSID)
+                ->where('id', $id)
+                ->first();
+
+            if (!$variation) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Variation not found.'
+                ], 404);
+            }
+
+            // Verify product belongs to the user's POSID
+            if ($variation->product->POSID != $POSID) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Unauthorized access.'
+                ], 403);
+            }
+
+            $purchaseItem = PurchaseItem::findOrFail($request->current_purchase_item_id);
+
+            // Verify purchase item belongs to this variation
+            if ($purchaseItem->product_variant_id != $id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Invalid purchase item for this variation.'
+                ], 400);
+            }
+
+            // Verify purchase item is sellable
+            $status = $purchaseItem->status ?? 'reserved';
+            if ($status !== 'sellable') {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Only sellable purchase items can be moved back to purchase.'
+                ], 400);
+            }
+
+            // Calculate allocated quantity (items already added to product)
+            $allocatedQty = $purchaseItem->purchased_qty - $purchaseItem->unallocated_qty;
+
+            // Verify quantity doesn't exceed allocated quantity
+            if ($request->quantity > $allocatedQty) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Insufficient allocated stock. Maximum available: ' . $allocatedQty
+                ], 400);
+            }
+
+            // Verify variation has enough stock
+            if ($request->quantity > $variation->stock) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Insufficient variation stock. Available: ' . $variation->stock
+                ], 400);
+            }
+
+            DB::transaction(function () use ($variation, $purchaseItem, $request) {
+                // Decrease variation stock
+                $variation->stock -= $request->quantity;
+                $variation->save();
+
+                // Increase purchase item unallocated quantity (move back to purchase)
+                $purchaseItem->unallocated_qty += $request->quantity;
+                $purchaseItem->save();
+            });
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Stock moved back to purchase successfully.',
+                'variation' => [
+                    'id' => $variation->id,
+                    'stock' => $variation->stock,
+                ]
+            ]);
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => '',
+                'errors' => $exception->validator->errors()
             ]);
         } catch (Exception $exception) {
             return response()->json([

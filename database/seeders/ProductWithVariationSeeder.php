@@ -6,7 +6,6 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Product;
 use App\Models\Variation;
-use App\Models\Supplier;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Unit;
@@ -25,8 +24,7 @@ class ProductWithVariationSeeder extends Seeder
         $POSID = 1;
         $createdBy = 1;
 
-        // Get existing suppliers, brands, categories, and units
-        $suppliers = Supplier::where('POSID', $POSID)->pluck('id')->toArray();
+        // Get existing brands, categories, and units
         $brands = Brand::where('POSID', $POSID)->pluck('id')->toArray();
         $categories = Category::where('POSID', $POSID)->pluck('id')->toArray();
         $units = Unit::where('POSID', $POSID)->pluck('id')->toArray();
@@ -37,8 +35,6 @@ class ProductWithVariationSeeder extends Seeder
 
         // Create 20 products
         for ($i = 1; $i <= 20; $i++) {
-            // Random supplier
-            $supplierId = !empty($suppliers) ? $suppliers[array_rand($suppliers)] : null;
             $brandId = !empty($brands) ? $brands[array_rand($brands)] : null;
             $unitId = !empty($units) ? $units[array_rand($units)] : null;
 
@@ -50,7 +46,6 @@ class ProductWithVariationSeeder extends Seeder
             $product->type = 'Product';
             $product->price = 0; // Random price between 100 and 5000
             $product->description = 'This is a description for Product ' . $i;
-            $product->supplier_id = $supplierId;
             $product->brand_id = $brandId;
             $product->unit_id = $unitId;
             $product->created_by = $createdBy;

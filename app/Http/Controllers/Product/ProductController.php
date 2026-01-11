@@ -150,7 +150,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $POSID = auth()->user()->POSID;
-        $product = Product::with('categories', 'salesItemProducts', 'variations', 'brand', 'unit', 'supplier')->where('POSID', $POSID)
+        $product = Product::with('categories', 'salesItemProducts', 'variations', 'brand', 'unit')->where('POSID', $POSID)
             ->where('id', $id)->where('type', 'Product')
             ->first();
         
@@ -188,21 +188,19 @@ class ProductController extends Controller
         $brands = Brand::where('POSID', '=', $POSID)->get();
         $categories = Category::where('POSID', '=', $POSID)->get();
         $units = Unit::where('POSID', '=', $POSID)->get();
-        $suppliers = Supplier::where('POSID', '=', $POSID)->get();
         
         return view('product.edit', [
             'product' => $product,
             'brands' => $brands,
             'categories' => $categories,
-            'units' => $units,
-            'suppliers' => $suppliers
+            'units' => $units
         ]);
     }
 
     public function show($id)
     {
         $POSID = auth()->user()->POSID;
-        $product = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'supplier', 'salesItemProducts', 'variations')
+        $product = Product::with('creator', 'updater', 'brand', 'categories', 'unit', 'salesItemProducts', 'variations')
             ->where('POSID', $POSID)->where('type', 'Product')
             ->where('id', $id)
             ->first();
@@ -347,7 +345,6 @@ class ProductController extends Controller
             $product->description = $request->description;
             $product->unit_id = $request->unit_id ?: null;
             $product->brand_id = $request->brand_id ?: null;
-            $product->supplier_id = $request->supplier_id ?: null;
             $product->created_by = auth()->user()->id;
 
             $product->save();
@@ -420,7 +417,6 @@ class ProductController extends Controller
             $product->description = $request->description;
             $product->unit_id = $request->unit_id ?: null;
             $product->brand_id = $request->brand_id ?: null;
-            $product->supplier_id = $request->supplier_id ?: null;
             $product->updated_by = auth()->id();
 
             $product->save();

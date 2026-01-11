@@ -324,7 +324,7 @@ WinPos.Product = (function (Urls){
         );
     }
 
-    var openStockUpdateModal = function (variationId){
+    var openStockUpdateModal = function (variationId, actionType){
         // Show loading state
         $('#purchaseItemsContainer').html('<p class="text-muted text-center p-3">Loading purchase items...</p>');
         $('#modalVariationTagline').text('Loading...');
@@ -332,6 +332,9 @@ WinPos.Product = (function (Urls){
         $('#currentSellingPriceDisplay').text('-');
         $('#currentStocksDisplay').text('-');
         $('#alreadySalesQtyDisplay').text('-');
+        
+        // Store action type for later use
+        $('#stockUpdateModal').data('action-type', actionType || 'add');
         
         // Open modal
         WinPos.Common.showBootstrapModal("stockUpdateModal");
@@ -341,7 +344,7 @@ WinPos.Product = (function (Urls){
             if(response.status === 'success'){
                 $('#modalVariationTagline').text(response.variation.tagline);
                 displayVariationInfo(response.variation);
-                displayPurchaseItems(response.purchase_items, response.variation);
+                displayPurchaseItems(response.purchase_items, response.variation, actionType || 'add');
             }else{
                 $('#purchaseItemsContainer').html('<p class="text-danger text-center p-3">' + (response.message || 'Failed to load purchase items.') + '</p>');
             }
@@ -355,8 +358,14 @@ WinPos.Product = (function (Urls){
         $('#alreadySalesQtyDisplay').text(variation.sold_items_qty || 0);
     }
 
-    var displayPurchaseItems = function (purchaseItems, variation){
+    var displayPurchaseItems = function (purchaseItems, variation, actionType){
         let container = $('#purchaseItemsContainer');
+        
+        // Safety check: ensure purchaseItems is an array
+        if(!purchaseItems || !Array.isArray(purchaseItems)){
+            container.html('<p class="text-danger text-center p-3">Invalid purchase items data received.</p>');
+            return;
+        }
         
         if(purchaseItems.length === 0){
             container.html('<p class="text-muted text-center p-3">No purchase items available for this variation.</p>');
@@ -371,45 +380,54 @@ WinPos.Product = (function (Urls){
         html += '<th class="text-center align-middle">Status</th>';
         html += '<th class="text-center align-middle">Cost Price</th>';
         html += '<th class="text-center align-middle">Available Stocks</th>';
+        html += '<th class="text-center align-middle">Action Type</th>';
         html += '<th class="text-center align-middle">Action</th>';
         html += '</tr>';
         html += '</thead>';
         html += '<tbody>';
         
         purchaseItems.forEach(function(item){
-            let isEnabled = item.is_enabled === true;
-            let rowClass = isEnabled ? '' : 'table-secondary';
-            let disabledAttr = isEnabled ? '' : 'disabled';
-            let disabledClass = isEnabled ? '' : 'disabled';
+            let unallocatedQty = item.unallocated_qty || 0;
+            let allocatedQty = item.allocated_qty || 0;
+            let defaultAction = actionType === 'move' ? 'move' : 'add';
             
-            html += '<tr class="' + rowClass + '">';
+            html += '<tr>';
             html += '<td class="text-center align-middle">' + (item.purchase_date || 'N/A') + '</td>';
             html += '<td class="text-center align-middle">' + (item.invoice_number || 'N/A') + '</td>';
             html += '<td class="text-center align-middle">';
-            html += '<span class="badge badge-' + (item.status_raw === 'sellable' ? 'success' : 'secondary') + '">';
+            html += '<span class="badge badge-success">';
             html += (item.status || 'N/A');
             html += '</span>';
             html += '</td>';
             html += '<td class="text-center align-middle">' + parseFloat(item.cost_price || 0).toFixed(2) + '</td>';
             html += '<td class="text-center align-middle">' + (item.available_stock || 0) + '</td>';
             html += '<td class="text-center align-middle">';
+            html += '<select class="form-control form-control-sm action-type-select" ';
+            html += 'id="actionType_' + item.id + '" ';
+            html += 'data-purchase-item-id="' + item.id + '">';
+            html += '<option value="add" ' + (defaultAction === 'add' ? 'selected' : '') + '>Add to Product</option>';
+            html += '<option value="move" ' + (defaultAction === 'move' ? 'selected' : '') + '>Back to Purchase</option>';
+            html += '</select>';
+            html += '</td>';
+            html += '<td class="text-center align-middle">';
             html += '<div class="d-flex align-items-center justify-content-center gap-2">';
             html += '<input type="number" ';
-            html += 'class="form-control form-control-sm ' + disabledClass + '" ';
+            html += 'class="form-control form-control-sm qty-input" ';
             html += 'id="qtyInput_' + item.id + '" ';
+            html += 'data-purchase-item-id="' + item.id + '" ';
+            html += 'data-unallocated-qty="' + unallocatedQty + '" ';
+            html += 'data-allocated-qty="' + allocatedQty + '" ';
             html += 'min="1" ';
-            html += 'max="' + (item.available_stock || 0) + '" ';
+            html += 'max="' + (defaultAction === 'add' ? unallocatedQty : allocatedQty) + '" ';
             html += 'value="1" ';
-            html += disabledAttr + ' ';
             html += 'style="width: 80px;">';
             html += '<button type="button" ';
-            html += 'class="btn btn-sm btn-success add-stock-btn ' + disabledClass + '" ';
+            html += 'class="btn btn-sm btn-success save-stock-btn" ';
             html += 'data-purchase-item-id="' + item.id + '" ';
             html += 'data-variation-id="' + variation.id + '" ';
             html += 'data-cost-price="' + item.cost_price + '" ';
-            html += 'data-selling-price="' + variation.selling_price + '" ';
-            html += disabledAttr + '>';
-            html += '<i class="fa-solid fa-plus"></i> Add';
+            html += 'data-selling-price="' + variation.selling_price + '">';
+            html += '<i class="fa-solid fa-save"></i> Save';
             html += '</button>';
             html += '</div>';
             html += '</td>';
@@ -420,6 +438,42 @@ WinPos.Product = (function (Urls){
         html += '</table></div>';
         
         container.html(html);
+        
+        // Add event listener for action type change
+        $(document).off('change', '.action-type-select').on('change', '.action-type-select', function() {
+            let purchaseItemId = $(this).data('purchase-item-id');
+            let actionType = $(this).val();
+            let qtyInput = $('#qtyInput_' + purchaseItemId);
+            let unallocatedQty = parseInt(qtyInput.data('unallocated-qty')) || 0;
+            let allocatedQty = parseInt(qtyInput.data('allocated-qty')) || 0;
+            let currentQty = parseInt(qtyInput.val()) || 1;
+            
+            // Update max value based on action type
+            if (actionType === 'add') {
+                qtyInput.attr('max', unallocatedQty);
+                if (currentQty > unallocatedQty || unallocatedQty === 0) {
+                    qtyInput.val(unallocatedQty > 0 ? unallocatedQty : 1);
+                }
+            } else {
+                qtyInput.attr('max', allocatedQty);
+                if (currentQty > allocatedQty || allocatedQty === 0) {
+                    qtyInput.val(allocatedQty > 0 ? allocatedQty : 1);
+                }
+            }
+        });
+        
+        // Add event listener for quantity input validation
+        $(document).off('input change', '.qty-input').on('input change', '.qty-input', function() {
+            let maxQty = parseInt($(this).attr('max')) || 1;
+            let currentQty = parseInt($(this).val()) || 1;
+            
+            if (currentQty > maxQty) {
+                $(this).val(maxQty);
+                toastr.warning('Quantity cannot exceed maximum allowed: ' + maxQty);
+            } else if (currentQty < 1) {
+                $(this).val(1);
+            }
+        });
     }
 
     var addStockFromPurchaseItem = function (variationId, purchaseItemId, quantity){
@@ -434,7 +488,28 @@ WinPos.Product = (function (Urls){
                 // Update the stock input in the table
                 $('tr[data-variation-id="' + variationId + '"] .variation-stock').val(response.variation.stock);
                 // Reload purchase items to update available stock
-                openStockUpdateModal(variationId);
+                let actionType = $('#stockUpdateModal').data('action-type') || 'add';
+                openStockUpdateModal(variationId, actionType);
+            }else{
+                WinPos.Common.showValidationErrors(response.errors);
+            }
+        });
+    }
+
+    var moveStockToPurchase = function (variationId, purchaseItemId, quantity){
+        let formData = {
+            current_purchase_item_id: purchaseItemId,
+            quantity: quantity
+        };
+        
+        WinPos.Common.postAjaxCall(Urls.moveStockToPurchase.replace('variationID', variationId), JSON.stringify(formData), function (response){
+            if(response.status === 'success'){
+                toastr.success(response.message);
+                // Update the stock input in the table
+                $('tr[data-variation-id="' + variationId + '"] .variation-stock').val(response.variation.stock);
+                // Reload purchase items to update available stock
+                let actionType = $('#stockUpdateModal').data('action-type') || 'move';
+                openStockUpdateModal(variationId, actionType);
             }else{
                 WinPos.Common.showValidationErrors(response.errors);
             }
@@ -628,6 +703,7 @@ WinPos.Product = (function (Urls){
         deleteVariation: deleteVariation,
         openStockUpdateModal: openStockUpdateModal,
         addStockFromPurchaseItem: addStockFromPurchaseItem,
+        moveStockToPurchase: moveStockToPurchase,
         openPriceUpdateModal: openPriceUpdateModal,
         updateVariationPrice: updateVariationPrice,
         createFreshVariant: createFreshVariant,
@@ -648,18 +724,14 @@ $(document).on('click', '.delete-product', function() {
     }
 });
 
-// Handle add stock from purchase item
-$(document).on('click', '.add-stock-btn', function() {
-    // Prevent action if button is disabled
-    if($(this).prop('disabled') || $(this).hasClass('disabled')){
-        return;
-    }
-    
+// Handle save stock from purchase item
+$(document).on('click', '.save-stock-btn', function() {
     let purchaseItemId = $(this).data('purchase-item-id');
     let variationId = $(this).data('variation-id');
     let costPrice = parseFloat($(this).data('cost-price'));
     let sellingPrice = parseFloat($(this).data('selling-price'));
     let quantity = parseInt($('#qtyInput_' + purchaseItemId).val());
+    let actionType = $('#actionType_' + purchaseItemId).val();
     
     if(!quantity || quantity < 1){
         toastr.error('Please enter a valid quantity.');
@@ -668,7 +740,7 @@ $(document).on('click', '.add-stock-btn', function() {
     
     let maxQty = parseInt($('#qtyInput_' + purchaseItemId).attr('max'));
     if(quantity > maxQty){
-        toastr.error('Quantity cannot exceed available stock: ' + maxQty);
+        toastr.error('Quantity cannot exceed maximum allowed: ' + maxQty);
         return;
     }
     
@@ -676,11 +748,21 @@ $(document).on('click', '.add-stock-btn', function() {
     $('#confirmStockUpdate').data('purchase-item-id', purchaseItemId);
     $('#confirmStockUpdate').data('variation-id', variationId);
     $('#confirmStockUpdate').data('quantity', quantity);
+    $('#confirmStockUpdate').data('action-type', actionType);
+    $('#confirmStockUpdate').data('cost-price', costPrice);
+    $('#confirmStockUpdate').data('selling-price', sellingPrice);
     
-    // Show confirmation modal
-    let confirmationMessage = 'The cost price of this product is ' + costPrice.toFixed(2) + ', ';
-    confirmationMessage += 'Are you sure want to sell this product for ' + sellingPrice.toFixed(2) + ' (Current price). ';
-    confirmationMessage += 'If not please update the price first.';
+    // Show confirmation modal with appropriate message
+    let confirmationMessage = '';
+    if (actionType === 'add') {
+        confirmationMessage = 'The cost price of this product is ' + costPrice.toFixed(2) + ', ';
+        confirmationMessage += 'Are you sure want to sell this product for ' + sellingPrice.toFixed(2) + ' (Current price). ';
+        confirmationMessage += 'If not please update the price first.';
+    } else {
+        confirmationMessage = 'The unit cost price of this purchase is: ' + costPrice.toFixed(2) + '. ';
+        confirmationMessage += 'Are you sure want to move ' + quantity + ' item(s) to this purchase? ';
+        confirmationMessage += 'You are currently selling this product at price: ' + sellingPrice.toFixed(2) + '.';
+    }
     $('#confirmationMessage').text(confirmationMessage);
     
     WinPos.Common.showBootstrapModal("stockUpdateConfirmationModal");
@@ -691,11 +773,21 @@ $(document).on('click', '#confirmStockUpdate', function() {
     let purchaseItemId = $(this).data('purchase-item-id');
     let variationId = $(this).data('variation-id');
     let quantity = $(this).data('quantity');
+    let actionType = $(this).data('action-type');
     
     // Close confirmation modal
     WinPos.Common.hideBootstrapModal("stockUpdateConfirmationModal");
     
-    // Add stock
-    WinPos.Product.addStockFromPurchaseItem(variationId, purchaseItemId, quantity);
+    // Perform action based on type
+    if (actionType === 'add') {
+        WinPos.Product.addStockFromPurchaseItem(variationId, purchaseItemId, quantity);
+    } else {
+        WinPos.Product.moveStockToPurchase(variationId, purchaseItemId, quantity);
+    }
+});
+
+// Handle modal close - reload page
+$(document).on('hidden.bs.modal', '#stockUpdateModal', function() {
+    location.reload();
 });
 

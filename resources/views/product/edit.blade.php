@@ -13,76 +13,78 @@
             </div>
         </div>
         <div class="card-body p-1">
-            <!-- Product Edit Form -->
+            <!-- Product Edit Form with Collapsible Tab -->
             <div class="card border mb-3">
-                <div class="card-header">
-                    <h5 class="mb-0">Product Information</h5>
+                <div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#productInfoCollapse" aria-expanded="false" aria-controls="productInfoCollapse">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span>Product Information</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </h5>
                 </div>
-                <div class="card-body">
-                    <form id="productEditForm">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" id="productId" name="product_id" value="{{ $product->id ?? '' }}">
-                        <div class="row">
-                            <div class="col-12 col-lg-4 form-group">
-                                <label for="editProductCode">Code*</label>
-                                <input required type="text" class="form-control rounded" name="code" id="editProductCode" value="{{ $product->code ?? '' }}">
-                            </div>
+                <div class="collapse" id="productInfoCollapse">
+                    <div class="card-body">
+                        <form id="productEditForm">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" id="productId" name="product_id" value="{{ $product->id ?? '' }}">
+                            <div class="row">
+                                <!-- Left Side: Code, Unit, Brand -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group">
+                                        <label for="editProductCode">Code*</label>
+                                        <input required type="text" class="form-control rounded" name="code" id="editProductCode" value="{{ $product->code ?? '' }}">
+                                    </div>
 
-                            <div class="col-12 col-lg-8 form-group">
-                                <label for="editProductName">Name*</label>
-                                <input required type="text" class="form-control rounded" name="name" id="editProductName" value="{{ $product->name ?? '' }}">
-                            </div>
+                                    <div class="form-group">
+                                        <label for="editProductUnit">Unit</label>
+                                        <select class="form-control rounded" name="unit_id" id="editProductUnit">
+                                            <option value="">Select Unit</option>
+                                            @foreach($units as $unit)
+                                                <option value="{{ $unit->id }}" {{ ($product->unit_id ?? '') == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
 
-                            <div class="col-12 col-lg-4 form-group">
-                                <label for="editProductUnit">Unit</label>
-                                <select class="form-control rounded" name="unit_id" id="editProductUnit">
-                                    <option value="">Select Unit</option>
-                                    @foreach($units as $unit)
-                                        <option value="{{ $unit->id }}" {{ ($product->unit_id ?? '') == $unit->id ? 'selected' : '' }}>{{ $unit->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                    <div class="form-group">
+                                        <label for="editProductBrand">Brand</label>
+                                        <select class="form-control rounded" name="brand_id" id="editProductBrand">
+                                            <option value="">Select Brand</option>
+                                            @foreach($brands as $brand)
+                                                <option value="{{ $brand->id }}" {{ ($product->brand_id ?? '') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
 
-                            <div class="col-12 col-lg-4 form-group">
-                                <label for="editProductBrand">Brand</label>
-                                <select class="form-control rounded" name="brand_id" id="editProductBrand">
-                                    <option value="">Select Brand</option>
-                                    @foreach($brands as $brand)
-                                        <option value="{{ $brand->id }}" {{ ($product->brand_id ?? '') == $brand->id ? 'selected' : '' }}>{{ $brand->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                <!-- Right Side: Name, Category -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="form-group">
+                                        <label for="editProductName">Name*</label>
+                                        <input required type="text" class="form-control rounded" name="name" id="editProductName" value="{{ $product->name ?? '' }}">
+                                    </div>
 
-                            <div class="col-12 col-lg-4 form-group">
-                                <label for="editProductSupplier">Supplier</label>
-                                <select class="form-control rounded" name="supplier_id" id="editProductSupplier">
-                                    <option value="">Select Supplier</option>
-                                    @foreach($suppliers as $supplier)
-                                        <option value="{{ $supplier->id }}" {{ ($product->supplier_id ?? '') == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                    <div class="form-group">
+                                        <label for="editProductCategory">Category*</label>
+                                        <select style="height: 120px;" multiple class="form-control rounded" name="category" id="editProductCategory" required>
+                                            @foreach($categories as $category)
+                                                <option value="{{ $category->id }}" {{ in_array($category->id, $product->categories->pluck('id')->toArray() ?? []) ? 'selected' : '' }}>{{ $category->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
 
-                            <div class="col-12 form-group">
-                                <label for="editProductCategory">Category*</label>
-                                <select style="height: 120px;" multiple class="form-control rounded" name="category" id="editProductCategory" required>
-                                    @foreach($categories as $category)
-                                        <option value="{{ $category->id }}" {{ in_array($category->id, $product->categories->pluck('id')->toArray() ?? []) ? 'selected' : '' }}>{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                                <!-- Description: Full Width -->
+                                <div class="col-12 form-group">
+                                    <label for="editProductDescription">Description</label>
+                                    <textarea name="description" id="editProductDescription" class="form-control rounded" cols="30" rows="5" placeholder="Product Description">{{ $product->description ?? '' }}</textarea>
+                                </div>
 
-                            <div class="col-12 form-group">
-                                <label for="editProductDescription">Description</label>
-                                <textarea name="description" id="editProductDescription" class="form-control rounded" cols="30" rows="5" placeholder="Product Description">{{ $product->description ?? '' }}</textarea>
+                                <div class="col-12">
+                                    <button type="button" id="updateProduct" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Update Product</button>
+                                </div>
                             </div>
-
-                            <div class="col-12">
-                                <button type="button" id="updateProduct" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Update Product</button>
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
 
@@ -221,7 +223,7 @@
 
 <!-- Stock Update Modal -->
 <div class="modal fade" id="stockUpdateModal" tabindex="-1" role="dialog" aria-labelledby="stockUpdateModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content rounded">
             <div class="modal-header rounded">
                 <h5 class="modal-title" id="stockUpdateModalLabel">Update Stock - <span id="modalVariationTagline"></span></h5>
@@ -266,7 +268,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Close</button>
+                <button type="button" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm" data-dismiss="modal" data-bs-dismiss="modal" id="closeStockUpdateModal"><i class="fa-solid fa-xmark"></i> Close</button>
             </div>
         </div>
     </div>
@@ -329,6 +331,7 @@ let productUrls = {
     'deleteVariation': "{{ route('product.variation.destroy',['variation' => 'variationID']) }}",
     'getPurchaseItems': "{{ route('product.variation.purchase-items',['variation' => 'variationID']) }}",
     'addStockFromPurchase': "{{ route('product.variation.add-stock',['variation' => 'variationID']) }}",
+    'moveStockToPurchase': "{{ route('product.variation.move-stock',['variation' => 'variationID']) }}",
     'getPriceUpdateInfo': "{{ route('product.variation.price-update-info',['variation' => 'variationID']) }}",
     'createFreshVariant': "{{ route('product.variation.create-fresh-variant',['variation' => 'variationID']) }}",
 };
@@ -336,6 +339,15 @@ let productUrls = {
 let productId = {{ $product->id ?? 'null' }};
 
 $(document).ready(function() {
+    // Handle collapsible Product Information tab icon rotation
+    $('#productInfoCollapse').on('show.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    });
+    
+    $('#productInfoCollapse').on('hide.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+    
     // Update product
     $("#updateProduct").on('click', function() {
         WinPos.Product.updateProduct(productId);
@@ -448,7 +460,7 @@ $(document).ready(function() {
     });
 
     // Stock increase/decrease buttons
-    $(document).on('click', '.stock-increase-btn, .stock-decrease-btn', function() {
+    $(document).on('click', '.stock-increase-btn', function() {
         let variationId = $(this).data('variation-id');
         let row = $('tr[data-variation-id="' + variationId + '"]');
         // Check if variation is inactive
@@ -456,7 +468,18 @@ $(document).ready(function() {
             toastr.error('Cannot update stock for inactive variant.');
             return;
         }
-        WinPos.Product.openStockUpdateModal(variationId);
+        WinPos.Product.openStockUpdateModal(variationId, 'add');
+    });
+
+    $(document).on('click', '.stock-decrease-btn', function() {
+        let variationId = $(this).data('variation-id');
+        let row = $('tr[data-variation-id="' + variationId + '"]');
+        // Check if variation is inactive
+        if(row.hasClass('table-secondary')){
+            toastr.error('Cannot update stock for inactive variant.');
+            return;
+        }
+        WinPos.Product.openStockUpdateModal(variationId, 'move');
     });
 
     // Price increase/decrease buttons

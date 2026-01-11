@@ -249,6 +249,10 @@
                             <i class="fa-solid fa-cart-shopping"></i> Purchases
                         </a>
 
+                        <a class="collapse-item {{ request()->routeIs('stock.return.*') ? 'active' : '' }}" href="{{ route('stock.return.index') }}">
+                            <i class="fa-solid fa-rotate-left"></i> Returns
+                        </a>
+
                     </div>
                 </div>
 

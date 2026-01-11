@@ -9,6 +9,7 @@ use App\Models\Variation;
 use App\Models\Product;
 use App\Models\PurchaseItem;
 use App\Models\Sales_items;
+use App\Models\StockTransaction;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -609,7 +610,9 @@ class VariationController extends Controller
                 ], 400);
             }
 
-            DB::transaction(function () use ($variation, $purchaseItem, $request) {
+            DB::transaction(function () use ($variation, $purchaseItem, $request, $POSID) {
+                $oldStock = $variation->stock;
+                
                 // Update variation stock
                 $variation->stock += $request->quantity;
                 $variation->save();
@@ -617,6 +620,21 @@ class VariationController extends Controller
                 // Update purchase item unallocated quantity
                 $purchaseItem->unallocated_qty -= $request->quantity;
                 $purchaseItem->save();
+
+                // Record stock transaction
+                StockTransaction::create([
+                    'POSID' => $POSID,
+                    'purchase_id' => $purchaseItem->purchase_id,
+                    'purchase_item_id' => $purchaseItem->id,
+                    'product_id' => $variation->product_id,
+                    'product_variant_id' => $variation->id,
+                    'quantity' => $request->quantity,
+                    'transaction_type' => 'Add to Product',
+                    'old_stock' => $oldStock,
+                    'new_stock' => $variation->stock,
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
             });
 
             return response()->json([
@@ -854,7 +872,9 @@ class VariationController extends Controller
                 ], 400);
             }
 
-            DB::transaction(function () use ($variation, $purchaseItem, $request) {
+            DB::transaction(function () use ($variation, $purchaseItem, $request, $POSID) {
+                $oldStock = $variation->stock;
+                
                 // Decrease variation stock
                 $variation->stock -= $request->quantity;
                 $variation->save();
@@ -862,6 +882,21 @@ class VariationController extends Controller
                 // Increase purchase item unallocated quantity (move back to purchase)
                 $purchaseItem->unallocated_qty += $request->quantity;
                 $purchaseItem->save();
+
+                // Record stock transaction
+                StockTransaction::create([
+                    'POSID' => $POSID,
+                    'purchase_id' => $purchaseItem->purchase_id,
+                    'purchase_item_id' => $purchaseItem->id,
+                    'product_id' => $variation->product_id,
+                    'product_variant_id' => $variation->id,
+                    'quantity' => $request->quantity,
+                    'transaction_type' => 'Move to Purchases',
+                    'old_stock' => $oldStock,
+                    'new_stock' => $variation->stock,
+                    'created_by' => auth()->id(),
+                    'updated_by' => auth()->id(),
+                ]);
             });
 
             return response()->json([

@@ -36,4 +36,9 @@ class Sales_items extends Model
     {
         return $this->belongsTo(Employee::class, 'staff_id');
     }
+
+    public function variation()
+    {
+        return $this->belongsTo(Variation::class, 'variation_id');
+    }
 }

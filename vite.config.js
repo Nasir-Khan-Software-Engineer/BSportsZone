@@ -52,7 +52,10 @@ export default defineConfig({
                 'resources/js/subscription.js',
                 'resources/js/loyalty/loyalty-script.js',
                 'resources/js/employee/employee-script.js',
-                'resources/js/attendance/attendance-script.js'
+                'resources/js/attendance/attendance-script.js',
+                'resources/js/product/product-script.js',
+                'resources/js/stock/purchase-script.js',
+                'resources/js/stock/return-script.js'
             
             ],
             refresh: true,

@@ -248,6 +248,23 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::put('/item/{purchaseItem}', 'updatePurchaseItem')->name('purchase.item.update');
             Route::delete('/item/{purchaseItem}', 'removePurchaseItem')->name('purchase.item.remove');
         });
+
+        Route::prefix('return')->controller(\App\Http\Controllers\Stock\ReturnController::class)->group(function () {
+            Route::get('/', 'index')->name('return.index');
+            Route::get('/datatable', 'datatable')->name('return.datatable');
+            Route::get('/create', 'create')->name('return.create');
+            Route::post('/store', 'store')->name('return.store');
+            Route::get('/{return}', 'show')->name('return.show');
+            Route::get('/{return}/edit', 'edit')->name('return.edit');
+            Route::put('/{return}', 'update')->name('return.update');
+            Route::get('/customer/search', 'searchCustomer')->name('return.customer.search');
+            Route::get('/customer/sales', 'getCustomerSales')->name('return.customer.sales');
+            Route::get('/sale/items', 'getSaleItems')->name('return.sale.items');
+            Route::post('/{return}/payment', 'storePayment')->name('return.payment.store');
+            Route::get('/{return}/payment/{payment}', 'getPayment')->name('return.payment.get');
+            Route::put('/{return}/payment/{payment}', 'updatePayment')->name('return.payment.update');
+            Route::delete('/{return}/payment/{payment}', 'destroyPayment')->name('return.payment.destroy');
+        });
     });
 
     Route::prefix('sales')->as('sales.')->group(function () {

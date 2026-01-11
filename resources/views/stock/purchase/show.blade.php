@@ -76,7 +76,6 @@
                                 <th class="text-center">Purchased Qty</th>
                                 <th class="text-center">Unallocated Qty</th>
                                 <th class="text-center">Allocated Qty</th>
-                                <th class="text-center">Sold Qty</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -105,7 +104,6 @@
                                 <td class="text-center">{{ $item->purchased_qty }}</td>
                                 <td class="text-center">{{ $item->unallocated_qty }}</td>
                                 <td class="text-center">{{ $item->purchased_qty - $item->unallocated_qty }}</td>
-                                <td class="text-center">{{ $item->sold_qty ?? 0 }}</td>
                             </tr>
                             @empty
                             <tr>

@@ -262,24 +262,6 @@ class PurchaseController extends Controller
         $purchase->formattedTime = formatTime($purchase->created_at);
         $purchase->createdBy = $purchase->creator->name ?? 'N/A';
 
-        // Calculate sold quantities for each purchase item
-        $variationIds = $purchase->purchaseItems->pluck('product_variant_id')->toArray();
-        $soldQuantities = [];
-        if (!empty($variationIds)) {
-            $soldQuantities = Sales_items::whereIn('variation_id', $variationIds)
-                ->where('POSID', $POSID)
-                ->where('type', 'Product')
-                ->selectRaw('variation_id, SUM(quantity) as total_sold_qty')
-                ->groupBy('variation_id')
-                ->pluck('total_sold_qty', 'variation_id')
-                ->toArray();
-        }
-
-        // Attach sold quantity to each purchase item
-        foreach ($purchase->purchaseItems as $item) {
-            $item->sold_qty = $soldQuantities[$item->product_variant_id] ?? 0;
-        }
-
         return view('stock.purchase.show', [
             'purchase' => $purchase
         ]);

@@ -142,7 +142,7 @@
                             </tbody>
                             <tfoot>
                                 <tr>
-                                    <td class="text-right"><strong>Total:</strong></td>
+                                    <td colspan="2" class="text-right"><strong>Total:</strong></td>
                                     <td class="text-center"><strong id="totalCost">{{ number_format($purchase->total_cost_price ?? 0, 2) }}</strong></td>
                                     <td class="text-center"><strong id="totalQty">{{ $purchase->total_qty ?? 0 }}</strong></td>
                                     <td class="text-center"><strong id="totalUnallocated">{{ $purchase->purchaseItems->sum('unallocated_qty') ?? 0 }}</strong></td>

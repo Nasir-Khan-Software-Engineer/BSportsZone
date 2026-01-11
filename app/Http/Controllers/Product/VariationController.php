@@ -226,7 +226,7 @@ class VariationController extends Controller
                 'tagline' => 'required|string|max:255',
                 'description' => 'nullable|string|max:1000',
                 'selling_price' => 'required|numeric|min:0',
-                'stock' => 'required|integer|min:1',
+                'stock' => 'required|integer|min:0',
                 'status' => 'nullable|string|in:active,inactive'
             ]);
 

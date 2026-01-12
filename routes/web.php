@@ -34,6 +34,7 @@ use App\Http\Controllers\Attendance\AttendanceController;
 use App\Http\Controllers\Product\ProductController;
 use App\Http\Controllers\Product\VariationController;
 use App\Http\Controllers\Stock\PurchaseController;
+use App\Http\Controllers\Media\ImageController;
 
 // help portal controllers
 use App\Http\Controllers\HelpPortal\LoyaltyHelpController;
@@ -217,7 +218,15 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::get('/{product}', 'show')->name('show');
             Route::post('/store', 'store')->name('store');
             Route::put('/{product}', 'update')->name('update');
+            Route::put('/{product}/seo', 'updateSeo')->name('update-seo');
+            Route::post('/{product}/toggle-published', 'togglePublished')->name('toggle-published');
             Route::delete('/{product}', 'destroy')->name('destroy');
+            Route::get('/images/list', 'getProductImagesList')->name('images.list');
+            Route::get('/{product}/images', 'getProductImages')->name('images.get');
+            Route::post('/{product}/images', 'storeProductImage')->name('images.store');
+            Route::get('/{product}/images/{image}', 'showProductImage')->name('images.show');
+            Route::post('/{product}/images/{image}/mark-default', 'markAsDefault')->name('images.mark-default');
+            Route::delete('/{product}/images/{image}', 'destroyProductImage')->name('images.destroy');
         });
 
         Route::prefix('variation')->controller(VariationController::class)->group(function () {
@@ -317,6 +326,16 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::post('/mark-all-present', 'markAllPresent')->name('attendance.mark-all-present');
         Route::get('/designations', 'getDesignations')->name('attendance.designations');
         Route::get('/check-today-status', 'checkTodayAttendanceStatus')->name('attendance.check-today-status')->middleware('permission');
+    });
+
+    Route::prefix('media')->as('media.')->group(function () {
+        Route::prefix('image')->controller(ImageController::class)->group(function () {
+            Route::get('/', 'index')->name('image.index');
+            Route::get('/datatable', 'datatable')->name('image.datatable');
+            Route::post('/store', 'store')->name('image.store');
+            Route::get('/{image}', 'show')->name('image.show');
+            Route::delete('/{image}', 'destroy')->name('image.destroy');
+        });
     });
 
     Route::prefix('pos')->as('pos.')->group(function () {

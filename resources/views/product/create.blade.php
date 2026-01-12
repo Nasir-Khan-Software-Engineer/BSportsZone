@@ -22,37 +22,31 @@
                             <input required type="text" class="form-control rounded" name="name" id="productName" placeholder="Product Name">
                         </div>
 
-                        <div class="col-12 col-lg-4 form-group">
-                            <label for="productUnit">Unit</label>
-                            <select class="form-control rounded" name="unit_id" id="productUnit">
-                                <option value="">Select Unit</option>
-                            </select>
+                        <!-- Left Side: Unit and Brand -->
+                        <div class="col-12 col-lg-6">
+                            <div class="form-group">
+                                <label for="productUnit">Unit</label>
+                                <select class="form-control rounded" name="unit_id" id="productUnit">
+                                    <option value="">Select Unit</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="productBrand">Brand</label>
+                                <select class="form-control rounded" name="brand_id" id="productBrand">
+                                    <option value="">Select Brand</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <div class="col-12 col-lg-4 form-group">
-                            <label for="productBrand">Brand</label>
-                            <select class="form-control rounded" name="brand_id" id="productBrand">
-                                <option value="">Select Brand</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 col-lg-4 form-group">
-                            <label for="productSupplier">Supplier</label>
-                            <select class="form-control rounded" name="supplier_id" id="productSupplier">
-                                <option value="">Select Supplier</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 form-group">
-                            <label for="productCategory">Category*</label>
-                            <select style="height: 120px;" multiple class="form-control rounded" name="category_id" id="productCategory" required>
-                                <option value="">Select category</option>
-                            </select>
-                        </div>
-
-                        <div class="col-12 form-group">
-                            <label for="productDescription">Description</label>
-                            <textarea name="description" id="productDescription" class="form-control rounded" cols="30" rows="5" placeholder="Product Description"></textarea>
+                        <!-- Right Side: Category -->
+                        <div class="col-12 col-lg-6">
+                            <div class="form-group">
+                                <label for="productCategory">Category*</label>
+                                <select style="height: 120px;" multiple class="form-control rounded" name="category_id" id="productCategory" required>
+                                    <option value="">Select category</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </form>

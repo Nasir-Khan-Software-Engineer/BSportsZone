@@ -57,8 +57,7 @@ let productUrls = {
 let productData = {
     'brands': @json($brands),
     'categories': @json($categories),
-    'units': @json($units),
-    'suppliers': @json($suppliers)
+    'units': @json($units)
 };
 
 $(document).ready(function() {

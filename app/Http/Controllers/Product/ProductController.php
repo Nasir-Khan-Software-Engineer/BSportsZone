@@ -10,11 +10,12 @@ use App\Models\Product;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Unit;
-use App\Models\Supplier;
 use App\Models\Shop;
 use App\Models\PurchaseItem;
 use App\Models\Purchase;
 use App\Models\Sales_items;
+use App\Models\ProductImage;
+use App\Models\MediaImage;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -26,13 +27,11 @@ class ProductController extends Controller
         $brands = Brand::where('POSID', '=', $POSID)->get();
         $categories = Category::where('POSID', '=', $POSID)->get();
         $units = Unit::where('POSID', '=', $POSID)->get();
-        $suppliers = Supplier::where('POSID', '=', $POSID)->get();
 
         return view('product.index', [
             'brands' => $brands,
             'categories' => $categories,
-            'units' => $units,
-            'suppliers' => $suppliers
+            'units' => $units
         ]);
     }
 
@@ -400,7 +399,10 @@ class ProductController extends Controller
                         ->ignore($id),
                 ],
                 'category' => 'required',
-                'description' => 'nullable|string|min:3'
+                'description' => 'nullable|string|min:3',
+                'price' => 'nullable|numeric|min:0',
+                'discount_type' => 'nullable|in:fixed,percentage',
+                'discount_value' => 'nullable|numeric|min:0'
             ]);
 
             $product = Product::with('salesItemProducts')->where('POSID', $POSID)->where('type', 'Product')->where('id', $id)->first();
@@ -417,6 +419,12 @@ class ProductController extends Controller
             $product->description = $request->description;
             $product->unit_id = $request->unit_id ?: null;
             $product->brand_id = $request->brand_id ?: null;
+            $product->price = $request->price ?? 0;
+            $product->discount_type = $request->discount_type ?: null;
+            // Clear discount_value if discount_type is empty
+            $product->discount_value = $request->discount_type ? ($request->discount_value ?: null) : null;
+            $product->seo_keyword = $request->seo_keyword ?? null;
+            $product->seo_description = $request->seo_description ?? null;
             $product->updated_by = auth()->id();
 
             $product->save();
@@ -497,6 +505,395 @@ class ProductController extends Controller
                 'status'    => 'error',
                 'message'   => 'Something went wrong.',
             ]);
+        }
+    }
+
+    public function getProductImages($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            $images = ProductImage::where('product_id', $id)
+                ->where('POSID', $POSID)
+                ->with('mediaImage')
+                ->orderBy('is_default', 'desc')
+                ->orderBy('created_at', 'desc')
+                ->get();
+            
+            $images->transform(function($image) {
+                $mediaImage = MediaImage::where('POSID', $image->POSID)
+                    ->where('name', $image->image_name)
+                    ->first();
+                
+                $image->image_url = $mediaImage ? asset($mediaImage->file_path) : null;
+                $image->image_path = $mediaImage ? $mediaImage->file_path : null;
+                $image->formattedDate = formatDate($image->created_at);
+                $image->formattedTime = formatTime($image->created_at);
+                return $image;
+            });
+            
+            return response()->json([
+                'status' => 'success',
+                'images' => $images
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function getProductImagesList()
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $images = MediaImage::where('POSID', $POSID)
+                ->where('relation', 'Product')
+                ->orderBy('name', 'asc')
+                ->get(['id', 'name', 'file_path', 'file_name']);
+            
+            $imageList = $images->map(function($image) {
+                return [
+                    'id' => $image->id,
+                    'name' => $image->name,
+                    'file_path' => $image->file_path,
+                    'file_name' => $image->file_name,
+                    'url' => asset($image->file_path)
+                ];
+            });
+            
+            return response()->json([
+                'status' => 'success',
+                'images' => $imageList
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function storeProductImage(Request $request, $id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $request->validate([
+                'image_name' => 'required|string',
+            ]);
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            // Validate image exists in media_images with relation Product
+            $mediaImage = MediaImage::where('POSID', $POSID)
+                ->where('name', $request->image_name)
+                ->where('relation', 'Product')
+                ->first();
+            
+            if (!$mediaImage) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Image not found or not a Product image.',
+                ], 404);
+            }
+            
+            // Check if image already exists for this product
+            $existingImage = ProductImage::where('product_id', $id)
+                ->where('POSID', $POSID)
+                ->where('image_name', $request->image_name)
+                ->first();
+            
+            if ($existingImage) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This image is already added to the product.',
+                ], 422);
+            }
+            
+            // Create product image
+            $productImage = new ProductImage();
+            $productImage->POSID = $POSID;
+            $productImage->product_id = $id;
+            $productImage->image_name = $request->image_name;
+            $productImage->is_default = false;
+            $productImage->created_by = auth()->user()->id;
+            $productImage->save();
+            
+            $productImage->image_url = asset($mediaImage->file_path);
+            $productImage->image_path = $mediaImage->file_path;
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product image added successfully.',
+                'image' => $productImage
+            ]);
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => '',
+                'errors' => $exception->validator->errors(),
+            ], 422);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function showProductImage($productId, $imageId)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $productImage = ProductImage::where('id', $imageId)
+                ->where('product_id', $productId)
+                ->where('POSID', $POSID)
+                ->first();
+            
+            if (!$productImage) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product image not found.',
+                ], 404);
+            }
+            
+            $mediaImage = MediaImage::where('POSID', $POSID)
+                ->where('name', $productImage->image_name)
+                ->first();
+            
+            if ($mediaImage) {
+                $productImage->image_url = asset($mediaImage->file_path);
+                $productImage->image_path = $mediaImage->file_path;
+                $productImage->formattedSize = $this->formatFileSize($mediaImage->size);
+                $productImage->formattedDate = formatDate($productImage->created_at);
+                $productImage->formattedTime = formatTime($productImage->created_at);
+                $productImage->createdBy = $productImage->creator ? $productImage->creator->name : 'N/A';
+            }
+            
+            return response()->json([
+                'status' => 'success',
+                'image' => $productImage
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function markAsDefault($productId, $imageId)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $productImage = ProductImage::where('id', $imageId)
+                ->where('product_id', $productId)
+                ->where('POSID', $POSID)
+                ->first();
+            
+            if (!$productImage) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product image not found.',
+                ], 404);
+            }
+            
+            DB::transaction(function () use ($productImage, $productId, $POSID) {
+                // Remove default from all images of this product
+                ProductImage::where('product_id', $productId)
+                    ->where('POSID', $POSID)
+                    ->update(['is_default' => false]);
+                
+                // Set this image as default
+                $productImage->is_default = true;
+                $productImage->updated_by = auth()->user()->id;
+                $productImage->save();
+                
+                // Update product table image column
+                $product = Product::where('id', $productId)
+                    ->where('POSID', $POSID)
+                    ->first();
+                
+                if ($product) {
+                    $product->image = $productImage->image_name;
+                    $product->save();
+                }
+            });
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Image marked as default successfully.',
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function destroyProductImage($productId, $imageId)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $productImage = ProductImage::where('id', $imageId)
+                ->where('product_id', $productId)
+                ->where('POSID', $POSID)
+                ->first();
+            
+            if (!$productImage) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product image not found.',
+                ], 404);
+            }
+            
+            $wasDefault = $productImage->is_default;
+            $productImage->delete();
+            
+            // If deleted image was default, update product image column
+            if ($wasDefault) {
+                $newDefault = ProductImage::where('product_id', $productId)
+                    ->where('POSID', $POSID)
+                    ->where('is_default', true)
+                    ->first();
+                
+                $product = Product::where('id', $productId)
+                    ->where('POSID', $POSID)
+                    ->first();
+                
+                if ($product) {
+                    $product->image = $newDefault ? $newDefault->image_name : null;
+                    $product->save();
+                }
+            }
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Product image deleted successfully.',
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function updateSeo(Request $request, $id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $request->validate([
+                'seo_keyword' => 'nullable|string|max:500',
+                'seo_description' => 'nullable|string|max:1000',
+            ]);
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            $product->seo_keyword = $request->seo_keyword ?? null;
+            $product->seo_description = $request->seo_description ?? null;
+            $product->updated_by = auth()->id();
+            $product->save();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'SEO information updated successfully.',
+                'product' => $product
+            ]);
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => '',
+                'errors' => $exception->validator->errors(),
+            ], 422);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function togglePublished($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            $product->is_published = !$product->is_published;
+            $product->updated_by = auth()->id();
+            $product->save();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => $product->is_published ? 'Product published successfully.' : 'Product unpublished successfully.',
+                'is_published' => $product->is_published
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    private function formatFileSize($bytes)
+    {
+        if ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 2) . ' MB';
+        } elseif ($bytes >= 1024) {
+            return number_format($bytes / 1024, 2) . ' KB';
+        } else {
+            return $bytes . ' B';
         }
     }
 }

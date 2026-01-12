@@ -418,6 +418,22 @@
             <hr class="sidebar-divider my-0">
 
             <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('media.*') ? '' : 'collapsed' }}" href="#" data-toggle="collapse" data-target="#MediaDropdown" aria-expanded="true" aria-controls="MediaDropdown">
+                    <i class="fa-solid fa-images"></i>
+                    <span>Media</span>
+                </a>
+                <div id="MediaDropdown" class="collapse {{ request()->routeIs('media.*') ? 'show' : '' }}" aria-labelledby="headingMediaDropdown" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item {{ request()->routeIs('media.image.*') ? 'active' : '' }}" href="{{ route('media.image.index') }}">
+                            <i class="fa-solid fa-image"></i> Image
+                        </a>
+                    </div>
+                </div>
+            </li>
+
+            <hr class="sidebar-divider my-0">
+
+            <li class="nav-item">
                 <a class="nav-link @if(!\Request::is('*setup*') || Request::is('*setup/profile*')) collapsed @endif" href="#" data-toggle="collapse" data-target="#SetupDropdown" aria-expanded="true"
                     aria-controls="SetupDropdown">
                     <i class="fas fa-fw fa-cog"></i>

@@ -9,6 +9,10 @@
                 <h3>Edit Product</h3>
             </div>
             <div class="d-flex gap-2 align-items-center">
+                <button type="button" class="btn {{ $product->is_published ? 'btn-success' : 'btn-secondary' }} rounded btn-sm toggle-published" data-product-id="{{ $product->id }}" data-published="{{ $product->is_published ? '1' : '0' }}">
+                    <i class="fa-solid {{ $product->is_published ? 'fa-check-circle' : 'fa-times-circle' }}"></i> 
+                    {{ $product->is_published ? 'Published' : 'Unpublished' }}
+                </button>
                 <a href="{{ route('product.index') }}" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
             </div>
         </div>
@@ -73,6 +77,31 @@
                                     </div>
                                 </div>
 
+                                <!-- Default Price and Discount: Full Width -->
+                                <div class="col-12">
+                                    <div class="row">
+                                        <div class="col-12 col-lg-4 form-group">
+                                            <label for="editProductDefaultPrice">Default Price</label>
+                                            <input type="number" step="0.01" min="0" class="form-control rounded" name="price" id="editProductDefaultPrice" value="{{ $product->price ?? 0 }}" placeholder="0.00">
+                                        </div>
+
+                                        <div class="col-12 col-lg-4 form-group">
+                                            <label for="editProductDefaultDiscountType">Default Discount Type</label>
+                                            <select class="form-control rounded" name="discount_type" id="editProductDefaultDiscountType">
+                                                <option value="">No Discount</option>
+                                                <option value="fixed" {{ ($product->discount_type ?? '') == 'fixed' ? 'selected' : '' }}>Fixed</option>
+                                                <option value="percentage" {{ ($product->discount_type ?? '') == 'percentage' ? 'selected' : '' }}>Percentage</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-12 col-lg-4 form-group">
+                                            <label for="editProductDefaultDiscount">Default Discount</label>
+                                            <input type="number" step="0.01" min="0" class="form-control rounded" name="discount_value" id="editProductDefaultDiscount" value="{{ $product->discount_value ?? '' }}" placeholder="0.00">
+                                            <small class="form-text text-muted" id="defaultDiscountValueHelp">Enter discount value based on selected type</small>
+                                        </div>
+                                    </div>
+                                </div>
+
                                 <!-- Description: Full Width -->
                                 <div class="col-12 form-group">
                                     <label for="editProductDescription">Description</label>
@@ -81,6 +110,75 @@
 
                                 <div class="col-12">
                                     <button type="button" id="updateProduct" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Update Product</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Product Images Section -->
+            <div class="card border mb-3">
+                <div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#productImagesCollapse" aria-expanded="false" aria-controls="productImagesCollapse">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span>Images</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </h5>
+                </div>
+                <div class="collapse" id="productImagesCollapse">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h6 class="mb-0">Product Images</h6>
+                            <button type="button" id="addNewProductImage" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-plus"></i> Add New Image</button>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="productImagesTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle" style="width: 5%;">ID</th>
+                                        <th class="text-center align-middle" style="width: 25%;">Image Name</th>
+                                        <th class="text-center align-middle" style="width: 15%;">Preview</th>
+                                        <th class="text-center align-middle" style="width: 10%;">Default</th>
+                                        <th class="text-center align-middle" style="width: 15%;">Created At</th>
+                                        <th class="text-center align-middle" style="width: 20%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Images will be loaded dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SEO Section -->
+            <div class="card border mb-3">
+                <div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#productSeoCollapse" aria-expanded="false" aria-controls="productSeoCollapse">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span>SEO</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </h5>
+                </div>
+                <div class="collapse" id="productSeoCollapse">
+                    <div class="card-body">
+                        <form id="productSeoForm">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" id="seoProductId" name="product_id" value="{{ $product->id ?? '' }}">
+                            <div class="row">
+                                <div class="col-12 form-group">
+                                    <label for="productSeoKeyword">SEO Keywords</label>
+                                    <textarea name="seo_keyword" id="productSeoKeyword" class="form-control rounded" rows="3" placeholder="Enter SEO keywords separated by commas">{{ $product->seo_keyword ?? '' }}</textarea>
+                                    <small class="form-text text-muted">Enter keywords separated by commas (e.g., product, item, category)</small>
+                                </div>
+                                <div class="col-12 form-group">
+                                    <label for="productSeoDescription">SEO Description</label>
+                                    <textarea name="seo_description" id="productSeoDescription" class="form-control rounded" rows="4" placeholder="Enter SEO description">{{ $product->seo_description ?? '' }}</textarea>
+                                    <small class="form-text text-muted">Enter a brief description for search engines (recommended: 150-160 characters)</small>
+                                </div>
+                                <div class="col-12">
+                                    <button type="button" id="updateProductSeo" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-floppy-disk"></i> Update SEO</button>
                                 </div>
                             </div>
                         </form>
@@ -102,7 +200,7 @@
                                 <th class="text-center align-middle" style="width: 18%;">Description</th>
                                 <th class="text-center align-middle" style="width: 10%;">Selling Price</th>
                                 <th class="text-center align-middle" style="width: 10%;">Stock</th>
-                                <th class="text-center align-middle" style="width: 8%;">Available Stock in Warehouse</th>
+                                <th class="text-center align-middle" style="width: 8%;">Warehouse</th>
                                 <th class="text-center align-middle" style="width: 10%;">Discount</th>
                                 <th class="text-center align-middle" style="width: 8%;">Status</th>
                                 <th class="text-center align-middle" style="width: 10%;">Action</th>
@@ -406,6 +504,97 @@
     </div>
 </div>
 
+<!-- Add Product Image Modal -->
+<div class="modal fade" id="addProductImageModal" tabindex="-1" role="dialog" aria-labelledby="addProductImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addProductImageModalLabel">Add New Image</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#addProductImageModal').modal('hide');">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="addProductImageForm">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="productImageName">Select Image <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="productImageName" name="image_name" list="productImagesList" placeholder="Type to search and select image" autocomplete="off" required>
+                        <small class="form-text text-muted">Select an image from the Product images</small>
+                    </div>
+                    <div class="form-group">
+                        <label>Preview</label>
+                        <div id="productImagePreview" style="width: 100%; height: 300px; border: 2px dashed #ddd; background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #f9f9f9; display: flex; align-items: center; justify-content: center;">
+                            <span class="text-muted">Image preview will appear here</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#addProductImageModal').modal('hide');">Close</button>
+                    <button type="submit" class="btn thm-btn-bg thm-btn-text-color">Add Image</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Show Product Image Modal -->
+<div class="modal fade" id="showProductImageModal" tabindex="-1" role="dialog" aria-labelledby="showProductImageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="showProductImageModalLabel">Image Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="$('#showProductImageModal').modal('hide');">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="showProductImagePreview" style="width: 100%; height: 300px; border: 2px solid #ddd; background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #f9f9f9;">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th>ID:</th>
+                                <td id="showProductImageId">-</td>
+                            </tr>
+                            <tr>
+                                <th>Image Name:</th>
+                                <td id="showProductImageName">-</td>
+                            </tr>
+                            <tr>
+                                <th>Size:</th>
+                                <td id="showProductImageSize">-</td>
+                            </tr>
+                            <tr>
+                                <th>Is Default:</th>
+                                <td id="showProductImageDefault">-</td>
+                            </tr>
+                            <tr>
+                                <th>Created At:</th>
+                                <td id="showProductImageCreatedAt">-</td>
+                            </tr>
+                            <tr>
+                                <th>Created By:</th>
+                                <td id="showProductImageCreatedBy">-</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#showProductImageModal').modal('hide');">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Datalist for product images -->
+<datalist id="productImagesList">
+    <!-- Options will be populated dynamically -->
+</datalist>
+
 @endsection
 
 @section('script')
@@ -421,6 +610,14 @@ let productUrls = {
     'moveStockToPurchase': "{{ route('product.variation.move-stock',['variation' => 'variationID']) }}",
     'getPriceUpdateInfo': "{{ route('product.variation.price-update-info',['variation' => 'variationID']) }}",
     'createFreshVariant': "{{ route('product.variation.create-fresh-variant',['variation' => 'variationID']) }}",
+    'getProductImagesList': "{{ route('product.images.list') }}",
+    'getProductImages': "{{ route('product.images.get',['product' => $product->id ?? 'productID']) }}",
+    'storeProductImage': "{{ route('product.images.store',['product' => $product->id ?? 'productID']) }}",
+    'showProductImage': "{{ route('product.images.show',['product' => $product->id ?? 'productID', 'image' => 'imageID']) }}",
+    'markProductImageDefault': "{{ route('product.images.mark-default',['product' => $product->id ?? 'productID', 'image' => 'imageID']) }}",
+    'deleteProductImage': "{{ route('product.images.destroy',['product' => $product->id ?? 'productID', 'image' => 'imageID']) }}",
+    'updateProductSeo': "{{ route('product.update-seo',['product' => $product->id ?? 'productID']) }}",
+    'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id ?? 'productID']) }}",
 };
 
 let productId = {{ $product->id ?? 'null' }};
@@ -434,10 +631,59 @@ $(document).ready(function() {
     $('#productInfoCollapse').on('hide.bs.collapse', function () {
         $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
     });
+
+    // Handle default discount type change
+    $(document).on('change', '#editProductDefaultDiscountType', function() {
+        WinPos.Product.updateDefaultDiscountFields();
+    });
+
+    // Initialize default discount fields on page load
+    WinPos.Product.updateDefaultDiscountFields();
+
+    // Handle collapsible Product Images tab icon rotation
+    $('#productImagesCollapse').on('show.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        // Load product images when section is expanded
+        WinPos.Product.loadProductImages(productId);
+    });
+    
+    $('#productImagesCollapse').on('hide.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+
+    // Handle collapsible SEO tab icon rotation
+    $('#productSeoCollapse').on('show.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+    });
+    
+    $('#productSeoCollapse').on('hide.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
     
     // Update product
     $("#updateProduct").on('click', function() {
+        // Validate discount before submitting
+        var discountType = $('#editProductDefaultDiscountType').val();
+        var discountValue = $('#editProductDefaultDiscount').val();
+        var defaultPrice = parseFloat($('#editProductDefaultPrice').val() || 0);
+        
+        if (discountType && discountValue) {
+            if (discountType === 'percentage' && parseFloat(discountValue) > 100) {
+                toastr.error('Percentage discount cannot exceed 100%.');
+                return;
+            }
+            if (discountType === 'fixed' && parseFloat(discountValue) > defaultPrice) {
+                toastr.error('Fixed discount cannot exceed default price.');
+                return;
+            }
+        }
+        
         WinPos.Product.updateProduct(productId);
+    });
+
+    // Update discount fields when price changes
+    $(document).on('input change', '#editProductDefaultPrice', function() {
+        WinPos.Product.updateDefaultDiscountFields();
     });
 
     // Add new variation
@@ -480,6 +726,52 @@ $(document).ready(function() {
     // Update variation from modal
     $(document).on('click', '#updateVariationBtn', function() {
         WinPos.Product.updateVariationFromModal();
+    });
+
+    // Product Images functionality
+    $(document).on('click', '#addNewProductImage', function() {
+        WinPos.Product.openAddProductImageModal(productId);
+    });
+
+    // Handle image name input change for preview
+    $(document).on('input change', '#productImageName', function() {
+        var imageName = $(this).val();
+        WinPos.Product.previewProductImage(imageName);
+    });
+
+    // Save product image
+    $(document).on('submit', '#addProductImageForm', function(event) {
+        event.preventDefault();
+        WinPos.Product.saveProductImage();
+    });
+
+    // Show product image
+    $(document).on('click', '.show-product-image', function() {
+        let imageId = $(this).data('image-id');
+        WinPos.Product.showProductImage(productId, imageId);
+    });
+
+    // Mark as default
+    $(document).on('click', '.mark-default-product-image', function() {
+        let imageId = $(this).data('image-id');
+        WinPos.Product.markProductImageAsDefault(productId, imageId);
+    });
+
+    // Delete product image
+    $(document).on('click', '.delete-product-image', function() {
+        let imageId = $(this).data('image-id');
+        WinPos.Product.deleteProductImage(productId, imageId);
+    });
+
+    // Toggle published status
+    $(document).on('click', '.toggle-published', function() {
+        let productId = $(this).data('product-id');
+        WinPos.Product.togglePublished(productId, $(this));
+    });
+
+    // Update SEO
+    $(document).on('click', '#updateProductSeo', function() {
+        WinPos.Product.updateSeo(productId);
     });
     
     // Handle discount type change

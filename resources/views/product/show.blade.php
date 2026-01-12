@@ -9,6 +9,10 @@
                 <h3>Product Details</h3>
             </div>
             <div class="d-flex gap-2 align-items-center">
+                <button type="button" class="btn {{ $product->is_published ? 'btn-success' : 'btn-secondary' }} rounded btn-sm toggle-published" data-product-id="{{ $product->id }}" data-published="{{ $product->is_published ? '1' : '0' }}">
+                    <i class="fa-solid {{ $product->is_published ? 'fa-check-circle' : 'fa-times-circle' }}"></i> 
+                    {{ $product->is_published ? 'Published' : 'Unpublished' }}
+                </button>
                 <a href="{{ route('product.index') }}" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
             </div>
         </div>
@@ -77,7 +81,7 @@
                                 <th class="text-center">Selling Price</th>
                                 <th class="text-center">Discount</th>
                                 <th class="text-center">Stock</th>
-                                <th class="text-center">Available Stock in Warehouse</th>
+                                <th class="text-center">Warehouse</th>
                                 <th class="text-center">Sales</th>
                                 <th class="text-center">Status</th>
                             </tr>
@@ -154,17 +158,50 @@
 
 @endsection
 
+@push('url-scripts')
+<script>
+var ProductShowUrls = {
+    'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id]) }}"
+};
+</script>
+@endpush
+
 @section('script')
 @vite(['resources/js/product/product-script.js'])
 <script>
 let productUrls = {
     'getProductPurchases': "{{ route('product.get-purchases', ['product' => $product->id]) }}",
-    'showPurchase': "{{ route('stock.purchase.show', ['purchase' => 'purchaseID']) }}"
+    'showPurchase': "{{ route('stock.purchase.show', ['purchase' => 'purchaseID']) }}",
+    'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id]) }}"
 };
 
 $(document).ready(function() {
     // Initialize product purchases table with client-side pagination
     WinPos.Product.initProductPurchasesTable();
+
+    // Toggle published status
+    $(document).on('click', '.toggle-published', function() {
+        let productId = $(this).data('product-id');
+        let $button = $(this);
+        
+        WinPos.Common.postAjaxCall(productUrls.toggleProductPublished, JSON.stringify({}), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                // Update button appearance
+                if (response.is_published) {
+                    $button.removeClass('btn-secondary').addClass('btn-success');
+                    $button.html('<i class="fa-solid fa-check-circle"></i> Published');
+                    $button.attr('data-published', '1');
+                } else {
+                    $button.removeClass('btn-success').addClass('btn-secondary');
+                    $button.html('<i class="fa-solid fa-times-circle"></i> Unpublished');
+                    $button.attr('data-published', '0');
+                }
+            } else {
+                toastr.error(response.message || 'Failed to toggle published status');
+            }
+        });
+    });
 });
 </script>
 @endsection

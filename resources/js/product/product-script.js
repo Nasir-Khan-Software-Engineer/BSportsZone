@@ -69,15 +69,6 @@ WinPos.Product = (function (Urls){
             });
         }
 
-        // Populate suppliers
-        let supplierSelect = $("#productSupplier");
-        supplierSelect.html('<option value="">Select Supplier</option>');
-        if (typeof productData !== 'undefined' && productData.suppliers) {
-            productData.suppliers.forEach(function(supplier) {
-                supplierSelect.append('<option value="' + supplier.id + '">' + supplier.name + '</option>');
-            });
-        }
-
         // Populate categories
         let categorySelect = $("#productCategory");
         categorySelect.html('<option value="">Select category</option>');
@@ -858,6 +849,245 @@ WinPos.Product = (function (Urls){
         });
     }
 
+    var productImagesList = [];
+    var currentProductId = null;
+
+    var loadProductImagesList = function(callback) {
+        if (productImagesList.length > 0 && callback) {
+            callback();
+            return;
+        }
+        WinPos.Common.getAjaxCall(Urls.getProductImagesList, function(response) {
+            if (response.status === 'success') {
+                productImagesList = response.images;
+                // Populate datalist
+                var datalist = $('#productImagesList');
+                datalist.empty();
+                productImagesList.forEach(function(image) {
+                    var option = $('<option></option>');
+                    option.attr('value', image.name);
+                    option.attr('data-url', image.url);
+                    option.text(image.name);
+                    datalist.append(option);
+                });
+                if (callback) callback();
+            }
+        });
+    };
+
+    var loadProductImages = function(productId) {
+        currentProductId = productId;
+        WinPos.Common.getAjaxCall(Urls.getProductImages.replace('productID', productId), function(response) {
+            if (response.status === 'success') {
+                renderProductImagesTable(response.images);
+            } else {
+                toastr.error(response.message || 'Failed to load product images');
+            }
+        });
+    };
+
+    var renderProductImagesTable = function(images) {
+        var tbody = $('#productImagesTable tbody');
+        tbody.empty();
+        
+        if (images && images.length > 0) {
+            images.forEach(function(image) {
+                var row = '<tr data-image-id="' + image.id + '">' +
+                    '<td class="text-center align-middle">' + image.id + '</td>' +
+                    '<td class="text-center align-middle">' + image.image_name + '</td>' +
+                    '<td class="text-center align-middle">' +
+                    (image.image_url ? '<img src="' + image.image_url + '" style="max-width: 100px; max-height: 80px; object-fit: contain;">' : '-') +
+                    '</td>' +
+                    '<td class="text-center align-middle">' +
+                    (image.is_default ? '<span class="badge badge-success"><i class="fa-solid fa-check"></i> Default</span>' : '-') +
+                    '</td>' +
+                    '<td class="text-center align-middle">' + (image.formattedDate || '-') + '</td>' +
+                    '<td class="text-center align-middle">' +
+                    '<button type="button" class="btn btn-sm btn-info show-product-image" data-image-id="' + image.id + '" title="Show"><i class="fa-solid fa-eye"></i></button> ' +
+                    '<button type="button" class="btn btn-sm btn-success mark-default-product-image ' + (image.is_default ? 'active' : '') + '" data-image-id="' + image.id + '" title="Mark As Default">' +
+                    (image.is_default ? '<i class="fa-solid fa-check"></i>' : '<i class="fa-solid fa-star"></i>') +
+                    '</button> ' +
+                    '<button type="button" class="btn btn-sm btn-danger delete-product-image" data-image-id="' + image.id + '" title="Delete"><i class="fa-solid fa-trash"></i></button>' +
+                    '</td>' +
+                    '</tr>';
+                tbody.append(row);
+            });
+        } else {
+            tbody.append('<tr><td colspan="6" class="text-center">No images found. Click "Add New Image" to add one.</td></tr>');
+        }
+    };
+
+    var openAddProductImageModal = function(productId) {
+        currentProductId = productId;
+        loadProductImagesList(function() {
+            $('#addProductImageForm')[0].reset();
+            $('#productImagePreview').css('background-image', '').html('<span class="text-muted">Image preview will appear here</span>');
+            $('#addProductImageModal').modal('show');
+        });
+    };
+
+    var previewProductImage = function(imageName) {
+        if (!imageName) {
+            $('#productImagePreview').css('background-image', '').html('<span class="text-muted">Image preview will appear here</span>');
+            return;
+        }
+        
+        var image = productImagesList.find(function(img) {
+            return img.name === imageName;
+        });
+        
+        if (image) {
+            $('#productImagePreview').css('background-image', 'url(' + image.url + ')').html('');
+        } else {
+            $('#productImagePreview').css('background-image', '').html('<span class="text-danger">Image not found</span>');
+        }
+    };
+
+    var saveProductImage = function() {
+        if (!currentProductId) {
+            toastr.error('Product ID not found');
+            return;
+        }
+        
+        var imageName = $('#productImageName').val().trim();
+        if (!imageName) {
+            toastr.error('Please select an image');
+            return;
+        }
+        
+        var data = {
+            image_name: imageName
+        };
+        
+        WinPos.Common.postAjaxCall(Urls.storeProductImage.replace('productID', currentProductId), JSON.stringify(data), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                $('#addProductImageModal').modal('hide');
+                loadProductImages(currentProductId);
+            } else {
+                WinPos.Common.showValidationErrors(response.errors || {});
+            }
+        });
+    };
+
+    var showProductImage = function(productId, imageId) {
+        WinPos.Common.getAjaxCall(Urls.showProductImage.replace('productID', productId).replace('imageID', imageId), function(response) {
+            if (response.status === 'success') {
+                var image = response.image;
+                
+                $('#showProductImageId').text(image.id);
+                $('#showProductImageName').text(image.image_name);
+                $('#showProductImageSize').text(image.formattedSize || '-');
+                $('#showProductImageDefault').text(image.is_default ? 'Yes' : 'No');
+                $('#showProductImageCreatedAt').text(image.formattedDate + ' ' + image.formattedTime);
+                $('#showProductImageCreatedBy').text(image.createdBy || 'N/A');
+                
+                if (image.image_url) {
+                    $('#showProductImagePreview').css('background-image', 'url(' + image.image_url + ')').html('');
+                } else {
+                    $('#showProductImagePreview').html('<span class="text-muted">No image available</span>');
+                }
+                
+                $('#showProductImageModal').modal('show');
+            } else {
+                toastr.error(response.message || 'Failed to load image details');
+            }
+        });
+    };
+
+    var markProductImageAsDefault = function(productId, imageId) {
+        WinPos.Common.postAjaxCall(Urls.markProductImageDefault.replace('productID', productId).replace('imageID', imageId), JSON.stringify({}), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                loadProductImages(productId);
+            } else {
+                toastr.error(response.message || 'Failed to mark image as default');
+            }
+        });
+    };
+
+    var deleteProductImage = function(productId, imageId) {
+        if (confirm("Are you sure you want to delete this image?\nThis will only remove the database record, not the image file.\nClick OK to continue or Cancel.")) {
+            WinPos.Common.deleteAjaxCallPost(Urls.deleteProductImage.replace('productID', productId).replace('imageID', imageId), function(response) {
+                if (response.status === 'success') {
+                    toastr.success(response.message);
+                    loadProductImages(productId);
+                } else {
+                    toastr.error(response.message || 'Failed to delete image');
+                }
+            });
+        }
+    };
+
+    var togglePublished = function(productId, buttonElement) {
+        WinPos.Common.postAjaxCall(Urls.toggleProductPublished.replace('productID', productId), JSON.stringify({}), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                // Update button appearance
+                if (buttonElement) {
+                    if (response.is_published) {
+                        $(buttonElement).removeClass('btn-secondary').addClass('btn-success');
+                        $(buttonElement).html('<i class="fa-solid fa-check-circle"></i> Published');
+                        $(buttonElement).attr('data-published', '1');
+                    } else {
+                        $(buttonElement).removeClass('btn-success').addClass('btn-secondary');
+                        $(buttonElement).html('<i class="fa-solid fa-times-circle"></i> Unpublished');
+                        $(buttonElement).attr('data-published', '0');
+                    }
+                }
+            } else {
+                toastr.error(response.message || 'Failed to toggle published status');
+            }
+        });
+    };
+
+    var updateSeo = function(productId) {
+        var formData = WinPos.Common.getFormData('#productSeoForm');
+        
+        WinPos.Common.putAjaxCallPost(Urls.updateProductSeo.replace('productID', productId), JSON.stringify(formData), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+            } else {
+                WinPos.Common.showValidationErrors(response.errors || {});
+            }
+        });
+    };
+
+    var updateDefaultDiscountFields = function() {
+        var discountType = $('#editProductDefaultDiscountType').val();
+        var discountValueInput = $('#editProductDefaultDiscount');
+        var helpText = $('#defaultDiscountValueHelp');
+        var defaultPrice = parseFloat($('#editProductDefaultPrice').val() || 0);
+        
+        if (discountType === '') {
+            discountValueInput.prop('disabled', true);
+            discountValueInput.val('');
+            helpText.text('Enter discount value based on selected type');
+        } else if (discountType === 'percentage') {
+            discountValueInput.prop('disabled', false);
+            discountValueInput.attr('max', '100');
+            discountValueInput.attr('step', '0.01');
+            helpText.text('Enter percentage (max 100%)');
+            // Clear value if it exceeds 100
+            if (parseFloat(discountValueInput.val()) > 100) {
+                discountValueInput.val('');
+            }
+        } else if (discountType === 'fixed') {
+            discountValueInput.prop('disabled', false);
+            discountValueInput.attr('max', defaultPrice > 0 ? defaultPrice : '');
+            discountValueInput.attr('step', '0.01');
+            if (defaultPrice > 0) {
+                helpText.text('Enter fixed amount (max ' + defaultPrice.toFixed(2) + 'tk)');
+                // Clear value if it exceeds price
+                if (parseFloat(discountValueInput.val()) > defaultPrice) {
+                    discountValueInput.val('');
+                }
+            } else {
+                helpText.text('Enter fixed amount');
+            }
+        }
+    };
+
     return {
         datatableConfiguration: datatableConfiguration,
         populateCreateForm: populateCreateForm,
@@ -878,7 +1108,17 @@ WinPos.Product = (function (Urls){
         openPriceUpdateModal: openPriceUpdateModal,
         updateVariationPrice: updateVariationPrice,
         createFreshVariant: createFreshVariant,
-        initProductPurchasesTable: initProductPurchasesTable
+        initProductPurchasesTable: initProductPurchasesTable,
+        loadProductImages: loadProductImages,
+        openAddProductImageModal: openAddProductImageModal,
+        previewProductImage: previewProductImage,
+        saveProductImage: saveProductImage,
+        showProductImage: showProductImage,
+        markProductImageAsDefault: markProductImageAsDefault,
+        deleteProductImage: deleteProductImage,
+        togglePublished: togglePublished,
+        updateSeo: updateSeo,
+        updateDefaultDiscountFields: updateDefaultDiscountFields
     }
 })(productUrls);
 

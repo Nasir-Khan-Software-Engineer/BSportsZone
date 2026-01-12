@@ -10,6 +10,32 @@ class Product extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'POSID',
+        'code',
+        'name',
+        'type',
+        'unit_id',
+        'brand_id',
+        'image',
+        'price',
+        'description',
+        'discount_type',
+        'discount_value',
+        'staff_id',
+        'created_by',
+        'updated_by',
+        'seo_keyword',
+        'seo_description',
+        'is_published',
+    ];
+
+    protected $casts = [
+        'price' => 'double',
+        'discount_value' => 'double',
+        'is_published' => 'boolean',
+    ];
+
     public function brand(): BelongsTo{
         return $this->BelongsTo(Brand::class,'brand_id');
     }
@@ -44,6 +70,16 @@ class Product extends Model
     public function staff()
     {
         return $this->belongsTo(Employee::class, 'staff_id');
+    }
+
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class, 'product_id');
+    }
+
+    public function defaultImage()
+    {
+        return $this->hasOne(ProductImage::class, 'product_id')->where('is_default', true);
     }
 
     public function TodaysStaff()

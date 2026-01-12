@@ -75,6 +75,7 @@
                                 <th class="text-center">Tagline</th>
                                 <th class="text-center">Description</th>
                                 <th class="text-center">Selling Price</th>
+                                <th class="text-center">Discount</th>
                                 <th class="text-center">Stock</th>
                                 <th class="text-center">Available Stock in Warehouse</th>
                                 <th class="text-center">Sales</th>
@@ -83,10 +84,24 @@
                         </thead>
                         <tbody>
                             @foreach($product->variations as $variation)
-                            <tr>
+                            @php
+                                $isClosed = $variation->status == 'closed';
+                            @endphp
+                            <tr class="{{ $isClosed ? 'table-secondary' : '' }}">
                                 <td class="text-center">{{ $variation->tagline }}</td>
                                 <td class="text-center">{{ $variation->description ?? '-' }}</td>
                                 <td class="text-center">TK {{ number_format($variation->selling_price, 2) }}</td>
+                                <td class="text-center">
+                                    @if($variation->discount_type && $variation->discount_value)
+                                        @if($variation->discount_type == 'percentage')
+                                            {{ number_format($variation->discount_value, 2) }}%
+                                        @else
+                                            TK {{ number_format($variation->discount_value, 2) }}
+                                        @endif
+                                    @else
+                                        <span class="text-muted">-</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">{{ $variation->stock }}</td>
                                 <td class="text-center">
                                     {{ $variation->available_stock_in_warehouse ?? 0 }}

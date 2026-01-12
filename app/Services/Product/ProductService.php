@@ -41,6 +41,8 @@ class ProductService implements IProductService
                         'stock'        => $variation->stock ?? 0,
                         'price'        => $variation->selling_price ?? 0,
                         'tagline'      => $variation->tagline,
+                        'discount_type'     => $variation->discount_type ?? "Fixed",
+                        'discount_value'    => $variation->discount_value ?? 0
                     ];
                 });
             })
@@ -95,6 +97,8 @@ class ProductService implements IProductService
                         'stock'        => $variation->stock ?? 0,
                         'price'        => $variation->selling_price ?? 0,
                         'tagline'      => $variation->tagline,
+                        'discount_type'     => $variation->discount_type ?? "Fixed",
+                        'discount_value'    => $variation->discount_value ?? 0
                     ];
                 });
             })

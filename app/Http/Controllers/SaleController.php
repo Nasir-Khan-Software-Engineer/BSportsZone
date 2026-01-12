@@ -235,6 +235,22 @@ class SaleController extends Controller
                 ->map(function ($item) {
 
                     $service = $item->service;
+                    
+                    // Calculate discount amount
+                    $discountAmount = 0;
+                    if ($item->discount_type && $item->discount_value) {
+                        if ($item->discount_type == 'percentage') {
+                            $discountAmount = ($item->selling_price * $item->discount_value) / 100;
+                        } else {
+                            $discountAmount = $item->discount_value;
+                        }
+                    }
+                    
+                    // Calculate price after discount per unit
+                    $priceAfterDiscount = $item->selling_price - $discountAmount;
+                    
+                    // Calculate total price after discount
+                    $totalPrice = $priceAfterDiscount * $item->quantity;
 
                     return [
                         'type'          => 'Service',
@@ -243,7 +259,10 @@ class SaleController extends Controller
                         'staff_name'    => $item->staff?->name ?? 'N/A',
                         'selling_price' => $item->selling_price,
                         'quantity'      => $item->quantity,
-                        'total_price'   => $item->selling_price * $item->quantity,
+                        'discount_type' => $item->discount_type,
+                        'discount_value' => $item->discount_value,
+                        'discount_amount' => $discountAmount,
+                        'total_price'   => $totalPrice,
                     ];
                 })
                 ->values();
@@ -256,6 +275,22 @@ class SaleController extends Controller
                 ->map(function ($item) {
 
                     $product = $item->product;
+                    
+                    // Calculate discount amount
+                    $discountAmount = 0;
+                    if ($item->discount_type && $item->discount_value) {
+                        if ($item->discount_type == 'percentage') {
+                            $discountAmount = ($item->selling_price * $item->discount_value) / 100;
+                        } else {
+                            $discountAmount = $item->discount_value;
+                        }
+                    }
+                    
+                    // Calculate price after discount per unit
+                    $priceAfterDiscount = $item->selling_price - $discountAmount;
+                    
+                    // Calculate total price after discount
+                    $totalPrice = $priceAfterDiscount * $item->quantity;
 
                     return [
                         'type'          => 'Product',
@@ -264,7 +299,10 @@ class SaleController extends Controller
                         'quantity'      => $item->quantity,
                         'tagline'       => $item->variant_tagline,
                         'selling_price' => $item->selling_price,
-                        'total_price'   => $item->quantity * $item->selling_price
+                        'discount_type' => $item->discount_type,
+                        'discount_value' => $item->discount_value,
+                        'discount_amount' => $discountAmount,
+                        'total_price'   => $totalPrice
                     ];
                 })
                 ->values(); // reindex

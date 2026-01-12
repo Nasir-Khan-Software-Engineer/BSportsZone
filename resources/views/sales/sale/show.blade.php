@@ -91,6 +91,7 @@
                                 <th class="text-center">Staff</th>
                                 <th class="text-center">QTY</th>
                                 <th class="text-end">Unit Price</th>
+                                <th class="text-end">Discount</th>
                                 <th class="text-end">Total Price</th>
                             </tr>
                         </thead>
@@ -103,11 +104,22 @@
                                     <td class="text-center">{{ $item['staff_name'] }}</td>
                                     <td class="text-center">{{ $item['quantity'] }}</td>
                                     <td class="text-end">{{ number_format($item['selling_price'], 2) }} Tk</td>
+                                    <td class="text-end">
+                                        @if($item['discount_type'] && $item['discount_value'])
+                                            @if($item['discount_type'] == 'percentage')
+                                                {{ number_format($item['discount_value'], 2) }}%
+                                            @else
+                                                {{ number_format($item['discount_amount'], 2) }} Tk
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                     <td class="text-end">{{ number_format($item['total_price'], 2) }} Tk</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="6" class="text-center text-muted">
+                                    <td colspan="7" class="text-center text-muted">
                                         No service items found
                                     </td>
                                 </tr>
@@ -130,6 +142,7 @@
                                 <th>Product Name</th>
                                 <th class="text-center">QTY</th>
                                 <th class="text-end">Unit Price</th>
+                                <th class="text-end">Discount</th>
                                 <th class="text-end">Total Price</th>
                             </tr>
                         </thead>
@@ -143,12 +156,23 @@
                                         {{ number_format($item['selling_price'], 2) }} Tk
                                     </td>
                                     <td class="text-end">
+                                        @if($item['discount_type'] && $item['discount_value'])
+                                            @if($item['discount_type'] == 'percentage')
+                                                {{ number_format($item['discount_value'], 2) }}%
+                                            @else
+                                                {{ number_format($item['discount_amount'], 2) }} Tk
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td class="text-end">
                                         {{ number_format($item['total_price'], 2) }} Tk
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted">
+                                    <td colspan="6" class="text-center text-muted">
                                         No product items found
                                     </td>
                                 </tr>

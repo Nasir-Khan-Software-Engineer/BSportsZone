@@ -25,7 +25,9 @@ class ServiceRepository implements IServiceRepository
                 'products.type',
                 DB::raw('0 as stock'),
                 DB::raw('0 as variation_id'),
-                DB::raw('"" as tagline')
+                DB::raw('"" as tagline'),
+                'products.discount_type',
+                'products.discount_value'
             )
             ->with('TodaysStaff:id,name')
             ->where('products.POSID', $posId)

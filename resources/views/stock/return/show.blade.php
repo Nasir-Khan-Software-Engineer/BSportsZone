@@ -103,7 +103,6 @@
                                         </span>
                                     </p>
                                     <p class="mb-1"><strong>Sales From:</strong> {{ ucfirst($return->sale->sales_from ?? '-') }}</p>
-                                    <p class="mb-1"><strong>Sales Type:</strong> {{ ucfirst($return->sale->sales_type ?? '-') }}</p>
                                 </div>
                             </div>
                         </div>

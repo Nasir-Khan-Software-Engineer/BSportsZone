@@ -102,6 +102,15 @@ class PosController extends Controller
         $totalAmount = collect($request->services)->sum(function ($item) {
             $price = (float) ($item['price'] ?? 0);
             $quantity = (int) ($item['quantity'] ?? 0);
+            $discountType = $item['discount_type'] ?? 'fixed';
+            $discountValue = (float) $item['discount_value'] ?? 0;
+
+            if($discountType == 'percentage') {
+                $price = $price - ($price * $discountValue) / 100;
+            }else{
+                $price = $price - $discountValue;
+            }
+
             return $price * $quantity;
         });
 
@@ -478,6 +487,9 @@ class PosController extends Controller
             $salesItemObj['variation_id'] = $variation->id;
             $salesItemObj['variant_tagline'] = $variation->tagline;
             $salesItemObj['type'] = "Product";
+
+            $salesItemObj['discount_type'] = $reqiestedData['discount_type'];
+            $salesItemObj['discount_value'] = $reqiestedData['discount_value'];
             
             $salesItemObj['updated_at'] = now();
             $salesItemObj['created_at'] = now();
@@ -529,6 +541,9 @@ class PosController extends Controller
             $salesItemObj['created_at'] = now();
             $salesItemObj['updated_at'] = now();
             $salesItemObj['type'] = "Service";
+
+            $salesItemObj['discount_type'] = $serviceData['discount_type'];
+            $salesItemObj['discount_value'] = $serviceData['discount_value'];
             array_push($salesItems, $salesItemObj);
 
         }

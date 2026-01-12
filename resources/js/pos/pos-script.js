@@ -68,6 +68,14 @@ WinPos.Pos = (function (Urls) {
             }
         }
 
+        // discount calcualtion
+        let priceAfterDiscount = service.price;
+        if(service.discount_type == 'percentage') {
+            priceAfterDiscount = service.price - (service.price * service.discount_value) / 100;
+        }else{
+            priceAfterDiscount = service.price - service.discount_value;
+        }
+
         if (cartItem) {
             cartItem.quantity++;
         } else {
@@ -86,7 +94,10 @@ WinPos.Pos = (function (Urls) {
                 type: service.type,
                 variation_id: service.variation_id ? service.variation_id : null,
                 tagline: service.tagline ? service.tagline : null,
-                stock: service.stock
+                stock: service.stock,
+                discount_type: service.discount_type,
+                discount_value: service.discount_value,
+                price_after_discount: priceAfterDiscount
             });
         }
 
@@ -184,7 +195,7 @@ WinPos.Pos = (function (Urls) {
 
     var updateCartTotal = function () {
         const totalSum = cartObj.items.reduce((total, item) => {
-            return total + (item.price * item.quantity);
+            return total + (item.price_after_discount * item.quantity);
         }, 0);
 
         cartObj.total = totalSum;
@@ -234,7 +245,10 @@ WinPos.Pos = (function (Urls) {
                     variation_id: item.variation_id || null,
                     type: item.type,
                     price: item.price,
-                    tagline: item.tagline
+                    tagline: item.tagline,
+                    discount_type: item.discount_type,
+                    discount_value: item.discount_value,
+                    price_after_discount: item.price_after_discount
                 })),
                 discountType: cartObj.discountType,
                 discount: cartObj.discount,
@@ -493,6 +507,40 @@ WinPos.Pos = (function (Urls) {
         return false;
     }
 
+    var updateIndividualDiscount = function(type ,productId, variationId, discountType, discountValue) {
+        let cartItem;
+        if(type == 'Product') {
+            cartItem = WinPos.Pos.cartObj.items.find(item => item.id == productId && item.variation_id == variationId);
+            if(cartItem == null || cartItem == undefined) {
+                return false;
+            }
+        }else{
+            cartItem = WinPos.Pos.cartObj.items.find(item => item.id == productId);
+            if(cartItem == null || cartItem == undefined) {
+                return false;
+            }
+        }
+
+        let priceAfterDiscount = cartItem.price;
+        if(discountType == 'percentage') {
+            priceAfterDiscount = cartItem.price - (cartItem.price * discountValue) / 100;
+        }else{
+            priceAfterDiscount = cartItem.price - discountValue;
+        }
+
+        if (cartItem) {
+            cartItem.discount_type = discountType;
+            cartItem.discount_value = discountValue;
+            cartItem.price_after_discount = priceAfterDiscount;
+
+            updateCartTotal();
+            notify();
+            return true;
+        }
+
+        return false;
+    }
+
     var renderStaffCards = function (staffs, selectedStaffId) {
         const container = $('#staffCardsContainer');
         container.html('');
@@ -554,7 +602,8 @@ WinPos.Pos = (function (Urls) {
             setCustomer: setCartCustomer,
             setCashier: setCartCashier,
             applyAdjustment: addCartAdjustment,
-            updateStaff: updateCartStaff
+            updateStaff: updateCartStaff,
+            updateIndividualDiscount: updateIndividualDiscount
 
         },
         saveSalesDetails: saveSalesDetails,

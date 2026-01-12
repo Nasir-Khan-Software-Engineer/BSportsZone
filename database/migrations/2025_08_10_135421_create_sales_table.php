@@ -20,7 +20,6 @@ return new class extends Migration
             $table->decimal('discount_amount', $precision = 8, $scale = 2)->default(0);
             $table->decimal('total_payable_amount', $precision = 8, $scale = 2)->default(0);
             $table->string('sales_from')->default('offline');
-            $table->string('sales_type')->default('product');
             $table->foreignId('customerId')->constrained(table: 'customers', indexName: 'FK_Sales_customer')->onUpdate('cascade')->onDelete('cascade');
 
             $table->foreignId('created_by')->constrained(table: 'users', indexName: 'fk_sales_user_create')->onUpdate('cascade')->onDelete('cascade');

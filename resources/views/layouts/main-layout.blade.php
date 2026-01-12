@@ -661,6 +661,13 @@
 
     $(document).ready(async function() {
 
+        toastr.options = {
+            closeButton: true,
+            progressBar: true,
+            positionClass: "toast-bottom-right",
+            timeOut: 2000
+        };
+
         WinPos.Common.CommonVariables = WinPos.Common.CommonVariables || {};
 
         const logoKey = 'accountLogo_' + accountInfoSettings.logo; // ✅ Cache key depends on filename

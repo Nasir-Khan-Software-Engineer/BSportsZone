@@ -171,6 +171,20 @@ WinPos.PrintReceipt.algoTypes.salesDetails = {
         data.cartInfo.items.forEach(function(item){
             let shortServiceName = (item.name.length > 20 ? (item.name).slice(0,20) : item.name);
             let staffName = item.staff_name || 'None';
+            let discountType = item.discount_type || 'fixed';
+            let discountValue = item.discount_value || 0;
+            let discount = 0;
+            let price_after_discount =  item.price;
+
+            debugger;
+
+            if(discountType == 'percentage') {
+                discount = (item.price * discountValue) / 100;
+                price_after_discount = item.price - discount;
+            }else{
+                discount = discountValue;
+                price_after_discount = item.price - discount;
+            }
 
             dom.push('<tr>');
                 if(item.tagline){
@@ -179,8 +193,8 @@ WinPos.PrintReceipt.algoTypes.salesDetails = {
                     dom.push('<td style="text-align: left;">' + shortServiceName + '</td>');
                 }
                 dom.push('<td style="width: 50px; text-align: right;">'+ item.quantity +'</td>');
-                dom.push('<td style="width: 50px; text-align: right;">'+ (item.price) +'</td>');
-                dom.push('<td style="width: 50px; text-align: right;">'+ ((item.price) * item.quantity) +'</td>');
+                dom.push('<td style="width: 50px; text-align: right;">'+ price_after_discount +'</td>');
+                dom.push('<td style="width: 50px; text-align: right;">'+ (price_after_discount * item.quantity) +'</td>');
             dom.push('</tr>');
             if (staffName !== 'None') {
                 dom.push('<tr>');

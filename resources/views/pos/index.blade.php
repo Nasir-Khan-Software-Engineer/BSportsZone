@@ -12,6 +12,7 @@
 @include('pos.staff-assign-modal')
 @include('components.customer-info-modal')
 @include('pos.last-sales-history-modal')
+@include('pos.individual-discount-modal')
 
 
 @if(isFeatureEnabled('ENABLED_LOYALTY'))
@@ -112,9 +113,9 @@
                                 <tr>
                                     <th style="width: 50%;">Service</th>
                                     <th style="width: 10%;" class="text-center">Quantity</th>
-                                    <th style="width: 15%;" class="text-center">Price</th>
+                                    <th style="width: 18%;" class="text-center">Price</th>
                                     <th style="width: 15%;" class="text-center">Subtotal</th>
-                                    <th style="width: 10%;" class="text-center"><i class="fa fa-solid fa-times fw-bold"></i></th>
+                                    <th style="width: 7%;" class="text-center"><i class="fa fa-solid fa-times fw-bold"></i></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -668,11 +669,23 @@ function renderCart(cart) {
     const dom = [];
     cart.items.forEach((item) => {
 
-        dom.push('<tr>');
+        if(!item.discount_value){
+            item.discount_value = 0;
+            item.discount_type = 'fixed';
+        }
+
+        let discountType = "Tk";
+        if(item.discount_type == "percentage"){
+            discountType = "%";
+        }else{
+            discountType = "Tk";
+        }
+
+        dom.push('<tr class="selected-cart-item" data-type="' + item.type + '">');
 
         if(item.type == 'Service') {
-            const staffName = item.staff_name || '---------';
-            const staffDisplay = '<span class="text-muted assigned-staff" data-toggle="tooltip" data-placement="top" title="Click to Change" data-item-id="' + item.id + '" style="cursor: pointer;"> <i class="fa-solid fa-hand-holding-heart"></i> Staff: ' +
+            let staffName = item.staff_name || '---------';
+            let staffDisplay = '<span class="text-muted assigned-staff" data-toggle="tooltip" data-placement="top" title="Click to Change" data-item-id="' + item.id + '" style="cursor: pointer;"> <i class="fa-solid fa-hand-holding-heart"></i> Staff: ' +
             staffName + ' <button class="staff-change-button"><i class="fa-solid fa-pen-to-square"></i></button></span>';
             dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + 
                 ' <br> ' + staffDisplay + '</td>');
@@ -682,10 +695,13 @@ function renderCart(cart) {
             dom.push('<td class="selected-service-name" style="width: 50%;">' + item.code + ' - ' + item.name + ' (' + item.tagline + ')</td>');
             dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><input max="' + item.stock + '" type="number" class="form-control cart-qty-input pos-page-font-size" value="' + item.quantity + '" min="1" data-id="' + item.id + '" data-type="' + item.type + '" data-variation-id="' + item.variation_id + '"></td>');
         }
-        
-        dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + item.price.toFixed(2) + ' Tk.</td>');
-        dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + ((item.price) * item.quantity).toFixed(2) + ' Tk.</td>');
-        dom.push('<td style="width: 10%; vertical-align: middle" class="text-center"><button type="button" class="btn thm-btn-bg thm-btn-text-color btn-sm remove-cart-service pos-page-font-size" data-id="' +
+       
+        let discountElement = '<br><span style="cursor: pointer;" class="text-muted individual-discount" data-toggle="tooltip" data-placement="top" title="Click to Change" data-item-id="' + item.id + '" data-variation-id="' + item.variation_id + '"> <i class="fa-solid fa-tag"></i> Discount: ' + item.discount_value + ' ' + discountType;
+        discountElement += '<button class="individual-discount-change-button"><i class="fa-solid fa-pen-to-square"></i></button></span>';
+
+        dom.push('<td style="width: 18%; vertical-align: middle" class="text-end">' + item.price.toFixed(2) + ' Tk. '+discountElement+'</td>');
+        dom.push('<td style="width: 15%; vertical-align: middle" class="text-end">' + ((item.price_after_discount) * item.quantity).toFixed(2) + ' Tk.</td>');
+        dom.push('<td style="width: 7%; vertical-align: middle" class="text-center"><button type="button" class="btn thm-btn-bg thm-btn-text-color btn-sm remove-cart-service pos-page-font-size" data-id="' +
             item.id + '" data-type="' + item.type + '" data-variation-id="' + item.variation_id + '"><i class="fa fa-solid fa-times"></i></button></td>')
         dom.push('</tr>');
     });
@@ -851,6 +867,53 @@ $(document).on('click', '.assigned-staff, .staff-change-button', function(e) {
         }
     });
 });
+
+
+$(document).on('click', '.individual-discount', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const productId = $(this).closest('.individual-discount').data('item-id');
+    const variationId = $(this).closest('.individual-discount').data('variation-id');
+    const itemType = $(this).closest('.selected-cart-item').data('type');
+
+    const cartItem = WinPos.Pos.cartObj.items.find(item => item.id == productId && item.variation_id == variationId);
+
+    if (!cartItem) return;
+    
+    let currentDiscountType = cartItem.discount_type;
+    let currentDiscountValue = cartItem.discount_value;
+    let currentSelectItemType = itemType;
+
+    $('#individualDiscountType').val(currentDiscountType);
+    $('#individualDiscountValue').val(currentDiscountValue);
+
+    // hidden fields
+    $('#individualDiscountProductId').val(productId);
+    $('#individualDiscountVariationId').val(variationId);
+    $("#individualDiscountItemType").val(currentSelectItemType);
+
+
+    $('#individualDiscountItemName').text(cartItem.name);
+    $('#individualDiscountModal').modal('show');
+})
+
+
+$(document).on('click', '#applyIndividualDiscountBtn', function(e) {
+    let productId = $('#individualDiscountProductId').val();
+    let variationId = $('#individualDiscountVariationId').val();
+    let discountType = $('#individualDiscountType').val();
+    let discountValue = $('#individualDiscountValue').val();
+    let itemType = $('#individualDiscountItemType').val();
+
+    let isUpdated = WinPos.Pos.cart.updateIndividualDiscount(itemType, productId, variationId, discountType, discountValue);
+    if(isUpdated) {
+        $('#individualDiscountModal').modal('hide');
+        toastr.success('Discount applied successfully.', 'Success');
+    }else{
+        toastr.error('Failed to apply discount.', 'Error');
+    }
+})
 
 
 $(document).on('click', '.staff-card', function() {

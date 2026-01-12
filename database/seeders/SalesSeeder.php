@@ -39,7 +39,6 @@ class SalesSeeder extends Seeder
 
 
                 'sales_from' => 'offline',
-                'sales_type' => 'product'
             ]);
 
             DB::table('sales_items')->insert([
@@ -82,7 +81,6 @@ class SalesSeeder extends Seeder
 
 
                 'sales_from' => 'offline',
-                'sales_type' => 'product'
             ]);
 
             DB::table('sales_items')->insert([

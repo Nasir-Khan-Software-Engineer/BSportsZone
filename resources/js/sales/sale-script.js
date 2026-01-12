@@ -228,7 +228,10 @@ WinPos.sale = (function (Urls){
                 price: parseFloat(item.selling_price),
                 quantity: parseInt(item.quantity),
                 staff_name: item.staff ? item.staff.name : null,
-                tagline: item.variant_tagline ? item.variant_tagline : null
+                tagline: item.variant_tagline ? item.variant_tagline : null,
+                type: item.type,
+                discount_type: item.discount_type,
+                discount_value: item.discount_value
             };
         });
 

@@ -207,18 +207,22 @@
     /* // not working  */
 }
 
-.assigned-staff{
+.assigned-staff,
+.individual-discount{
     font-size: 13px;
     float: right;
     transition: all 0.3s ease-in-out;
     cursor: pointer;
 }
-.staff-change-button{
+.staff-change-button,
+.individual-discount-change-button{
     border: 0px;
     background: transparent;
 }
 
-.selected-service-name:hover .assigned-staff{
+.selected-cart-item:hover .assigned-staff,
+.selected-cart-item:hover .individual-discount{
+    color: #4e73df;
     font-size: 16px;
 }
 

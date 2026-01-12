@@ -59,6 +59,8 @@ class ProductRepository implements IProductRepository
                         'stock'        => $variation->stock ?? 0,
                         'price'        => $variation->selling_price ?? 0,
                         'tagline'      => $variation->tagline,
+                        'discount_type'     => $variation->discount_type ?? "Fixed",
+                        'discount_value'    => $variation->discount_value ?? 0,
 
                         // optional staff (POS usage)
                         'staff'        => $product->TodaysStaff->name ?? null,

@@ -63,6 +63,9 @@ let productData = {
 $(document).ready(function() {
     WinPos.Datatable.initDataTable("#productTable", WinPos.Product.datatableConfiguration());
 
+    // Initialize slug generation
+    WinPos.Product.initSlugGeneration();
+
     $("#searchProduct").on("keyup search input paste cut", function() {
         WinPos.Datatable.filter($(this).val());
     })

@@ -13,6 +13,7 @@ class Variation extends Model
 
     protected $fillable = [
         'product_id',
+        'is_default',
         'tagline',
         'description',
         'selling_price',

@@ -68,6 +68,12 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <label for="editProductSlug">Slug* <small>(Auto-generated from name, max 100 characters)</small></label>
+                                        <input required type="text" class="form-control rounded" name="slug" id="editProductSlug" value="{{ $product->slug ?? '' }}" maxlength="100">
+                                        <small class="form-text text-muted">This will be used in the product URL. You can edit it if needed.</small>
+                                    </div>
+
+                                    <div class="form-group">
                                         <label for="editProductCategory">Category*</label>
                                         <select style="height: 120px;" multiple class="form-control rounded" name="category" id="editProductCategory" required>
                                             @foreach($categories as $category)
@@ -623,6 +629,9 @@ let productUrls = {
 let productId = {{ $product->id ?? 'null' }};
 
 $(document).ready(function() {
+    // Initialize slug generation
+    WinPos.Product.initSlugGeneration();
+    
     // Handle collapsible Product Information tab icon rotation
     $('#productInfoCollapse').on('show.bs.collapse', function () {
         $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-down').addClass('fa-chevron-up');

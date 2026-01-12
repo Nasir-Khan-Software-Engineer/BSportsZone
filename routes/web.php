@@ -39,9 +39,15 @@ use App\Http\Controllers\Media\ImageController;
 // help portal controllers
 use App\Http\Controllers\HelpPortal\LoyaltyHelpController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// public routes
+
+use App\Http\Controllers\Public\PublicProductController;
+use App\Http\Controllers\Public\PublicIndexController;
+
+Route::get('/', [PublicIndexController::class, 'index'])->name('index');
+Route::get('/shop/{page?}', [PublicProductController::class, 'index'])->name('shop')->where('page', '[0-9]+');
+Route::get('/{slug}', [PublicProductController::class, 'product'])->name('product.show');
+
 
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
@@ -380,5 +386,8 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
     });
 
 });
+
+
+
 
 require __DIR__.'/auth.php';

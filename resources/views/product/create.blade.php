@@ -22,6 +22,12 @@
                             <input required type="text" class="form-control rounded" name="name" id="productName" placeholder="Product Name">
                         </div>
 
+                        <div class="col-12 form-group">
+                            <label for="productSlug">Slug* <small>(Auto-generated from name, max 100 characters)</small></label>
+                            <input required type="text" class="form-control rounded" name="slug" id="productSlug" placeholder="product-slug" maxlength="100">
+                            <small class="form-text text-muted">This will be used in the product URL. You can edit it if needed.</small>
+                        </div>
+
                         <!-- Left Side: Unit and Brand -->
                         <div class="col-12 col-lg-6">
                             <div class="form-group">

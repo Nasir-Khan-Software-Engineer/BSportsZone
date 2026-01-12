@@ -79,6 +79,76 @@ WinPos.Product = (function (Urls){
         }
     }
 
+    // Function to generate slug from text
+    var generateSlug = function(text) {
+        if (!text) return '';
+        
+        // Convert to lowercase
+        let slug = text.toLowerCase();
+        
+        // Replace spaces and special characters with hyphens
+        slug = slug.replace(/[^\w\s-]/g, ''); // Remove special characters except word chars, spaces, and hyphens
+        slug = slug.replace(/\s+/g, '-'); // Replace spaces with hyphens
+        slug = slug.replace(/-+/g, '-'); // Replace multiple hyphens with single hyphen
+        slug = slug.replace(/^-+|-+$/g, ''); // Remove leading and trailing hyphens
+        
+        // Limit to 100 characters
+        if (slug.length > 100) {
+            slug = slug.substring(0, 100);
+            // Remove trailing hyphen if exists
+            slug = slug.replace(/-+$/, '');
+        }
+        
+        return slug;
+    }
+
+    // Auto-generate slug from product name (create form)
+    var initSlugGeneration = function() {
+        // For create form
+        $(document).on('input', '#productName', function() {
+            let name = $(this).val();
+            let slugField = $('#productSlug');
+            // Only auto-generate if slug field is empty or matches the previous auto-generated slug
+            if (!slugField.data('manually-edited')) {
+                let generatedSlug = generateSlug(name);
+                slugField.val(generatedSlug);
+            }
+        });
+
+        // Track manual edits to slug field (create form)
+        $(document).on('input', '#productSlug', function() {
+            $(this).data('manually-edited', true);
+        });
+
+        // Reset manual edit flag when modal is opened (create form)
+        $(document).on('shown.bs.modal', '#productCreateModal', function() {
+            $('#productSlug').data('manually-edited', false);
+            $('#productName').val('');
+            $('#productSlug').val('');
+        });
+
+        // For edit form
+        $(document).on('input', '#editProductName', function() {
+            let name = $(this).val();
+            let slugField = $('#editProductSlug');
+            // Only auto-generate if slug field is empty or matches the previous auto-generated slug
+            if (!slugField.data('manually-edited')) {
+                let generatedSlug = generateSlug(name);
+                slugField.val(generatedSlug);
+            }
+        });
+
+        // Track manual edits to slug field (edit form)
+        $(document).on('input', '#editProductSlug', function() {
+            $(this).data('manually-edited', true);
+        });
+
+        // Initialize manual edit flag for edit form based on current value
+        if ($('#editProductSlug').length && $('#editProductSlug').val()) {
+            $('#editProductSlug').data('manually-edited', true);
+        }
+    }
+
     var saveProduct = function (){
         let formData = WinPos.Common.getFormData("#productCreateForm");
         
@@ -1094,6 +1164,7 @@ WinPos.Product = (function (Urls){
         saveProduct: saveProduct,
         updateProduct: updateProduct,
         deleteProduct: deleteProduct,
+        initSlugGeneration: initSlugGeneration,
         loadProductDetails: loadProductDetails,
         saveVariation: saveVariation,
         openEditVariationModal: openEditVariationModal,

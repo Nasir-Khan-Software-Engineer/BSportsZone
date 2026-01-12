@@ -331,6 +331,14 @@ class ProductController extends Controller
                     Rule::unique('products', 'name')
                         ->where('POSID', $POSID),
                 ],
+                'slug' => [
+                    'required',
+                    'string',
+                    'max:100',
+                    Rule::unique('products', 'slug')
+                        ->where('POSID', $POSID)
+                        ->where('type', 'Product'),
+                ],
                 'category_id' => 'required',
                 'description' => 'nullable|string|min:3'
             ]);
@@ -339,6 +347,7 @@ class ProductController extends Controller
             $product->POSID = $POSID;
             $product->code = (session('accountInfo.productCodePrefix') ?? 'PR').'-'.$request->code;
             $product->name = $request->name;
+            $product->slug = $request->slug;
             $product->type = 'Product';
             $product->price = 0; // Products don't have price, variations do
             $product->description = $request->description;
@@ -398,6 +407,15 @@ class ProductController extends Controller
                         ->where('POSID', $POSID)
                         ->ignore($id),
                 ],
+                'slug' => [
+                    'required',
+                    'string',
+                    'max:100',
+                    Rule::unique('products', 'slug')
+                        ->where('POSID', $POSID)
+                        ->where('type', 'Product')
+                        ->ignore($id),
+                ],
                 'category' => 'required',
                 'description' => 'nullable|string|min:3',
                 'price' => 'nullable|numeric|min:0',
@@ -416,6 +434,7 @@ class ProductController extends Controller
 
             // Products don't have price, variations do
             $product->name = $request->name;
+            $product->slug = $request->slug;
             $product->description = $request->description;
             $product->unit_id = $request->unit_id ?: null;
             $product->brand_id = $request->brand_id ?: null;

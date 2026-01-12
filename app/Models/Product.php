@@ -14,6 +14,7 @@ class Product extends Model
         'POSID',
         'code',
         'name',
+        'slug',
         'type',
         'unit_id',
         'brand_id',

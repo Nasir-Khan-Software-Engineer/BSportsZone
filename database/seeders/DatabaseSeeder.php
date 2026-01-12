@@ -35,9 +35,10 @@ class DatabaseSeeder extends Seeder
         $this->call(EmployeeReviewSeeder::class);
 
         $this->call(ServiceSeeder::class);
-        $this->call(ProductWithVariationSeeder::class);
+        //$this->call(ProductWithVariationSeeder::class);
 
         $this->call(EmployeeSmsReportAccessRightSeeder::class);
-        $this->call(PurchaseSeeder::class);
+        //$this->call(PurchaseSeeder::class);
+        $this->call(ProductSeeder::class);
     }
 }

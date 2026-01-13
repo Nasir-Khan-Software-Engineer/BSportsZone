@@ -133,6 +133,12 @@ class ProductController extends Controller
             } else {
                 $product->createdBy = $product->creator->name ?? 'N/A';
             }
+            
+            // Include is_published status for frontend highlighting
+            $product->is_published = $product->is_published ?? false;
+            
+            // Add action field (even though it's rendered on frontend, DataTables expects it)
+            $product->action = null;
 
             return $product;
         });
@@ -445,6 +451,11 @@ class ProductController extends Controller
             $product->seo_keyword = $request->seo_keyword ?? null;
             $product->seo_description = $request->seo_description ?? null;
             $product->updated_by = auth()->id();
+            
+            // Auto-unpublish product if it was published (any edit requires republishing)
+            if ($product->is_published) {
+                $product->is_published = false;
+            }
 
             $product->save();
           
@@ -850,6 +861,7 @@ class ProductController extends Controller
             $product->seo_keyword = $request->seo_keyword ?? null;
             $product->seo_description = $request->seo_description ?? null;
             $product->updated_by = auth()->id();
+            $product->is_published = false;
             $product->save();
             
             return response()->json([
@@ -876,7 +888,8 @@ class ProductController extends Controller
         try {
             $POSID = auth()->user()->POSID;
             
-            $product = Product::where('id', $id)
+            $product = Product::with('variations')
+                ->where('id', $id)
                 ->where('POSID', $POSID)
                 ->where('type', 'Product')
                 ->first();
@@ -886,6 +899,56 @@ class ProductController extends Controller
                     'status' => 'error',
                     'message' => 'Product not found.',
                 ], 404);
+            }
+            
+            // If publishing, calculate price and discount from lowest price variation
+            if (!$product->is_published) {
+                // Get all active variations
+                $activeVariations = $product->variations->where('status', 'active');
+                
+                if ($activeVariations->isEmpty()) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => 'Cannot publish product. No active variations found.',
+                    ], 422);
+                }
+                
+                // Calculate final price for each variation (after discount)
+                $variationsWithFinalPrice = $activeVariations->map(function($variation) {
+                    $finalPrice = $variation->selling_price;
+                    
+                    if ($variation->discount_type && $variation->discount_value) {
+                        if ($variation->discount_type === 'percentage') {
+                            $finalPrice = $variation->selling_price - ($variation->selling_price * $variation->discount_value / 100);
+                        } else {
+                            $finalPrice = $variation->selling_price - $variation->discount_value;
+                        }
+                        $finalPrice = max(0, $finalPrice); // prevent negative
+                    }
+                    
+                    return [
+                        'variation' => $variation,
+                        'final_price' => $finalPrice
+                    ];
+                });
+                
+                // Find variation with lowest final price
+                $lowestPriceVariation = $variationsWithFinalPrice->sortBy('final_price')->first();
+                $defaultVariation = $lowestPriceVariation['variation'];
+                
+                // Mark all variations as not default first
+                DB::table('variations')
+                    ->where('product_id', $product->id)
+                    ->update(['is_default' => false]);
+                
+                // Mark the lowest price variation as default
+                $defaultVariation->is_default = true;
+                $defaultVariation->save();
+                
+                // Update product with default variation's price and discount
+                $product->price = $defaultVariation->selling_price;
+                $product->discount_type = $defaultVariation->discount_type;
+                $product->discount_value = $defaultVariation->discount_value;
             }
             
             $product->is_published = !$product->is_published;

@@ -37,29 +37,49 @@
                     <!-- Section 1 -->
                     <div class="flex-grow-1 mr-3">
                         <p class="mb-1"><strong>Customer Name:</strong> {{ $sale->customer->name ?? '-' }}</p>
-                        <p class="mb-1"><strong>Customer Phone:</strong> {{ $sale->customer->phone1 ?? '-' }}</p>
+                        <p class="mb-1"><strong>Customer Phone:</strong> {{ $sale->formatedCustomerPhone ?? '-' }}</p>
+                        <p class="mb-1"><strong>Customer Age Group:</strong> {{ $sale->customer->age_group ?? '-' }}</p>
                         <p class="mb-1"><strong>Invoice Number:</strong> {{ $sale->invoice_code ?? '-' }}</p>
                     </div>
 
                     <!-- Section 2 -->
                     <div class="flex-grow-1 mr-3">
+                        <p class="mb-1"><strong>Order Source:</strong> 
+                            <span class="badge bg-{{ $sale->sales_from === 'online' ? 'success' : 'secondary' }}">
+                                {{ ucfirst($sale->sales_from ?? 'offline') }}
+                            </span>
+                        </p>
+                        <p class="mb-1"><strong>Shipping Address:</strong> {{ $sale->shipping_address ?? '-' }}</p>
+                        <p class="mb-1"><strong>Delivery Area:</strong> {{ $sale->delivery_area ? ucfirst($sale->delivery_area) : '-' }}</p>
                         <p class="mb-1"><strong>Total Service Qty:</strong> {{ $sale->items->sum('quantity') ?? 0 }}</p>
-                        <p class="mb-1"><strong>Created At:</strong> {{ $sale->formattedCreatedDate }}</p>
-                        <p class="mb-1"><strong>Created By:</strong> {{ $sale->createdByUser->name ?? '-' }}</p>
                     </div>
 
                     <!-- Section 3 -->
                     <div class="flex-grow-1 mr-3">
-                        <p class="mb-1"><strong>Customer Name:</strong> {{ $sale->customer->name ?? '-' }}</p>
-                        <p class="mb-1"><strong>Customer Phone:</strong> {{ $sale->formatedCustomerPhone ?? '-' }}</p>
-                        <p class="mb-1"><strong>Customer Age Group:</strong> {{ $sale->customer->age_group ?? '-' }}</p>
+                        <p class="mb-1"><strong>Created At:</strong> {{ $sale->formattedCreatedDate }}</p>
+                        <p class="mb-1"><strong>Created By:</strong> {{ $sale->createdByUser->name ?? '-' }}</p>
+                        <p class="mb-1"><strong>Discount:</strong> {{ $sale->discountText }}</p>
+                        <p class="mb-1"><strong>Adjustment:</strong> {{ $sale->adjustmentText }}</p>
                     </div>
 
                     <!-- Section 4 -->
                     <div class="flex-grow-1">
-                        <p class="mb-1"><strong>Total Amount:</strong> {{ number_format($sale->total_amount, 2) }} Tk</p>
-                        <p class="mb-1"><strong>Discount:</strong> {{ $sale->discountText }}</p>
-                        <p class="mb-1"><strong>Adjustment:</strong> {{ $sale->adjustmentText }}</p>
+                        <p class="mb-1"><strong>Total Amount:</strong> 
+                            <span class="badge bg-primary fs-6">{{ number_format($sale->total_amount, 2) }} Tk</span>
+                        </p>
+                        <p class="mb-1"><strong>Total Payable:</strong> 
+                            <span class="badge bg-success fs-6">{{ number_format($sale->total_payable_amount, 2) }} Tk</span>
+                        </p>
+                        <p class="mb-1"><strong>Payment Status:</strong> 
+                            <span class="badge bg-{{ $sale->payment_status === 'paid' ? 'success' : 'warning' }}">
+                                {{ ucfirst($sale->payment_status ?? 'pending') }}
+                            </span>
+                        </p>
+                        <p class="mb-1"><strong>Sale Status:</strong> 
+                            <span class="badge bg-{{ $sale->sale_status === 'completed' ? 'success' : 'info' }}">
+                                {{ ucfirst($sale->sale_status ?? 'pending') }}
+                            </span>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -124,6 +144,14 @@
                                     </td>
                                 </tr>
                             @endforelse
+                            @if(count($serviceList) > 0)
+                                <tr class="table-info fw-bold">
+                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-center"><strong>{{ collect($serviceList)->sum('quantity') }}</strong></td>
+                                    <td colspan="2"></td>
+                                    <td class="text-end"><strong>{{ number_format(collect($serviceList)->sum('total_price'), 2) }} Tk</strong></td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
 
@@ -177,6 +205,14 @@
                                     </td>
                                 </tr>
                             @endforelse
+                            @if(count($productList) > 0)
+                                <tr class="table-info fw-bold">
+                                    <td colspan="2" class="text-end"><strong>Total:</strong></td>
+                                    <td class="text-center"><strong>{{ collect($productList)->sum('quantity') }}</strong></td>
+                                    <td colspan="2"></td>
+                                    <td class="text-end"><strong>{{ number_format(collect($productList)->sum('total_price'), 2) }} Tk</strong></td>
+                                </tr>
+                            @endif
                         </tbody>
                     </table>
                 </div>

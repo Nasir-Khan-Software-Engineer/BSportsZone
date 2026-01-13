@@ -10,6 +10,10 @@ class Customer extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'POSID','name', 'gender', 'email', 'phone1', 'phone2', 'address', 'note', 'created_by', 'updated_by', 'latest_card_id'
+    ];
     
     protected $dates = [
         'created_at', 'updated_at', 'deleted_at'

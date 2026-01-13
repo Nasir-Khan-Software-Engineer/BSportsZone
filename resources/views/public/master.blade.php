@@ -25,14 +25,13 @@
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
 
     <script>
-        var Website = {};
+    var Website = {};
     </script>
 
 
 
 
     @yield('styles')
-    @yield('scripts')
     @yield('seo')
 
 
@@ -65,13 +64,17 @@
 
                 <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
                     <li><a class="nav-link" href="#"><img src="{{asset('website/images/user.svg') }}"></a></li>
-                    <li><a class="nav-link" href="cart.html"><img src="{{asset('website/images/cart.svg') }}"></a></li>
+                    <li class="check-out-btn"><a class="nav-link" href="{{ route('checkout') }}">
+                        <img src="{{asset('website/images/cart.svg') }}"></a>
+                    </li>
                 </ul>
             </div>
         </div>
 
     </nav>
     <!-- End Header/Navigation -->
+
+    <div id="toast-container"></div>
 
     @yield('content')
 
@@ -141,7 +144,8 @@
                 <div class="row pt-4">
                     <div class="col-lg-6">
                         <p class="mb-2 text-center text-lg-start">Copyright &copy;
-                            <span id="copyright-year"></span>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a> Distributed By <a hreff="https://themewagon.com">ThemeWagon</a>
+                            <span id="copyright-year"></span>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a> Distributed By <a
+                                hreff="https://themewagon.com">ThemeWagon</a>
                             <!-- License information: https://untree.co/license/ -->
                         </p>
                     </div>
@@ -166,35 +170,6 @@
     <script src="{{ asset('website/js/tiny-slider.js') }}"></script>
     <script src="{{ asset('website/js/custom.js') }}"></script>
 
-
-    <script>
-        new Splide('#reviewSplide', {
-            type: 'loop',
-            perPage: 6,
-            gap: '5px',
-            arrows: true,
-            pagination: false,
-            drag: true,
-            autoScroll: {
-                speed: 1.2,
-            },
-            breakpoints: {
-                768: {
-                    perPage: 5
-                },
-                480: {
-                    perPage: 4
-                },
-                320: {
-                    perPage: 3
-                }
-            }
-        }).mount(window.splide.Extensions);
-        
-        
-
-    </script>
-
     <script>
         var websiteData = {
             currentYear: new Date().getFullYear()
@@ -202,10 +177,17 @@
     </script>
 
     <script src="{{ asset('website/js/common.js') }}"></script>
+    <script src="{{ asset('website/js/add-to-cart.js') }}"></script>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             Website.Common.updateCopyRightYear();
+            Website.AddToCart.setWebsiteCartCount();
+
+            // Website.Common.showToastMessage('success', 'Product added to cart!');
+            // Website.Common.showToastMessage('error', 'Something went wrong!');
+            // Website.Common.showToastMessage('warning', 'Please select a size first!');
+
         });
     </script>
 

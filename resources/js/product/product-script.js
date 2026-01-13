@@ -45,8 +45,25 @@ WinPos.Product = (function (Urls){
                                '<a href="' + Urls.editProduct.replace('productID', row.id) + '" class="btn btn-sm thm-btn-bg thm-btn-text-color" data-toggle="tooltip" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a> ' +
                                '<button data-productid="' + row.id + '" class="btn btn-sm thm-btn-bg thm-btn-text-color delete-product" data-toggle="tooltip" title="Delete"><i class="fa-solid fa-trash"></i></button>';
                     }
+                },
+                {
+                    targets: '_all',
+                    createdCell: function (td, cellData, rowData, row, col) {
+                        // Highlight row if product is unpublished
+                        if (rowData.is_published === false || rowData.is_published === 0) {
+                            $(td).closest('tr').addClass('table-warning');
+                            $(td).closest('tr').attr('title', 'This product is unpublished');
+                        }
+                    }
                 }
-            ]
+            ],
+            rowCallback: function(row, data) {
+                // Add warning class to entire row if unpublished
+                if (data.is_published === false || data.is_published === 0) {
+                    $(row).addClass('table-warning');
+                    $(row).attr('title', 'This product is unpublished');
+                }
+            }
         };
     }
 

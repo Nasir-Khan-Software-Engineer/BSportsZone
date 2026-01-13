@@ -27,6 +27,7 @@ class Variation extends Model
         'selling_price' => 'double',
         'stock' => 'integer',
         'discount_value' => 'double',
+        'is_default' => 'boolean',
     ];
 
     public function product(): BelongsTo

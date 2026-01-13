@@ -11,73 +11,51 @@
                 </div>
             </div>
             <div class="col-12 col-lg-8">
-                <div class="product-info" 
-                     id="product-info"
-                     data-product-id="{{ $product->id }}"
-                     data-product-name="{{ $product->name }}"
-                     data-variation-id="{{ $defaultVariation->id ?? 0 }}"
-                     data-variation-tagline="{{ $defaultVariation->tagline ?? '' }}"
-                     data-variation-price="{{ $defaultVariationPrice ?? $finalPrice }}"
-                     data-quantity="1">
+                <div class="product-info" id="product-info">
                     <h2 class="heading">{{$product->name}}</h2>
                     <div class="price">
-                        @php
-                            $displayPrice = $defaultVariationPrice ?? $finalPrice;
-                            $displayOriginalPrice = $defaultVariation ? $defaultVariation->selling_price : $product->price;
-                        @endphp
-                        @if($defaultVariation && $defaultVariation->discount_type && $defaultVariation->discount_value)
-                        <span class="original-price" style="text-decoration: line-through; color: #999; margin-right: 8px;">
-                            Tk.{{ number_format($displayOriginalPrice, 2) }}
-                        </span>
-                        @elseif($product->discount_type && $product->discount_value)
+                        @if($product->price !== $priceAfterDiscount && $product->discount_type && $product->discount_value)
                         <span class="original-price" style="text-decoration: line-through; color: #999; margin-right: 8px;">
                             Tk.{{ number_format($product->price, 2) }}
                         </span>
                         @endif
-                        <strong class="price-display">Tk.{{ number_format($displayPrice, 2) }}</strong>
+                        <strong class="price-display">Tk.{{ number_format($priceAfterDiscount, 2) }}</strong>
                     </div>
                     <p class="m-0">{{$product->seo_description}}</p>
 
                     <div class="variation">
                         <div><span>Select Yours</span></div>
-
                         @foreach($product->variations as $variation)
-                            @php
-                                $isDefault = $variation->is_default ?? false;
-                                $variationFinalPrice = $variation->selling_price;
-                                if ($variation->discount_type && $variation->discount_value) {
-                                    if ($variation->discount_type === 'percentage') {
-                                        $variationFinalPrice = $variation->selling_price - ($variation->selling_price * $variation->discount_value / 100);
-                                    } else {
-                                        $variationFinalPrice = $variation->selling_price - $variation->discount_value;
-                                    }
-                                    $variationFinalPrice = max(0, $variationFinalPrice);
-                                }
-                            @endphp
-                            <button class="variation-btn {{ $isDefault ? 'active' : '' }}"
-                                data-id="{{ $variation->id }}"
-                                data-tagline="{{ $variation->tagline }}"
-                                data-selling-price="{{ $variation->selling_price }}"
-                                data-final-price="{{ $variationFinalPrice }}"
-                                data-discount-type="{{ $variation->discount_type }}"
-                                data-discount-value="{{ $variation->discount_value }}">
+                            <button class="variation-btn {{ $variation->is_default ? 'active' : '' }}"
+                                data-variation-id="{{ $variation->id }}"
+                                data-variation-tagline="{{ $variation->tagline }}"
+                                data-variation-selling-price="{{ $variation->selling_price }}"
+                                data-variation-price-after-discount="{{ $variation->price_after_discount }}"
+                                data-variation-discount-type="{{ $variation->discount_type }}"
+                                data-variation-discount-value="{{ $variation->discount_value }}">
                                 {{ $variation->tagline }}
+                                <i class="fa-solid fa-check"></i>
                             </button>
                         @endforeach
                     </div>
-
 
                     <div >
                         <div><span>Select Quantity</span></div>
                         <div class="input-group mb-3" style="max-width: 150px;">
                             <button class="qty-minus-btn qty-btn" type="button">&minus;</button>
-                            <input type="text" class="form-control text-center quantity" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+                            <input id="quantityInput" type="text" class="form-control text-center quantity" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
                             <button class="qty-plus-btn qty-btn" type="button">&plus;</button>
                         </div>
                     </div>
 
                     <p>
-                        <button data-id="{{ $product->id }}" data-variation-id="{{ $defaultVariation->id ?? 0 }}"  class="add-to-cart-btn">Add to Cart</button>
+                        <button 
+                        data-product-id="{{$product->id}}"
+                        data-product-name="{{$product->name}}"
+                        data-product-image="{{$product->image}}"
+                        
+                        id="addToCartBtn" class="add-to-cart-btn">Add to Cart</button>
+
                         <a href="index.html" class="buy-now-btn mt-1">Cash on Delivery</a>
                     </p>
                 </div>
@@ -175,6 +153,11 @@
 @endsection
 
 @section('scripts')
-    <script src="{{ asset('website/js/cart.js') }}"></script>
-    <script src="{{ asset('website/js/single-product.js') }}"></script>
+    <script>
+        var websiteData = {};
+    </script>
+
+    <script src="{{ asset('website/js/add-to-cart.js') }}"></script>
+    <!-- <script src="{{ asset('website/js/single-product.js') }}"></script> -->
+    <script src="{{ asset('website/js/single-product-script.js') }}"></script>
 @endsection

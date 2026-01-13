@@ -224,6 +224,12 @@ class VariationController extends Controller
             $variation->discount_value = $request->discount_value ? (float)$request->discount_value : null;
 
             $variation->save();
+            
+            // Auto-unpublish product if it was published (any variation change requires republishing)
+            if ($product->is_published) {
+                $product->is_published = false;
+                $product->save();
+            }
 
             $variation->formattedDate = formatDate($variation->created_at);
             $variation->formattedTime = formatTime($variation->created_at);
@@ -377,6 +383,12 @@ class VariationController extends Controller
             $variation->discount_value = $request->discount_value ? (float)$request->discount_value : null;
 
             $variation->save();
+            
+            // Auto-unpublish product if it was published (any variation change requires republishing)
+            if ($variation->product->is_published) {
+                $variation->product->is_published = false;
+                $variation->product->save();
+            }
 
             $variation->formattedDate = formatDate($variation->created_at);
             $variation->formattedTime = formatTime($variation->created_at);
@@ -454,7 +466,17 @@ class VariationController extends Controller
                 ], 422);
             }
 
+            // Store product reference before deletion
+            $product = $variation->product;
+            $wasPublished = $product->is_published;
+            
             $variation->delete();
+            
+            // Auto-unpublish product if it was published (variation deletion requires republishing)
+            if ($wasPublished) {
+                $product->is_published = false;
+                $product->save();
+            }
             
             return response()->json([
                 'status'    => 'success',
@@ -790,6 +812,10 @@ class VariationController extends Controller
             // Transfer purchase items to new variation
             PurchaseItem::where('product_variant_id', $id)
                 ->update(['product_variant_id' => $newVariation->id]);
+
+            // unpublish the product 
+            $variation->product->is_published = 0;
+            $variation->product->save();
 
             return response()->json([
                 'status' => 'success',

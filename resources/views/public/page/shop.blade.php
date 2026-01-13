@@ -22,34 +22,35 @@
 
         <div class="row">
             @forelse($products as $product)
-            @php
-            // Calculate final price after discount
-            $finalPrice = $product->price;
-            if ($product->discount_type && $product->discount_value) {
-            if ($product->discount_type === 'percentage') {
-            $finalPrice = $product->price - ($product->price * $product->discount_value / 100);
-            } else {
-            $finalPrice = $product->price - $product->discount_value;
-            }
-            $finalPrice = max(0, $finalPrice); // Ensure price doesn't go negative
-            }
-            @endphp
             <div class="col-12 col-md-4 col-lg-3 mb-3">
                 <div class="product-item px-2">
-                    <a href="{{ route('product.show', $product->slug) }}">
+                    <a title="{{ $product->name }}" href="{{ route('product.show', $product->slug) }}">
                         <img src="{{ asset('images/1/Product/') }}/{{$product->image}}" alt="{{ $product->name }}" class="img-fluid product-thumbnail">
-                        <h3 class="product-title">{{ Str::limit($product->name, 30) }}</h3>
+                        <h3 class="product-title">{{ $product->short_name }}</h3>
                         <div class="product-price">
                             @if($product->discount_type && $product->discount_value)
                             <span class="original-price" style="text-decoration: line-through; color: #999; margin-right: 8px;">
                                 Tk.{{ number_format($product->price, 2) }}
                             </span>
                             @endif
-                            <strong>Tk.{{ number_format($finalPrice, 2) }}</strong>
+                            <strong>Tk.{{ number_format($product->price_after_discount, 2) }}</strong>
                         </div>
                     </a>
                     <br>
-                    <button type="button" class="add-to-cart-btn">Add to Cart</button>
+                    <button type="button" class="add-to-cart-btn"
+                    data-product-id="{{ $product->id }}"
+                    data-product-name="{{ $product->name }}"
+                    data-product-image="{{ $product->image }}"
+                    data-product-quantity="1"
+
+                    data-variation-id="{{ $product->default_variation_id }}"
+                    data-variation-price-after-discount="{{ $product->default_variation_price_after_discount }}"
+                    data-variation-selling-price="{{ $product->default_variation_selling_price }}"
+                    data-variation-discount-type="{{ $product->default_variation_discount_type }}"
+                    data-variation-discount-value="{{ $product->default_variation_discount_value }}"
+                    data-variation-tagline="{{ $product->default_variation_tagline }}"
+                    
+                    >Add to Cart</button>
                 </div>
             </div>
             @empty
@@ -119,3 +120,43 @@
     </div>
 </div>
 @endsection
+
+@section('scripts')
+    <script>
+        var websiteData = {};
+    </script>
+    <script src="{{ asset('website/js/add-to-cart.js') }}"></script>
+
+
+
+    <script>
+
+        $(document).ready(function() {
+
+                $('.add-to-cart-btn').on('click', function() {
+                    let selectedProduct = {
+                        id: $(this).data('product-id'),
+                        name: $(this).data('product-name'),
+                        image: $(this).data('product-image'),
+
+                        quantity: 1,
+
+                        variation_id: $(this).data('variation-id'),
+                        variation_tagline: $(this).data('variation-tagline'),
+                        variation_price_after_discount: $(this).data('variation-price-after-discount'),
+                        variation_selling_price: $(this).data('variation-selling-price'),
+                        variation_discount_type: $(this).data('variation-discount-type'),
+                        variation_discount_value: $(this).data('variation-discount-value'),
+                    };
+
+                    let isAdded = Website.AddToCart.addProductToWebsiteCart(selectedProduct);
+                    if(isAdded){
+                        Website.Common.showToastMessage('success', 'The '+selectedProduct.variation_tagline + ' added to cart successfully!');
+                        Website.AddToCart.setWebsiteCartCount();
+                    }
+
+                })
+                
+        })
+    </script>
+@endSection

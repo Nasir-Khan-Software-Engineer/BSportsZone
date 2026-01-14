@@ -16,6 +16,7 @@ WinPos.Product = (function (Urls){
                 { data: 'id', name: 'id', orderable: true },
                 { data: 'code', name: 'code', orderable: true },
                 { data: 'name', name: 'name', orderable: true },
+                { data: 'is_published', name: 'is_published', orderable: true },
                 { data: 'salable_stocks', name: 'salable_stocks', orderable: false },
                 { data: 'warehouse_stocks', name: 'warehouse_stocks', orderable: false },
                 { data: 'cost_price_range', name: 'cost_price_range', orderable: false },
@@ -25,21 +26,32 @@ WinPos.Product = (function (Urls){
             ],
             columnDefs: [
                 {
-                    targets: [3, 4],
+                    targets: [4, 5],
                     className: 'text-center',
                     render: function (data, type, row) {
                         return data !== null && data !== undefined ? data : '0';
                     }
                 },
                 {
-                    targets: [5, 6],
+                    targets: [6, 7],
                     className: 'text-center',
                     render: function (data, type, row) {
                         return data || '-';
                     }
                 },
                 {
-                    targets: 8,
+                    targets: 3,
+                    className: 'text-center',
+                    render: function (data, type, row) {
+                        if (row.is_published === true || row.is_published === 1) {
+                            return '<span class="badge bg-success">Published</span>';
+                        } else {
+                            return '<span class="badge bg-warning">Unpublished</span>';
+                        }
+                    }
+                },
+                {
+                    targets: 9,
                     render: function (data, type, row) {
                         return '<a href="' + Urls.showProduct.replace('productID', row.id) + '" class="btn btn-sm thm-btn-bg thm-btn-text-color" data-toggle="tooltip" title="View Details"><i class="fa-solid fa-eye"></i></a> ' +
                                '<a href="' + Urls.editProduct.replace('productID', row.id) + '" class="btn btn-sm thm-btn-bg thm-btn-text-color" data-toggle="tooltip" title="Edit"><i class="fa-solid fa-pen-to-square"></i></a> ' +

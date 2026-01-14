@@ -288,7 +288,7 @@ WinPos.sale = (function (Urls){
                     }
                 }
             },
-            order: [[0, 'desc'], [2, 'desc']],
+            order: [[0, 'desc'], [6, 'desc']],
             columns: [
                 {
                     data: null,
@@ -314,20 +314,18 @@ WinPos.sale = (function (Urls){
                 {
                     data: null,
                     type: 'string',
-                    orderable: 'true',
-                    className: 'text-center align-middle',
-                    render: function(data, type, row){
-                        return row.total_amount;
-                    }
-                },
-                {
-                    data: null,
-                    type: 'string',
                     orderable: true,
                     className: 'text-center align-middle',
                     render: function(data, type, row){
+                        // Extract numeric values from formatted strings
+                        let payableAmt = parseFloat(row.total_payable_amount.replace(/[^\d.-]/g, '')) || 0;
+                        let paidAmt = parseFloat(row.paidAmount.replace(/[^\d.-]/g, '')) || 0;
+                        let warningIcon = '';
+                        if (Math.abs(payableAmt - paidAmt) > 0.01) {
+                            warningIcon = ' <i class="fa-solid fa-asterisk text-warning" title="Payable and Paid amounts do not match"></i>';
+                        }
                         let discountTitle = row.disountTpye == 'Fixed'? `${row.discount_amount} Tk (Fixed)`: `${row.discount_amount} Tk (Percentage)`;
-                        return `<span title="Discount: ${discountTitle}">${row.total_payable_amount}</span>`;
+                        return `<span title="Discount: ${discountTitle}">${row.total_payable_amount}${warningIcon}</span>`;
                     }
                 },
                 {
@@ -336,7 +334,36 @@ WinPos.sale = (function (Urls){
                     orderable: true,
                     className: 'text-center align-middle',
                     render: function(data, type, row){
-                        return row.paidAmount;
+                        // Extract numeric values from formatted strings
+                        let payableAmt = parseFloat(row.total_payable_amount.replace(/[^\d.-]/g, '')) || 0;
+                        let paidAmt = parseFloat(row.paidAmount.replace(/[^\d.-]/g, '')) || 0;
+                        let warningIcon = '';
+                        if (Math.abs(payableAmt - paidAmt) > 0.01) {
+                            warningIcon = ' <i class="fa-solid fa-asterisk text-warning" title="Payable and Paid amounts do not match"></i>';
+                        }
+                        return `${row.paidAmount}${warningIcon}`;
+                    }
+                },
+                {
+                    data: null,
+                    type: 'string',
+                    orderable: true,
+                    className: 'text-center align-middle',
+                    render: function(data, type, row){
+                        let status = row.payment_status || 'pending';
+                        let badgeClass = status === 'paid' ? 'success' : 'warning';
+                        return `<span class="badge bg-${badgeClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
+                    }
+                },
+                {
+                    data: null,
+                    type: 'string',
+                    orderable: true,
+                    className: 'text-center align-middle',
+                    render: function(data, type, row){
+                        let status = row.sale_status || 'pending';
+                        let badgeClass = status === 'completed' ? 'success' : (status === 'pending' ? 'info' : 'secondary');
+                        return `<span class="badge bg-${badgeClass}">${status.charAt(0).toUpperCase() + status.slice(1)}</span>`;
                     }
                 },
                 {
@@ -347,15 +374,6 @@ WinPos.sale = (function (Urls){
                     className: 'text-center align-middle',
                     render: function(data, type, row){
                         return WinPos.Common.dataTableCreatedOnCell(row.formattedTime, row.formattedDate);
-                    }
-                },
-                {
-                    data: null,
-                    type: 'string',
-                    orderable: true,
-                    className: 'text-center align-middle',
-                    render: function(data, type, row){
-                        return row.created_by;
                     }
                 },
                 {

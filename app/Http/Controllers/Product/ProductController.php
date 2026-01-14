@@ -35,6 +35,30 @@ class ProductController extends Controller
         ]);
     }
 
+    public function getUnpublishedCount()
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            // Count products with is_published = false
+            $count = Product::where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->where('is_published', false)
+                ->count();
+            
+            return response()->json([
+                'status' => 'success',
+                'count' => $count
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'count' => 0,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function datatable(Request $request)
     {
         $POSID = auth()->user()->POSID;
@@ -71,6 +95,12 @@ class ProductController extends Controller
         } elseif ($orderColumn == 2) {
             // Order by name
             $products = (clone $query)->orderBy('name', $orderDir)
+                ->skip($request->input('start'))
+                ->take($request->input('length'))
+                ->get();
+        } elseif ($orderColumn == 3) {
+            // Order by is_published (status)
+            $products = (clone $query)->orderBy('is_published', $orderDir)
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();

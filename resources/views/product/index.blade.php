@@ -22,12 +22,13 @@
                     <tr>
                         <th class="text-center align-middle" style="width: 5%;" scope="col">ID</th>
                         <th class="text-center align-middle" style="width: 10%;" scope="col">Code</th>
-                        <th class="text-center align-middle" style="width: 20%;" scope="col">Name</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Salable Stocks</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Warehouse Stocks</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Cost Price</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Selling Price</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Variations</th>
+                        <th class="text-center align-middle" style="width: 18%;" scope="col">Name</th>
+                        <th class="text-center align-middle" style="width: 8%;" scope="col">Status</th>
+                        <th class="text-center align-middle" style="width: 9%;" scope="col">Salable Stocks</th>
+                        <th class="text-center align-middle" style="width: 9%;" scope="col">Warehouse Stocks</th>
+                        <th class="text-center align-middle" style="width: 9%;" scope="col">Cost Price</th>
+                        <th class="text-center align-middle" style="width: 9%;" scope="col">Selling Price</th>
+                        <th class="text-center align-middle" style="width: 8%;" scope="col">Variations</th>
                         <th class="text-center align-middle" style="width: 15%;" scope="col">Action</th>
                     </tr>
                 </thead>

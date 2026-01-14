@@ -25,11 +25,11 @@
                 <tr>
                     <th class="text-center align-middle" style="width: 20%;" scope="col">Invoice No.</th>
                     <th class="text-center align-middle" style="width: 15%;" scope="col">Customer</th>
-                    <th class="text-center align-middle" style="width: 10%;" scope="col">Total Amt.</th>
                     <th class="text-center align-middle" style="width: 10%;" scope="col">Payable Amt.</th>
                     <th class="text-center align-middle" style="width: 10%;" scope="col">Paid Amt.</th>
+                    <th class="text-center align-middle" style="width: 10%;" scope="col">Payment Status</th>
+                    <th class="text-center align-middle" style="width: 10%;" scope="col">Sales Status</th>
                     <th class="text-center align-middle" style="width: 10%;" scope="col">Date</th>
-                    <th class="text-center align-middle" style="width: 15%;" scope="col">Created By</th>
                     <th class="text-center align-middle" style="width: 10%;" scope="col">Action</th>
                 </tr>
             </thead>

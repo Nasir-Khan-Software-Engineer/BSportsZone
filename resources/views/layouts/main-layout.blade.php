@@ -510,10 +510,34 @@
                     </button>
 
                     <ul class="navbar-nav ml-auto">
+                        <li class="nav-item position-relative">
+                            <a title="Online Order" class="nav-link online-order-shortcut" 
+                            href="{{ route('sales.sale.index') }}" id="onlineOrderBtnShotcut">
+                            
+                                <i class="fa-solid fa-basket-shopping fa-lg"></i>
+
+                                <!-- Order count badge -->
+                                <span class="menu-shortcut-icon-count" id="onlineOrderCount" style="display: none;">0</span>
+                            </a>
+                        </li>
+                        <div class="topbar-divider d-none d-sm-block"></div>
+
+                        <li class="nav-item position-relative">
+                            <a title="Unpublished Products" class="nav-link unpublished-product-shortcut" 
+                            href="{{ route('product.index') }}" id="unpublishedProductBtnShortcut">
+                            
+                                <i class="fa-solid fa-box fa-lg"></i>
+
+                                <!-- Unpublished products count badge -->
+                                <span class="menu-shortcut-icon-count" id="unpublishedProductCount" style="display: none;">0</span>
+                            </a>
+                        </li>
+
+                        <div class="topbar-divider d-none d-sm-block"></div>
 
                         @if(hasAccess('attendance.data'))
                         <li class="nav-item">
-                            <a title="Attendance" class="nav-link attendance-terminal" href="javascript:void(0);" id="attendanceBtnGlobal">
+                            <a title="Attendance" class="nav-link" href="javascript:void(0);" id="attendanceBtnGlobal">
                                 <i class="fa-solid fa-calendar-check"></i>
                             </a>
                         </li>
@@ -721,6 +745,81 @@
 
         $('[data-toggle="tooltip"]').tooltip({
             html: true
+        });
+
+        // Online Order Notification Count - Poll every 1 second
+        let onlineOrderCountUrl = "{{ route('sales.sale.pending.count') }}";
+        let onlineOrderCountInterval = null;
+
+        function updateOnlineOrderCount() {
+            WinPos.Common.getAjaxCall(onlineOrderCountUrl, function(response) {
+                if (response.status === 'success') {
+                    let count = response.count || 0;
+                    let $countSpan = $('#onlineOrderCount');
+                    
+                    if (count > 0) {
+                        $countSpan.text(count).show();
+                    } else {
+                        $countSpan.hide();
+                    }
+                }
+            }, function(error) {
+                // Silently fail - don't show error for polling
+                console.error('Failed to fetch online order count');
+            });
+        }
+
+        // Start polling on page load
+        updateOnlineOrderCount();
+        onlineOrderCountInterval = setInterval(updateOnlineOrderCount, 1000);
+
+        // Unpublished Products Notification Count - Poll every 5 minutes
+        let unpublishedProductCountUrl = "{{ route('product.unpublished.count') }}";
+        let unpublishedProductCountInterval = null;
+
+        function updateUnpublishedProductCount() {
+            WinPos.Common.getAjaxCall(unpublishedProductCountUrl, function(response) {
+                if (response.status === 'success') {
+                    let count = response.count || 0;
+                    let $countSpan = $('#unpublishedProductCount');
+                    
+                    if (count > 0) {
+                        $countSpan.text(count).show();
+                    } else {
+                        $countSpan.hide();
+                    }
+                }
+            }, function(error) {
+                // Silently fail - don't show error for polling
+                console.error('Failed to fetch unpublished product count');
+            });
+        }
+
+        // Start polling on page load (every 5 minutes = 300000ms)
+        updateUnpublishedProductCount();
+        unpublishedProductCountInterval = setInterval(updateUnpublishedProductCount, 300000);
+
+        // Clear intervals when page is hidden (to save resources)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                if (onlineOrderCountInterval) {
+                    clearInterval(onlineOrderCountInterval);
+                    onlineOrderCountInterval = null;
+                }
+                if (unpublishedProductCountInterval) {
+                    clearInterval(unpublishedProductCountInterval);
+                    unpublishedProductCountInterval = null;
+                }
+            } else {
+                if (!onlineOrderCountInterval) {
+                    updateOnlineOrderCount();
+                    onlineOrderCountInterval = setInterval(updateOnlineOrderCount, 1000);
+                }
+                if (!unpublishedProductCountInterval) {
+                    updateUnpublishedProductCount();
+                    unpublishedProductCountInterval = setInterval(updateUnpublishedProductCount, 300000);
+                }
+            }
         });
     });
 

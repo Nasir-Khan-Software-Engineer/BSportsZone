@@ -220,6 +220,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::prefix('product')->controller(ProductController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/datatable', 'datatable')->name('datatable');
+            Route::get('/unpublished-count', 'getUnpublishedCount')->name('unpublished.count');
             Route::get('/{product}/purchases', 'getProductPurchases')->name('get-purchases');
             Route::get('/{product}/edit', 'edit')->name('edit');
             Route::get('/{product}', 'show')->name('show');
@@ -306,9 +307,11 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::prefix('sale')->controller(SaleController::class)->group(function () {
             Route::get('/', 'index')->name('sale.index')->middleware('permission');
             Route::get('/datatable', 'datatable')->name('sale.datatable');
+            Route::get('/pending-count', 'getPendingCount')->name('sale.pending.count');
             Route::get('/{sale}', 'show')->name('sale.show')->middleware('permission');
             Route::get('/modal/{sale}', 'modal')->name('sale.modal');
             Route::delete('/{sale}', 'destroy')->name('sale.destroy')->middleware('permission');
+            Route::post('/{sale}/payment', 'storePayment')->name('sale.payment.store');
         });
     });
 

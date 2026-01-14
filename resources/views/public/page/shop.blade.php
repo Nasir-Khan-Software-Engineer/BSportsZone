@@ -24,7 +24,7 @@
             @forelse($products as $product)
             <div class="col-12 col-md-4 col-lg-3 mb-3">
                 <div class="product-item px-2">
-                    <a title="{{ $product->name }}" href="{{ route('product.show', $product->slug) }}">
+                    <a title="{{ $product->name }}" href="{{ route('product.single', $product->slug) }}">
                         <img src="{{ asset('images/1/Product/') }}/{{$product->image}}" alt="{{ $product->name }}" class="img-fluid product-thumbnail">
                         <h3 class="product-title">{{ $product->short_name }}</h3>
                         <div class="product-price">

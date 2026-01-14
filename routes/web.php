@@ -46,7 +46,7 @@ use App\Http\Controllers\Public\PublicIndexController;
 
 Route::get('/', [PublicIndexController::class, 'index'])->name('index');
 Route::get('/shop/{page?}', [PublicProductController::class, 'index'])->name('shop')->where('page', '[0-9]+');
-Route::get('/product/{slug}', [PublicProductController::class, 'product'])->name('product.show');
+Route::get('/p/{slug}', [PublicProductController::class, 'product'])->name('product.single');
 Route::get('/checkout', [PublicIndexController::class, 'checkout'])->name('checkout');
 Route::post('/place-order', [PublicIndexController::class, 'placeOrder'])->name('placeOrder');
 Route::get('/order/thanks/{order}', [PublicIndexController::class, 'thanks'])->name('order.thanks');

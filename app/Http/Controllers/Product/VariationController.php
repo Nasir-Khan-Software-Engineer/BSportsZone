@@ -359,6 +359,7 @@ class VariationController extends Controller
                 $taglineToCheck = $request->tagline ?? $variation->tagline;
                 $existingActive = Variation::where('tagline', $taglineToCheck)
                     ->where('POSID', $POSID)
+                    ->where('product_id', $variation->product_id)
                     ->where('status', 'active')
                     ->where('id', '!=', $id)
                     ->exists();

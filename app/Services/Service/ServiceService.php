@@ -16,6 +16,7 @@ class ServiceService implements IServiceService {
     public function getServiceByIds($serviceIds)
     {
         return Product::select(
+                'products.POSID',
                 'products.id',
                 'products.name',
                 'products.POSID',
@@ -50,6 +51,7 @@ class ServiceService implements IServiceService {
     public function getRecentServices($posId, $shopId, $categoryId, $brandId)
     {
         return Product::select(
+                'products.POSID',
                 'products.id',
                 'products.name',
                 'products.POSID',

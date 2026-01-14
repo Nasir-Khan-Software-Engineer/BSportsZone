@@ -317,7 +317,7 @@ function checkAndAutoOpenAttendanceModal() {
 
 function fetchDashboardData(filterValue) {
     $.ajax({
-        url: '/dashboard/filter/data',
+        url: '/admin/dashboard/filter/data',
         method: 'POST',
         data: JSON.stringify({
             filter: filterValue
@@ -369,7 +369,7 @@ function fetchDashboardData(filterValue) {
 
 function fetchDashboardFixedMetricsData(filterValue) {
     $.ajax({
-        url: '/dashboard/fixed/metrics',
+        url: '/admin/dashboard/fixed/metrics',
         method: 'POST',
         data: JSON.stringify({
             filter: filterValue

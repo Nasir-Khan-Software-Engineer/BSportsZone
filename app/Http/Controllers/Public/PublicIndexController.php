@@ -198,8 +198,9 @@ class PublicIndexController extends Controller
 
             DB::commit();
 
-            // Redirect to thanks page with invoice code
-            return redirect()->route('order.thanks', ['order' => $sales->invoice_code]);
+            // Redirect to thanks page with invoice code and order_placed query parameter
+            $thanksUrl = route('order.thanks', ['order' => $sales->invoice_code]) . '?order_placed=true';
+            return redirect($thanksUrl);
 
         } catch (\Exception $e) {
             DB::rollBack();

@@ -31,6 +31,7 @@ class ProductService implements IProductService
             ->flatMap(function ($product) {
                 return $product->variations->map(function ($variation) use ($product) {
                     return (object) [
+                        'POSID'        => $product->POSID,
                         'id'           => $product->id,
                         'code'         => $product->code,
                         'variation_id' => $variation->id,
@@ -85,6 +86,7 @@ class ProductService implements IProductService
             ->flatMap(function ($product) {
                 return $product->variations->map(function ($variation) use ($product) {
                     return (object) [
+                        'POSID'        => $product->POSID,
                         'id'           => $product->id,
                         'code'         => $product->code,
                         'variation_id' => $variation->id,

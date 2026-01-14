@@ -46,11 +46,10 @@ use App\Http\Controllers\Public\PublicIndexController;
 
 Route::get('/', [PublicIndexController::class, 'index'])->name('index');
 Route::get('/shop/{page?}', [PublicProductController::class, 'index'])->name('shop')->where('page', '[0-9]+');
-Route::get('/p/{slug}', [PublicProductController::class, 'product'])->name('product.single');
 Route::get('/checkout', [PublicIndexController::class, 'checkout'])->name('checkout');
 Route::post('/place-order', [PublicIndexController::class, 'placeOrder'])->name('placeOrder');
 Route::get('/order/thanks/{order}', [PublicIndexController::class, 'thanks'])->name('order.thanks');
-
+Route::get('/{slug}', [PublicProductController::class, 'product'])->name('product.single');
 // Route::get('/dashboard', function () {
 //     return view('dashboard');
 // })->middleware(['auth', 'verified'])->name('dashboard');
@@ -166,7 +165,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         Route::get('/sms/history/download', [SmsHistoryReportController::class, 'downloadSmsHistoryReport'])->name('sms.history.download')->middleware('permission');
     });
 
-    Route::prefix('service')->as('service.')->group(function () {
+    Route::prefix('product-and-service')->as('service.')->group(function () {
         Route::prefix('category')->controller(CategoryController::class)->group(function () {
             Route::get('/', 'index')->name('category.index')->middleware('permission');
             Route::get('/create', 'create')->name('category.create');
@@ -204,7 +203,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::delete('/{supplier}', 'destroy')->name('supplier.destroy');
         });
 
-        Route::controller(ServiceController::class)->group(function () {
+        Route::prefix('service')->controller(ServiceController::class)->group(function () {
             Route::get('/', 'index')->name('index')->middleware('permission');
             Route::get('/datatable', 'datatable')->name('datatable');
             Route::get('/create', 'create')->name('create');
@@ -217,8 +216,8 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         });
     });
 
-    Route::prefix('product')->as('product.')->group(function () {
-        Route::controller(ProductController::class)->group(function () {
+    Route::prefix('product-and-service')->as('product.')->group(function () {
+        Route::prefix('product')->controller(ProductController::class)->group(function () {
             Route::get('/', 'index')->name('index');
             Route::get('/datatable', 'datatable')->name('datatable');
             Route::get('/{product}/purchases', 'getProductPurchases')->name('get-purchases');
@@ -346,8 +345,8 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         });
     });
 
-    Route::prefix('pos')->as('pos.')->group(function () {
-        Route::controller(PosController::class)->group(function () {
+    Route::prefix('pos-terminal')->as('pos.')->group(function () {
+        Route::prefix('pos')->controller(PosController::class)->group(function () {
             Route::get('/', 'index')->name('index')->middleware('permission');
             Route::get('/account', 'getAccountInfo')->name('account.get');
             Route::get('/search/service', 'searchService')->name('search.service');
@@ -366,10 +365,14 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
         });
     });
 
-    Route::prefix('dashboard')->as('dashboard.')->controller(HomeController::class)->group(function () {
-        Route::get('/', 'index')->name('dashboard');
-        Route::post('/filter/data', 'filterData')->name('filter.data');
-        Route::post('/fixed/metrics', 'fixedMetrics')->name('fixedmetrics.data');
+    
+
+    Route::prefix('admin')->as('dashboard.')->group(function () {
+        Route::prefix('dashboard')->controller(HomeController::class)->group(function () {
+            Route::get('/', 'index')->name('dashboard');
+            Route::post('/filter/data', 'filterData')->name('filter.data');
+            Route::post('/fixed/metrics', 'fixedMetrics')->name('fixedmetrics.data');
+        });
     });
 
     Route::prefix('setup')->as('setup.')->group(function () {

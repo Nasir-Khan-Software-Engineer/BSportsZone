@@ -17,3 +17,23 @@
     </div>
 </div>
 @endsection
+
+@section('scripts')
+<script>
+$(document).ready(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderPlaced = urlParams.get('order_placed') === 'true';
+    
+    if (orderPlaced) {
+        if (typeof Website !== 'undefined' && Website.AddToCart) {
+            Website.AddToCart.clearWebsiteCart();
+            Website.AddToCart.setWebsiteCartCount();
+        }
+        
+        urlParams.delete('order_placed');
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '') + window.location.hash;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+});
+</script>
+@endsection

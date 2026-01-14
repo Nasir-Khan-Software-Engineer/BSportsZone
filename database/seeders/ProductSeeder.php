@@ -270,7 +270,7 @@ class ProductSeeder extends Seeder
                 $product->brand_id = $brandId;
                 $product->unit_id = $unitId;
                 $product->image = 'argentina.png';
-                $product->is_published = true;
+                $product->is_published = false;
                 $product->seo_keyword = $seoKeyword;
                 $product->seo_description = $seoDescription;
                 $product->created_by = $createdBy;

@@ -1,8 +1,5 @@
 @extends('layouts.main-layout')
 
-@section('style')
-
-@endsection
 
 @section('content')
 
@@ -12,9 +9,38 @@
 
         <!-- Header -->
         <div class="card-header d-flex justify-content-between">
-            <h3>Sales Details</h3>
+            <h3>Sales Details | 
 
-            <div class="d-flex gap-2">
+            <span class="badge text-dark bg-{{ $sale->sale_status === 'completed' ? 'success' : 'info' }} text-capitalize">
+                {{ $sale->sale_status ?? 'pending' }}
+            </span>
+            </h3>
+
+            <div class="d-flex gap-2 align-items-center">
+                @php
+                    $latestLifecycle = $sale->latestLifecycle;
+                    $currentStatus = $latestLifecycle ? $latestLifecycle->status : 'Pending';
+                @endphp
+                
+                @if($currentStatus === 'Pending')
+                    <button type="button" class="btn btn-sm thm-btn-bg thm-btn-text-color update-lifecycle-btn" data-status="Confirmed">
+                        <i class="fa-solid fa-check"></i> Mark as Confirmed
+                    </button>
+                    <button type="button" class="btn btn-sm thm-btn-bg thm-btn-text-color update-lifecycle-btn" data-status="Cancelled">
+                        <i class="fa-solid fa-times"></i> Mark as Cancelled
+                    </button>
+                @elseif($currentStatus === 'Confirmed')
+                    <button type="button" class="btn btn-sm thm-btn-bg thm-btn-text-color update-lifecycle-btn" data-status="Delivered to Courier">
+                        <i class="fa-solid fa-truck"></i> Delivered to Courier
+                    </button>
+                @elseif($currentStatus === 'Delivered to Courier')
+                    <button type="button" class="btn btn-sm thm-btn-bg thm-btn-text-color update-lifecycle-btn" data-status="Received">
+                        <i class="fa-solid fa-check-circle"></i> Received
+                    </button>
+                    <button type="button" class="btn btn-sm thm-btn-bg thm-btn-text-color update-lifecycle-btn" data-status="Customer Returned">
+                        <i class="fa-solid fa-undo"></i> Customer Returned
+                    </button>
+                @endif
 
                 <a href="{{ route('sales.customer.details', $sale->customerId) }}" class="btn btn-sm thm-btn-bg thm-btn-text-color">
                     <i class="fa-solid fa-user"></i> Customer
@@ -31,33 +57,31 @@
         </div>
 
         <div class="card-body p-1">
-
             <div class="card border mb-3">
                 <div class="card-body d-flex flex-wrap justify-content-between p-2">
                     <!-- Section 1 -->
                     <div class="flex-grow-1 mr-3">
                         <p class="mb-1"><strong>Customer Name:</strong> {{ $sale->customer->name ?? '-' }}</p>
                         <p class="mb-1"><strong>Customer Phone:</strong> {{ $sale->formatedCustomerPhone ?? '-' }}</p>
-                        <p class="mb-1"><strong>Customer Age Group:</strong> {{ $sale->customer->age_group ?? '-' }}</p>
-                        <p class="mb-1"><strong>Invoice Number:</strong> {{ $sale->invoice_code ?? '-' }}</p>
-                    </div>
-
-                    <!-- Section 2 -->
-                    <div class="flex-grow-1 mr-3">
+                        <p class="mb-1"><strong>Order ID:</strong> {{ $sale->invoice_code ?? '-' }}</p>
                         <p class="mb-1"><strong>Order Source:</strong> 
                             <span class="badge bg-{{ $sale->sales_from === 'online' ? 'success' : 'secondary' }}">
                                 {{ ucfirst($sale->sales_from ?? 'offline') }}
                             </span>
                         </p>
-                        <p class="mb-1"><strong>Shipping Address:</strong> {{ $sale->shipping_address ?? '-' }}</p>
+                    </div>
+
+                    <!-- Section 2 -->
+                    <div class="flex-grow-1 mr-3">
+                        
+                        <p class="mb-1" style="max-width: 350px;"><strong>Shipping Address:</strong> {{ $sale->shipping_address ?? '-' }}</p>
                         <p class="mb-1"><strong>Delivery Area:</strong> {{ $sale->delivery_area ? ucfirst($sale->delivery_area) : '-' }}</p>
                         <p class="mb-1"><strong>Total Item Qty:</strong> {{ $sale->items->sum('quantity') ?? 0 }}</p>
                     </div>
 
                     <!-- Section 3 -->
                     <div class="flex-grow-1 mr-3">
-                        <p class="mb-1"><strong>Created At:</strong> {{ $sale->formattedCreatedDate }}</p>
-                        <p class="mb-1"><strong>Created By:</strong> {{ $sale->createdByUser->name ?? '-' }}</p>
+                        <p class="mb-1"><strong>Order Date:</strong> {{ $sale->formattedCreatedDate }}</p>
                         <p class="mb-1"><strong>Discount:</strong> {{ $sale->discountText }}</p>
                         <p class="mb-1"><strong>Adjustment:</strong> {{ $sale->adjustmentText }}</p>
                     </div>
@@ -67,17 +91,15 @@
                         <p class="mb-1"><strong>Total Amount:</strong> 
                             <span class="badge bg-primary fs-6">{{ number_format($sale->total_amount, 2) }} Tk</span>
                         </p>
+                        <p class="mb-1"><strong>Delivery Charge:</strong> 
+                            <span class="badge bg-primary fs-6">{{ number_format($sale->delivery_cost, 2) }} Tk</span>
+                        </p>
                         <p class="mb-1"><strong>Total Payable:</strong> 
                             <span class="badge bg-success fs-6">{{ number_format($sale->total_payable_amount, 2) }} Tk</span>
                         </p>
                         <p class="mb-1"><strong>Payment Status:</strong> 
                             <span class="badge bg-{{ $sale->payment_status === 'paid' ? 'success' : 'warning' }}">
                                 {{ ucfirst($sale->payment_status ?? 'pending') }}
-                            </span>
-                        </p>
-                        <p class="mb-1"><strong>Sale Status:</strong> 
-                            <span class="badge bg-{{ $sale->sale_status === 'completed' ? 'success' : 'info' }}">
-                                {{ ucfirst($sale->sale_status ?? 'pending') }}
                             </span>
                         </p>
                     </div>
@@ -99,6 +121,7 @@
 
             
             <!-- SERVICE LIST -->
+            @if(count($serviceList) > 0)
             <div class="card border mb-3">
                 <div class="card-body p-1">
                     <h5 class="mb-2">Service List</h5>
@@ -117,7 +140,7 @@
                         </thead>
 
                         <tbody>
-                            @forelse ($serviceList as $item)
+                            @foreach ($serviceList as $item)
                                 <tr>
                                     <td>{{ $item['code'] ?? '-' }}</td>
                                     <td>{{ $item['name'] ?? '-' }}</td>
@@ -137,26 +160,19 @@
                                     </td>
                                     <td class="text-end">{{ number_format($item['total_price'], 2) }} Tk</td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center text-muted">
-                                        No service items found
-                                    </td>
-                                </tr>
-                            @endforelse
-                            @if(count($serviceList) > 0)
-                                <tr class="table-info fw-bold">
-                                    <td colspan="3" class="text-end"><strong>Total:</strong></td>
-                                    <td class="text-center"><strong>{{ collect($serviceList)->sum('quantity') }}</strong></td>
-                                    <td colspan="2"></td>
-                                    <td class="text-end"><strong>{{ number_format(collect($serviceList)->sum('total_price'), 2) }} Tk</strong></td>
-                                </tr>
-                            @endif
+                            @endforeach
+                            <tr class="table-info fw-bold">
+                                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                                <td class="text-center"><strong>{{ collect($serviceList)->sum('quantity') }}</strong></td>
+                                <td colspan="2"></td>
+                                <td class="text-end"><strong>{{ number_format(collect($serviceList)->sum('total_price'), 2) }} Tk</strong></td>
+                            </tr>
                         </tbody>
                     </table>
 
                 </div>
             </div>
+            @endif
 
             <!-- PRODUCT LIST -->
             <div class="card border mb-3">
@@ -299,10 +315,43 @@
 
 </div>
 
+<!-- Order Lifecycle Update Modal -->
+<div class="modal fade" id="updateLifecycleModal" tabindex="-1" role="dialog" aria-labelledby="updateLifecycleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content rounded">
+            <div class="modal-header rounded">
+                <h5 class="modal-title" id="updateLifecycleModalLabel">Update Order Status</h5>
+                <button type="button" class="close" data-dismiss="modal" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="updateLifecycleForm">
+                    @csrf
+                    <input type="hidden" id="lifecycleSaleId" name="sale_id" value="{{ $sale->id }}">
+                    <input type="hidden" id="lifecycleStatus" name="status">
+                    <input type="hidden" id="lifecycleCreatedBy" name="created_by" value="{{ auth()->user()->name }}">
+                    
+                    <div class="row">
+                        <div class="col-12 form-group">
+                            <label for="lifecycleNote">Note <small class="text-muted">(Optional)</small></label>
+                            <textarea name="note" id="lifecycleNote" class="form-control rounded" rows="3" placeholder="Enter any additional notes"></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal" data-bs-dismiss="modal">
+                    <i class="fa-solid fa-xmark"></i> Close
+                </button>
+                <button type="button" class="btn thm-btn-bg thm-btn-text-color btn-sm" id="saveLifecycleBtn">
+                    <i class="fa-solid fa-floppy-disk"></i> Update Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
-
-
-
 @section('script')
 @include('sales.sale.add-payment-modal')
 @vite(['resources/js/print-receipt-script.js', 'resources/js/sales/sale-script.js'])
@@ -311,7 +360,8 @@ let saleUrls = {
     'showSale': "{{ route('sales.sale.show',['sale' => 'saleID']) }}",
     'deleteSale': "{{ route('sales.sale.destroy',['sale' => 'saleID']) }}",
     'datatable': "{{route('sales.sale.datatable')}}",
-    'addPayment': "{{ route('sales.sale.payment.store', ['sale' => $sale->id]) }}"
+    'addPayment': "{{ route('sales.sale.payment.store', ['sale' => $sale->id]) }}",
+    'updateLifecycle': "{{ route('sales.sale.lifecycle.update', ['sale' => $sale->id]) }}"
 };
 
 $(document).ready(function() {
@@ -443,6 +493,53 @@ $(document).ready(function() {
      $('#viewReceivedBy').text($(this).data('received-by') || '-');
      $('#viewPaymentDate').text($(this).data('payment-date') || '-');
      WinPos.Common.showBootstrapModal('viewSalesPaymentModal');
+ });
+
+ // Order Lifecycle Update
+ $(document).on('click', '.update-lifecycle-btn', function() {
+     const status = $(this).data('status');
+     $('#updateLifecycleModalLabel').text('Update Order Status - ' + status);
+     $('#updateLifecycleForm')[0].reset();
+     $('#lifecycleSaleId').val({{ $sale->id }});
+     $('#lifecycleStatus').val(status);
+     $('#lifecycleCreatedBy').val('{{ auth()->user()->name }}');
+     WinPos.Common.showBootstrapModal('updateLifecycleModal');
+ });
+
+ // Save lifecycle update
+ $('#saveLifecycleBtn').on('click', function() {
+     const form = $('#updateLifecycleForm');
+     if (form[0].checkValidity()) {
+         const formData = WinPos.Common.getFormData('#updateLifecycleForm');
+         
+         WinPos.Common.postAjaxCall(saleUrls.updateLifecycle, JSON.stringify(formData), function(response) {
+             if (response.status === 'success') {
+                 toastr.success(response.message || 'Order status updated successfully');
+                 WinPos.Common.hideBootstrapModal('updateLifecycleModal');
+                 // Reload page to show updated status
+                 location.reload();
+             } else {
+                 if (response.message) {
+                     toastr.error(response.message);
+                 }
+                 if (response.errors) {
+                     WinPos.Common.showValidationErrors(response.errors);
+                 }
+             }
+         }, function(xhr) {
+             var response = xhr.responseJSON || {};
+             if (response.message) {
+                 toastr.error(response.message);
+             } else {
+                 toastr.error('An error occurred while updating order status');
+             }
+             if (response.errors && !response.message) {
+                 WinPos.Common.showValidationErrors(response.errors);
+             }
+         });
+     } else {
+         form[0].reportValidity();
+     }
  });
 
 });

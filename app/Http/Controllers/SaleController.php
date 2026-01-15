@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Sales;
+use App\Models\OrderLifecycle;
 use Illuminate\Http\Request;
 use Helper;
 use Number;
@@ -177,6 +178,8 @@ class SaleController extends Controller
                     'payments.createdByUser',
                     'customer',
                     'loyaltyHistories',
+                    'orderLifecycles',
+                    'latestLifecycle',
                 ])
                 ->findOrFail($id);
 
@@ -208,6 +211,12 @@ class SaleController extends Controller
                 $sale->formatedCustomerPhone = maskPhoneNumber($sale->customer->phone1);
             }else{
                 $sale->formatedCustomerPhone = $sale->customer->phone1;
+            }
+
+            if($sale->delivery_area == 'inside dhaka'){
+                $sale->delivery_cost = 70;
+            }else{
+                $sale->delivery_cost = 140;
             }
 
             // return with compact 
@@ -411,5 +420,119 @@ class SaleController extends Controller
                 })
                 ->values(); // reindex
         return $productList;
+    }
+
+    /**
+     * Update order lifecycle status
+     */
+    public function updateLifecycleStatus(Request $request, $saleId)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            // Validate request
+            $validator = Validator::make($request->all(), [
+                'status' => 'required|string|in:Pending,Confirmed,Cancelled,Delivered to Courier,Received,Customer Returned',
+                'note' => 'nullable|string|max:1000',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Find the sale
+            $sale = Sales::where('POSID', $POSID)->findOrFail($saleId);
+
+            // Get the latest lifecycle status
+            $latestLifecycle = $sale->latestLifecycle;
+            $currentStatus = $latestLifecycle ? $latestLifecycle->status : 'Pending';
+
+            // Validate status transition
+            $validTransitions = [
+                'Pending' => ['Confirmed', 'Cancelled'],
+                'Confirmed' => ['Delivered to Courier'],
+                'Delivered to Courier' => ['Received', 'Customer Returned'],
+                'Cancelled' => [], // No transitions from cancelled
+                'Received' => [], // No transitions from received
+                'Customer Returned' => [], // No transitions from returned
+            ];
+
+            if (!in_array($request->status, $validTransitions[$currentStatus] ?? [])) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => "Invalid status transition. Current status is '{$currentStatus}'. Valid next statuses are: " . implode(', ', $validTransitions[$currentStatus] ?? [])
+                ], 422);
+            }
+
+            // Create new lifecycle entry
+            $userName = auth()->user()->name;
+            $lifecycle = new OrderLifecycle();
+            $lifecycle->POSID = $POSID;
+            $lifecycle->sales_id = $sale->id;
+            $lifecycle->status = $request->status;
+            $lifecycle->note = $request->note;
+            $lifecycle->created_by = $userName;
+            $lifecycle->updated_by = $userName;
+            $lifecycle->save();
+
+            // Update sales status to match lifecycle status (same value)
+            $sale->sale_status = strtolower($request->status);
+            $sale->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Order lifecycle status updated successfully',
+                'lifecycle' => $lifecycle
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Get available next statuses for a sale
+     */
+    public function getAvailableStatuses($saleId)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            $sale = Sales::where('POSID', $POSID)->findOrFail($saleId);
+            
+            $latestLifecycle = $sale->latestLifecycle;
+            $currentStatus = $latestLifecycle ? $latestLifecycle->status : 'Pending';
+
+            $validTransitions = [
+                'Pending' => ['Confirmed', 'Cancelled'],
+                'Confirmed' => ['Delivered to Courier'],
+                'Delivered to Courier' => ['Received', 'Customer Returned'],
+                'Cancelled' => [],
+                'Received' => [],
+                'Customer Returned' => [],
+            ];
+
+            return response()->json([
+                'status' => 'success',
+                'current_status' => $currentStatus,
+                'available_statuses' => $validTransitions[$currentStatus] ?? []
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

@@ -312,6 +312,8 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::get('/modal/{sale}', 'modal')->name('sale.modal');
             Route::delete('/{sale}', 'destroy')->name('sale.destroy')->middleware('permission');
             Route::post('/{sale}/payment', 'storePayment')->name('sale.payment.store');
+            Route::post('/{sale}/lifecycle/update', 'updateLifecycleStatus')->name('sale.lifecycle.update');
+            Route::get('/{sale}/lifecycle/statuses', 'getAvailableStatuses')->name('sale.lifecycle.statuses');
         });
     });
 

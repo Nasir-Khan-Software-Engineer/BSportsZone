@@ -64,4 +64,16 @@ class Sales extends Model
     {
         return $this->hasMany(LoyaltyHistory::class, 'sales_id', 'id');
     }
+
+    // order lifecycle
+    public function orderLifecycles()
+    {
+        return $this->hasMany(OrderLifecycle::class, 'sales_id', 'id');
+    }
+
+    // get latest lifecycle status
+    public function latestLifecycle()
+    {
+        return $this->hasOne(OrderLifecycle::class, 'sales_id', 'id')->latestOfMany();
+    }
 }

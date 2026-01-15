@@ -16,8 +16,10 @@ use App\Models\Purchase;
 use App\Models\Sales_items;
 use App\Models\ProductImage;
 use App\Models\MediaImage;
+use App\Models\Variation;
 use Illuminate\Support\Facades\DB;
 use Exception;
+
 
 class ProductController extends Controller
 {
@@ -931,55 +933,7 @@ class ProductController extends Controller
                 ], 404);
             }
             
-            // If publishing, calculate price and discount from lowest price variation
-            if (!$product->is_published) {
-                // Get all active variations
-                $activeVariations = $product->variations->where('status', 'active');
-                
-                if ($activeVariations->isEmpty()) {
-                    return response()->json([
-                        'status' => 'error',
-                        'message' => 'Cannot publish product. No active variations found.',
-                    ], 422);
-                }
-                
-                // Calculate final price for each variation (after discount)
-                $variationsWithFinalPrice = $activeVariations->map(function($variation) {
-                    $finalPrice = $variation->selling_price;
-                    
-                    if ($variation->discount_type && $variation->discount_value) {
-                        if ($variation->discount_type === 'percentage') {
-                            $finalPrice = $variation->selling_price - ($variation->selling_price * $variation->discount_value / 100);
-                        } else {
-                            $finalPrice = $variation->selling_price - $variation->discount_value;
-                        }
-                        $finalPrice = max(0, $finalPrice); // prevent negative
-                    }
-                    
-                    return [
-                        'variation' => $variation,
-                        'final_price' => $finalPrice
-                    ];
-                });
-                
-                // Find variation with lowest final price
-                $lowestPriceVariation = $variationsWithFinalPrice->sortBy('final_price')->first();
-                $defaultVariation = $lowestPriceVariation['variation'];
-                
-                // Mark all variations as not default first
-                DB::table('variations')
-                    ->where('product_id', $product->id)
-                    ->update(['is_default' => false]);
-                
-                // Mark the lowest price variation as default
-                $defaultVariation->is_default = true;
-                $defaultVariation->save();
-                
-                // Update product with default variation's price and discount
-                $product->price = $defaultVariation->selling_price;
-                $product->discount_type = $defaultVariation->discount_type;
-                $product->discount_value = $defaultVariation->discount_value;
-            }
+            $this->setLowestPriceVariationAsDefault($product);
             
             $product->is_published = !$product->is_published;
             $product->updated_by = auth()->id();
@@ -1008,4 +962,59 @@ class ProductController extends Controller
             return $bytes . ' B';
         }
     }
+
+    private function setLowestPriceVariationAsDefault(Product $product)
+    {
+        // Get only active variations
+        $variations = $product->variations()
+            ->where('status', 'active')
+            ->get();
+
+        if ($variations->isEmpty()) {
+            throw new \Exception('No active variations found for this product.');
+        }
+
+        // Find lowest final price variation
+        $lowest = $variations->map(function ($variation) {
+
+            $final = $variation->selling_price;
+
+            if ($variation->discount_type && $variation->discount_value) {
+                if ($variation->discount_type === 'percentage') {
+                    $final -= ($variation->selling_price * $variation->discount_value / 100);
+                } else {
+                    $final -= $variation->discount_value;
+                }
+            }
+
+            return [
+                'variation' => $variation,
+                'final_price' => max(0, $final),
+            ];
+
+        })->sortBy('final_price')->first();
+
+        $defaultVariation = $lowest['variation'];
+
+        $defaultId = $defaultVariation->id;
+
+        $product->variations()
+            ->where('id', '!=', $defaultId)
+            ->update(['is_default' => false]);
+
+        Variation::where('id', $defaultId)
+                ->update(['is_default' => true]);
+
+
+        // Set new default
+        $defaultVariation->is_default = true;
+        $defaultVariation->save();
+
+        // Sync product price with default variation
+        $product->price = $defaultVariation->selling_price;
+        $product->discount_type = $defaultVariation->discount_type;
+        $product->discount_value = $defaultVariation->discount_value;
+        $product->save();
+    }
+
 }

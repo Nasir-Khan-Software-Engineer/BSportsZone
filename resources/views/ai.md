@@ -48,3 +48,8 @@ Calcualte from backend controller and pass the data to view
 - After confirmed we need to show the delivered button
 - After Delivered we need to show Received Button and Customer Returned Button
 - Here created and Updated By will not be user id, it will be a text field. User Name or Courier
+
+-- need to use ajax function from common js
+- We need to refresh the page after updating the status
+- We need to show icon with the button
+- Button color will be same always with the the other button color.

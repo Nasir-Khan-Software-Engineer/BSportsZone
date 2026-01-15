@@ -1028,6 +1028,13 @@ textarea {
   padding: 15px 20px;
 }
 
+.product-details{
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  background: #ffffff;
+  box-sizing: border-box;
+  padding: 15px 20px;
+}
 .single-product-page .product-info .variation-btn{
   border: 0px;
   background: #99b4a6;
@@ -1333,3 +1340,4 @@ textarea {
 .remove-cart-item:hover{
   background: #ee0b07;
 }
+

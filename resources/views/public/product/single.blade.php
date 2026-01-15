@@ -65,24 +65,14 @@
 
         <!-- // details Section -->
         <div class="row">
-            <div class="col-12 mt-4">
+            <div class="col-12 mt-1 col-lg-8">
                 <div class="product-details">
                     <h2 class="heading">Product Details</h2>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae. Lorem ipsum dolor sit amet consectetur adipisicing elit. Natus, quae.</p>
+                    <div class="row">
+                        <div class="col-12 ">
+                            {!! $product->description !!}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

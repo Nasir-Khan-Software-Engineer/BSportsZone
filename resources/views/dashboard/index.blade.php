@@ -382,6 +382,9 @@
             </div>
 
         </div>
+
+        <textarea class="myCkEditor" name="editor"></textarea>
+        <button id="getData">Get Data</button>
     </div>
 
 </div>
@@ -392,12 +395,20 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
 @vite(['resources/js/common-chart.js'])
 
+
+
+
+
 <script>
 $(document).ready(function() {
-    fetchDashboardFixedMetricsData("Last 12 Months");
-
     // Auto-open attendance modal on dashboard if attendance is pending
     checkAndAutoOpenAttendanceModal();
+
+    $("#getData").click(function() {
+        const data = window.editorInstance.getData();
+        console.log(data);
+    })
+    
 });
 
 // Function to check and auto-open attendance modal
@@ -459,86 +470,8 @@ function fetchDashboardData(filterValue) {
 
 }
 
-function fetchDashboardFixedMetricsData(filterValue) {
-    $.ajax({
-        url: '/admin/dashboard/fixed/metrics',
-        method: 'POST',
-        data: JSON.stringify({
-            filter: filterValue
-        }),
-        contentType: 'application/json',
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
-        success: function(response) {
-            updateServicesTable(response.topServices);
-            renderSalesExpenseChart(response.monthlySalesAndExpense.original);
-        },
-        error: function(xhr) {
-            alert('Error loading fixed metrics data');
-            console.error(xhr);
-        }
-    });
-}
-
-// Function to update Top 5 Services table
-function updateServicesTable(data) {
-    const tbody = $('#topServicesTable');
-    tbody.empty();
-
-    if (data && data.length > 0) {
-        data.forEach(function(item, index) {
-            const row = `
-                <tr>
-                    <td class="border-0">${item.service_name || 'N/A'}</td>
-                    <td class="border-0 text-end fw-bold">${item.total_count || '0'}</td>
-                </tr>
-            `;
-            tbody.append(row);
-        });
-    } else {
-        tbody.append('<tr><td colspan="2" class="text-center text-muted py-3">No data available</td></tr>');
-    }
-}
 
 
-function renderSalesExpenseChart(data) {
-    const ctx = document.getElementById("salesExpenseChart").getContext("2d");
-
-    // Convert strings → numbers
-    const expenseData = data.expense.map(Number);
-    const salesData   = data.sales.map(Number);
-
-    // Destroy previous chart
-    if (window.salesExpenseChart instanceof Chart) {
-        window.salesExpenseChart.destroy();
-    }
-
-    window.salesExpenseChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: data.labels,
-            datasets: [
-                {
-                    label: "Total Expense",
-                    data: expenseData,
-                    backgroundColor: "rgba(255, 99, 132, 0.6)"
-                },
-                {
-                    label: "Total Sales",
-                    data: salesData,
-                    backgroundColor: "rgba(54, 162, 235, 0.6)"
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: { beginAtZero: true }
-            }
-        }
-    });
-}
 
 </script>
 @endsection

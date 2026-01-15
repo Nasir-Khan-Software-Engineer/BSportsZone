@@ -32,6 +32,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.bootstrap5.min.css" />
 
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ asset('ckeditor5/ckeditor5.css') }}">
     <style>
     body {
         font-family: 'Rubik', sans-serif !important;
@@ -683,6 +685,19 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.min.js"></script>
+
+    <script type="importmap">
+    {
+    "imports": {
+        "ckeditor5": "{{ asset('ckeditor5/ckeditor5.js') }}",
+        "ckeditor5/": "{{ asset('ckeditor5/') }}"
+    }
+    }
+    </script>
+
+    <script type="module" src="{{ asset('ckeditor-main.js') }}"></script>
+
+
 
     @vite([
         'resources/js/app.js',

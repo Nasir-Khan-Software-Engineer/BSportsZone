@@ -111,7 +111,7 @@
                                 <!-- Description: Full Width -->
                                 <div class="col-12 form-group">
                                     <label for="editProductDescription">Description</label>
-                                    <textarea name="description" id="editProductDescription" class="form-control rounded" cols="30" rows="5" placeholder="Product Description">{{ $product->description ?? '' }}</textarea>
+                                    <textarea name="description" id="editProductDescription" class="form-control rounded myCkEditor" cols="30" rows="5" placeholder="Product Description">{!! $product->description ?? '' !!}</textarea>
                                 </div>
 
                                 <div class="col-12">
@@ -629,6 +629,9 @@ let productUrls = {
 let productId = {{ $product->id ?? 'null' }};
 
 $(document).ready(function() {
+
+    window.editorInstance.setData('{!! $product->description ?? '' !!}');
+
     // Initialize slug generation
     WinPos.Product.initSlugGeneration();
     

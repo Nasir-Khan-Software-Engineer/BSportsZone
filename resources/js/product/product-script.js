@@ -198,6 +198,7 @@ WinPos.Product = (function (Urls){
 
     var updateProduct = function (productId){
         let formData = WinPos.Common.getFormData("#productEditForm");
+        formData.description = window.editorInstance.getData();
         
         WinPos.Common.putAjaxCallPost(Urls.updateProduct.replace("productID", productId), JSON.stringify(formData), function (response){
             if(response.status === 'success'){

@@ -96,7 +96,7 @@
                                     <dt class="col-sm-4">Adjustment</dt>
                                     <dd class="col-sm-8" id="adjustment_amount"></dd>
 
-                                    <dt class="col-sm-4">Paid Amount</dt>
+                                    <dt class="col-sm-4">Total Payable</dt>
                                     <dd class="col-sm-8" id="total_payable_amount"></dd>
 
                                     <dt class="col-sm-4">Note</dt>

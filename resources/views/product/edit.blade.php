@@ -192,6 +192,53 @@
                 </div>
             </div>
 
+            <!-- Related Products Section -->
+            <div class="card border mb-3">
+                <div class="card-header" style="cursor: pointer;" data-toggle="collapse" data-target="#relatedProductsCollapse" aria-expanded="false" aria-controls="relatedProductsCollapse">
+                    <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                        <span>Related Products</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </h5>
+                </div>
+                <div class="collapse" id="relatedProductsCollapse">
+                    <div class="card-body">
+                        <!-- Add Related Product Form -->
+                        <div class="row mb-3">
+                            <div class="col-12 col-md-8">
+                                <label for="relatedProductSelect">Select Product</label>
+                                <select class="form-control rounded" id="relatedProductSelect" name="related_product_id">
+                                    <option value="">Select a product...</option>
+                                    <!-- Options will be populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="col-12 col-md-4 d-flex align-items-end">
+                                <button type="button" id="addRelatedProductBtn" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm w-100"><i class="fa-solid fa-plus"></i> Add</button>
+                            </div>
+                        </div>
+
+                        <!-- Related Products Table -->
+                        <div class="table-responsive">
+                            <table class="table table-bordered" id="relatedProductsTable">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center align-middle" style="width: 5%;">ID</th>
+                                        <th class="text-center align-middle" style="width: 20%;">Code</th>
+                                        <th class="text-center align-middle" style="width: 60%;">Name</th>
+                                        <th class="text-center align-middle" style="width: 15%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Related products will be loaded dynamically -->
+                                    <tr id="noRelatedProductsRow">
+                                        <td colspan="4" class="text-center">No related products found. Select a product and click "Add" to add one.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Variations Table -->
             <div class="card border">
                 <div class="card-header d-flex justify-content-between align-items-center">
@@ -624,6 +671,10 @@ let productUrls = {
     'deleteProductImage': "{{ route('product.images.destroy',['product' => $product->id ?? 'productID', 'image' => 'imageID']) }}",
     'updateProductSeo': "{{ route('product.update-seo',['product' => $product->id ?? 'productID']) }}",
     'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id ?? 'productID']) }}",
+    'getRelatedProducts': "{{ route('product.related-products.get',['product' => $product->id ?? 'productID']) }}",
+    'getAvailableProducts': "{{ route('product.related-products.available',['product' => $product->id ?? 'productID']) }}",
+    'addRelatedProduct': "{{ route('product.related-products.add',['product' => $product->id ?? 'productID']) }}",
+    'removeRelatedProduct': "{{ route('product.related-products.remove',['product' => $product->id ?? 'productID', 'relatedProduct' => 'relatedProductID']) }}",
 };
 
 let productId = {{ $product->id ?? 'null' }};
@@ -669,6 +720,18 @@ $(document).ready(function() {
     });
     
     $('#productSeoCollapse').on('hide.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+    });
+
+    // Handle collapsible Related Products tab icon rotation
+    $('#relatedProductsCollapse').on('show.bs.collapse', function () {
+        $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        // Load related products and available products when section is expanded
+        WinPos.Product.loadRelatedProducts(productId);
+        WinPos.Product.loadAvailableProductsForSelect(productId);
+    });
+    
+    $('#relatedProductsCollapse').on('hide.bs.collapse', function () {
         $(this).closest('.card').find('.card-header i').removeClass('fa-chevron-up').addClass('fa-chevron-down');
     });
     
@@ -784,6 +847,23 @@ $(document).ready(function() {
     // Update SEO
     $(document).on('click', '#updateProductSeo', function() {
         WinPos.Product.updateSeo(productId);
+    });
+
+    // Related Products functionality
+    $(document).on('click', '#addRelatedProductBtn', function() {
+        let relatedProductId = $('#relatedProductSelect').val();
+        if (!relatedProductId) {
+            toastr.error('Please select a product.');
+            return;
+        }
+        WinPos.Product.addRelatedProduct(productId, relatedProductId);
+    });
+
+    $(document).on('click', '.remove-related-product', function() {
+        let relatedProductId = $(this).data('related-product-id');
+        if (confirm('Are you sure you want to remove this related product?')) {
+            WinPos.Product.removeRelatedProduct(productId, relatedProductId);
+        }
     });
     
     // Handle discount type change

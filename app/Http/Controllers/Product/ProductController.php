@@ -1017,4 +1017,197 @@ class ProductController extends Controller
         $product->save();
     }
 
+    public function getRelatedProducts($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            $relatedProducts = $product->relatedProducts()
+                ->where('products.POSID', $POSID)
+                ->where('products.type', 'Product')
+                ->wherePivot('POSID', $POSID)
+                ->select('products.id', 'products.name', 'products.code')
+                ->get();
+            
+            return response()->json([
+                'status' => 'success',
+                'related_products' => $relatedProducts
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function getAllProductsForSelection($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            // Get all products except the current one and already related ones
+            $relatedProductIds = $product->relatedProducts()->pluck('products.id')->toArray();
+            $relatedProductIds[] = $id; // Exclude current product
+            
+            $products = Product::where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->whereNotIn('id', $relatedProductIds)
+                ->select('id', 'name', 'code')
+                ->orderBy('name', 'asc')
+                ->get();
+            
+            return response()->json([
+                'status' => 'success',
+                'products' => $products
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function addRelatedProduct(Request $request, $id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $request->validate([
+                'related_product_id' => 'required|exists:products,id',
+            ]);
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            $relatedProduct = Product::where('id', $request->related_product_id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$relatedProduct) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Related product not found.',
+                ], 404);
+            }
+            
+            // Prevent self-referencing
+            if ($id == $request->related_product_id) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'A product cannot be related to itself.',
+                ], 422);
+            }
+            
+            // Check if already related
+            if ($product->relatedProducts()->where('products.id', $request->related_product_id)->exists()) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'This product is already related.',
+                ], 422);
+            }
+            
+            // Add relationship with POSID
+            DB::table('product_related_products')->insert([
+                'POSID' => $POSID,
+                'product_id' => $id,
+                'related_product_id' => $request->related_product_id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Related product added successfully.',
+                'related_product' => [
+                    'id' => $relatedProduct->id,
+                    'name' => $relatedProduct->name,
+                    'code' => $relatedProduct->code,
+                ]
+            ]);
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => '',
+                'errors' => $exception->validator->errors(),
+            ], 422);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
+    public function removeRelatedProduct($id, $relatedProductId)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $product = Product::where('id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            // Remove relationship
+            DB::table('product_related_products')
+                ->where('product_id', $id)
+                ->where('related_product_id', $relatedProductId)
+                ->where('POSID', $POSID)
+                ->delete();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Related product removed successfully.',
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
 }

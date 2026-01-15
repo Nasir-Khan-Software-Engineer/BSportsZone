@@ -1188,6 +1188,92 @@ WinPos.Product = (function (Urls){
         }
     };
 
+    var loadRelatedProducts = function(productId) {
+        WinPos.Common.getAjaxCall(Urls.getRelatedProducts.replace('productID', productId), function(response) {
+            if (response.status === 'success') {
+                var tbody = $('#relatedProductsTable tbody');
+                tbody.empty();
+                
+                if (response.related_products && response.related_products.length > 0) {
+                    response.related_products.forEach(function(product) {
+                        var row = '<tr data-related-product-id="' + product.id + '">' +
+                            '<td class="text-center align-middle">' + product.id + '</td>' +
+                            '<td class="text-center align-middle">' + product.code + '</td>' +
+                            '<td class="text-center align-middle">' + product.name + '</td>' +
+                            '<td class="text-center align-middle">' +
+                            '<button type="button" class="btn btn-sm btn-danger remove-related-product" data-related-product-id="' + product.id + '" title="Remove Related Product">' +
+                            '<i class="fa-solid fa-trash"></i></button>' +
+                            '</td>' +
+                            '</tr>';
+                        tbody.append(row);
+                    });
+                } else {
+                    tbody.append('<tr id="noRelatedProductsRow"><td colspan="4" class="text-center">No related products found. Click "Add Related Product" to add one.</td></tr>');
+                }
+            } else {
+                toastr.error(response.message || 'Failed to load related products');
+            }
+        });
+    };
+
+    var loadAvailableProductsForSelect = function(productId) {
+        // Load available products and populate select dropdown
+        WinPos.Common.getAjaxCall(Urls.getAvailableProducts.replace('productID', productId), function(response) {
+            if (response.status === 'success') {
+                var select = $('#relatedProductSelect');
+                select.empty();
+                select.append('<option value="">Select a product...</option>');
+                
+                if (response.products && response.products.length > 0) {
+                    response.products.forEach(function(product) {
+                        select.append('<option value="' + product.id + '">' + product.code + ' - ' + product.name + '</option>');
+                    });
+                } else {
+                    select.append('<option value="">No available products to add</option>');
+                }
+            } else {
+                toastr.error(response.message || 'Failed to load available products');
+            }
+        });
+    };
+
+    var addRelatedProduct = function(productId, relatedProductId) {
+        var data = {
+            related_product_id: relatedProductId
+        };
+        
+        WinPos.Common.postAjaxCall(Urls.addRelatedProduct.replace('productID', productId), JSON.stringify(data), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                // Reset select dropdown
+                $('#relatedProductSelect').val('');
+                // Reload related products table
+                loadRelatedProducts(productId);
+                // Reload available products for select dropdown
+                loadAvailableProductsForSelect(productId);
+            } else {
+                WinPos.Common.showValidationErrors(response.errors || {});
+                if (response.message) {
+                    toastr.error(response.message);
+                }
+            }
+        });
+    };
+
+    var removeRelatedProduct = function(productId, relatedProductId) {
+        WinPos.Common.deleteAjaxCallPost(Urls.removeRelatedProduct.replace('productID', productId).replace('relatedProductID', relatedProductId), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                // Reload related products table
+                loadRelatedProducts(productId);
+                // Reload available products for select dropdown
+                loadAvailableProductsForSelect(productId);
+            } else {
+                toastr.error(response.message || 'Failed to remove related product');
+            }
+        });
+    };
+
     return {
         datatableConfiguration: datatableConfiguration,
         populateCreateForm: populateCreateForm,
@@ -1219,7 +1305,11 @@ WinPos.Product = (function (Urls){
         deleteProductImage: deleteProductImage,
         togglePublished: togglePublished,
         updateSeo: updateSeo,
-        updateDefaultDiscountFields: updateDefaultDiscountFields
+        updateDefaultDiscountFields: updateDefaultDiscountFields,
+        loadRelatedProducts: loadRelatedProducts,
+        loadAvailableProductsForSelect: loadAvailableProductsForSelect,
+        addRelatedProduct: addRelatedProduct,
+        removeRelatedProduct: removeRelatedProduct
     }
 })(productUrls);
 

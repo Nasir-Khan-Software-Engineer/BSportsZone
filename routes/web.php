@@ -235,6 +235,10 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::get('/{product}/images/{image}', 'showProductImage')->name('images.show');
             Route::post('/{product}/images/{image}/mark-default', 'markAsDefault')->name('images.mark-default');
             Route::delete('/{product}/images/{image}', 'destroyProductImage')->name('images.destroy');
+            Route::get('/{product}/related-products', 'getRelatedProducts')->name('related-products.get');
+            Route::get('/{product}/related-products/available', 'getAllProductsForSelection')->name('related-products.available');
+            Route::post('/{product}/related-products', 'addRelatedProduct')->name('related-products.add');
+            Route::delete('/{product}/related-products/{relatedProduct}', 'removeRelatedProduct')->name('related-products.remove');
         });
 
         Route::prefix('variation')->controller(VariationController::class)->group(function () {

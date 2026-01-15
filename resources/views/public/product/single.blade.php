@@ -49,13 +49,11 @@
                     </div>
 
                     <p>
-                        <button 
+                        <button
                         data-product-id="{{$product->id}}"
                         data-product-name="{{$product->name}}"
                         data-product-image="{{$product->image}}"
-                        
                         id="addToCartBtn" class="add-to-cart-btn">Add to Cart</button>
-
                         <a href="index.html" class="buy-now-btn mt-1">Cash on Delivery</a>
                     </p>
                 </div>
@@ -65,14 +63,50 @@
 
         <!-- // details Section -->
         <div class="row">
-            <div class="col-12 mt-1 col-lg-8">
+            <div class="col-12 mt-1 col-lg-9">
                 <div class="product-details">
-                    <h2 class="heading">Product Details</h2>
                     <div class="row">
                         <div class="col-12 ">
                             {!! $product->description !!}
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-3 mt-1">
+                <div class="row">
+                    @foreach($relatedProducts as $rproduct)
+                    <div class="col-12 mb-3">
+                        <div class="product-item px-2">
+                            <a title="{{ $rproduct->name }}" href="{{ route('product.single', $rproduct->slug) }}">
+                                <img src="{{ asset('images/1/Product/') }}/{{$rproduct->image}}" alt="{{ $rproduct->name }}" class="img-fluid product-thumbnail">
+                                <h3 class="product-title">{{ $rproduct->short_name }}</h3>
+                                <div class="product-price">
+                                    @if($rproduct->discount_type && $rproduct->discount_value)
+                                    <span class="original-price" style="text-decoration: line-through; color: #999; margin-right: 8px;">
+                                        Tk.{{ number_format($rproduct->price, 2) }}
+                                    </span>
+                                    @endif
+                                    <strong>Tk.{{ number_format($rproduct->price_after_discount, 2) }}</strong>
+                                </div>
+                            </a>
+                            <br>
+                            <button type="button" class="add-to-cart-btn"
+                            data-product-id="{{ $rproduct->id }}"
+                            data-product-name="{{ $rproduct->name }}"
+                            data-product-image="{{ $rproduct->image }}"
+                            data-product-quantity="1"
+
+                            data-variation-id="{{ $rproduct->default_variation_id }}"
+                            data-variation-price-after-discount="{{ $rproduct->default_variation_price_after_discount }}"
+                            data-variation-selling-price="{{ $rproduct->default_variation_selling_price }}"
+                            data-variation-discount-type="{{ $rproduct->default_variation_discount_type }}"
+                            data-variation-discount-value="{{ $rproduct->default_variation_discount_value }}"
+                            data-variation-tagline="{{ $rproduct->default_variation_tagline }}"
+
+                            >Add to Cart</button>
+                        </div>
+                    </div>
+                    @endforeach
                 </div>
             </div>
         </div>
@@ -148,6 +182,5 @@
     </script>
 
     <script src="{{ asset('website/js/add-to-cart.js') }}"></script>
-    <!-- <script src="{{ asset('website/js/single-product.js') }}"></script> -->
     <script src="{{ asset('website/js/single-product-script.js') }}"></script>
 @endsection

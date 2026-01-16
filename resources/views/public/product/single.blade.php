@@ -73,6 +73,56 @@
                 </div>
             </div>
             <div class="col-12 col-lg-3 mt-1">
+
+                <!-- // review Section -->
+                
+
+                <div class="row justify-content-center">
+                    <div class="col-lg-12">
+                        <div class="single-product-page-review-slider-section">
+                            <p class="mb-0 text-center">Our Happy Customers Says</p>
+                            <div id="singleProductPageReviewSplide" class="splide">
+                                <div class="splide__track">
+                                    <ul class="splide__list">
+
+                                        <li class="splide__slide">
+                                            <div class="review-card">
+                                                <img src="{{ asset('website/images/review/review (1).jpeg') }}" alt="">
+                                            </div>
+                                        </li>
+
+                                        <li class="splide__slide">
+                                            <div class="review-card">
+                                                <img src="{{ asset('website/images/review/review (2).jpeg') }}" alt="">
+                                            </div>
+                                        </li>
+
+                                        <li class="splide__slide">
+                                            <div class="review-card">
+                                                <img src="{{ asset('website/images/review/review (3).jpeg') }}" alt="">
+                                            </div>
+                                        </li>
+
+                                        <li class="splide__slide">
+                                            <div class="review-card">
+                                                <img src="{{ asset('website/images/review/review (4).jpeg') }}" alt="">
+                                            </div>
+                                        </li>
+
+                                        <li class="splide__slide">
+                                            <div class="review-card">
+                                                <img src="{{ asset('website/images/review/review (5).jpeg') }}" alt="">
+                                            </div>
+                                        </li>
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- // Related Products Section -->
                 <div class="row">
                     @foreach($relatedProducts as $rproduct)
                     <div class="col-12 mb-3">
@@ -110,68 +160,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-12 mt-4">
-                <div class="product-faq">
-                    <h2 class="heading">Product FAQ</h2>
-
-                    <div class="faq-container">
-
-                        <div class="faq-item">
-                            <button class="faq-question">
-                                Are these jerseys original or replicas?
-                                <span class="icon">+</span>
-                            </button>
-                            <div class="faq-answer">
-                                Our jerseys are premium quality replicas designed to match the look and feel of original team kits, using high-grade fabric and accurate detailing.
-                            </div>
-                        </div>
-
-                        <div class="faq-item">
-                            <button class="faq-question">
-                                What sizes are available?
-                                <span class="icon">+</span>
-                            </button>
-                            <div class="faq-answer">
-                                We offer sizes from S to XXL. A detailed size chart is available on every product page to help you find the perfect fit.
-                            </div>
-                        </div>
-
-                        <div class="faq-item">
-                            <button class="faq-question">
-                                Can I customize my jersey with a name and number?
-                                <span class="icon">+</span>
-                            </button>
-                            <div class="faq-answer">
-                                Yes! You can add your favorite player’s name and number or your own custom name before adding the jersey to your cart.
-                            </div>
-                        </div>
-
-                        <div class="faq-item">
-                            <button class="faq-question">
-                                How long does delivery take?
-                                <span class="icon">+</span>
-                            </button>
-                            <div class="faq-answer">
-                                Orders are usually delivered within 3–7 business days depending on your location and customization.
-                            </div>
-                        </div>
-
-                        <div class="faq-item">
-                            <button class="faq-question">
-                                What is your return policy?
-                                <span class="icon">+</span>
-                            </button>
-                            <div class="faq-answer">
-                                We accept returns within 7 days for unused and unwashed jerseys. Customized jerseys are not eligible unless there is a defect.
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 @endsection
@@ -179,8 +167,32 @@
 @section('scripts')
     <script>
         var websiteData = {};
+
+        document.querySelectorAll('.faq-question').forEach(question => {
+			question.addEventListener('click', () => {
+				const item = question.parentElement;
+				item.classList.toggle('active');
+			});
+		});
+
+        new Splide('#singleProductPageReviewSplide', {
+			type: 'loop',
+			perPage: 2,
+			gap: '1px',
+			arrows: false,
+			pagination: true,
+			drag: true,
+            grab: true,
+			autoScroll: {
+				speed: 0.5,
+			},
+			breakpoints: {
+				768: { perPage: 1 },
+				480: { perPage: 1 },
+				320: { perPage: 1 }
+			}
+		}).mount(window.splide.Extensions);
     </script>
 
-    <script src="{{ asset('website/js/add-to-cart.js') }}"></script>
     <script src="{{ asset('website/js/single-product-script.js') }}"></script>
 @endsection

@@ -127,36 +127,4 @@
     </script>
     <script src="{{ asset('website/js/add-to-cart.js') }}"></script>
 
-
-
-    <script>
-
-        $(document).ready(function() {
-
-                $('.add-to-cart-btn').on('click', function() {
-                    let selectedProduct = {
-                        id: $(this).data('product-id'),
-                        name: $(this).data('product-name'),
-                        image: $(this).data('product-image'),
-
-                        quantity: 1,
-
-                        variation_id: $(this).data('variation-id'),
-                        variation_tagline: $(this).data('variation-tagline'),
-                        variation_price_after_discount: $(this).data('variation-price-after-discount'),
-                        variation_selling_price: $(this).data('variation-selling-price'),
-                        variation_discount_type: $(this).data('variation-discount-type'),
-                        variation_discount_value: $(this).data('variation-discount-value'),
-                    };
-
-                    let isAdded = Website.AddToCart.addProductToWebsiteCart(selectedProduct);
-                    if(isAdded){
-                        Website.Common.showToastMessage('success', 'The '+selectedProduct.variation_tagline + ' added to cart successfully!');
-                        Website.AddToCart.setWebsiteCartCount();
-                    }
-
-                })
-                
-        })
-    </script>
 @endSection

@@ -1226,6 +1226,18 @@ textarea {
     cursor: grabbing;
 }
 
+
+
+.single-product-page-review-slider-section {
+  border: 1px solid #d8d8d8;
+  border-radius: 10px;
+  background: #ffffff;
+  box-sizing: border-box;
+  padding: 5px;
+}
+
+
+
 .page-item .page-link{
       padding: 5px 15px;
     display: inline-block;
@@ -1341,3 +1353,24 @@ textarea {
   background: #ee0b07;
 }
 
+
+
+
+.review-card,
+.product-image-wrap {
+    overflow: hidden;      /* important to prevent overflow */
+    border-radius: 8px;    /* optional */
+}
+
+.review-card img,
+.product-image-wrap img {
+    transition: transform 0.4s ease;
+    transform: scale(1);
+    border-radius: 10px;
+
+}
+
+.review-card:hover img,
+.product-image-wrap:hover img {
+    transform: scale(1.5);
+}

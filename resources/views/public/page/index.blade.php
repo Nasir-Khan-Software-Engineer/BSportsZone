@@ -91,7 +91,7 @@
                     <div class="col-6 col-md-6">
                         <div class="feature">
                             <div class="icon">
-                                <img src="images/truck.svg" alt="Image" class="imf-fluid">
+                                <img src="{{ asset('website/images/truck.svg') }}" alt="Image" class="imf-fluid">
                             </div>
                             <h3>Fast &amp; Free Shipping</h3>
                             <p>Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate.</p>
@@ -101,7 +101,7 @@
                     <div class="col-6 col-md-6">
                         <div class="feature">
                             <div class="icon">
-                                <img src="images/bag.svg" alt="Image" class="imf-fluid">
+                                <img src="{{ asset('website/images/bag.svg') }}" alt="Image" class="imf-fluid">
                             </div>
                             <h3>Easy to Shop</h3>
                             <p>Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate.</p>
@@ -111,7 +111,7 @@
                     <div class="col-6 col-md-6">
                         <div class="feature">
                             <div class="icon">
-                                <img src="images/support.svg" alt="Image" class="imf-fluid">
+                                <img src="{{ asset('website/images/support.svg') }}" alt="Image" class="imf-fluid">
                             </div>
                             <h3>24/7 Support</h3>
                             <p>Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate.</p>
@@ -121,7 +121,7 @@
                     <div class="col-6 col-md-6">
                         <div class="feature">
                             <div class="icon">
-                                <img src="images/return.svg" alt="Image" class="imf-fluid">
+                                <img src="{{ asset('website/images/return.svg') }}" alt="Image" class="imf-fluid">
                             </div>
                             <h3>Hassle Free Returns</h3>
                             <p>Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate.</p>
@@ -133,7 +133,7 @@
 
             <div class="col-lg-5">
                 <div class="img-wrap">
-                    <img src="images/full-pic-1.png" alt="Image" class="img-fluid">
+                    <img src="{{ asset('website/images/why-choose-us.png') }}" alt="Image" class="img-fluid">
                 </div>
             </div>
 
@@ -148,9 +148,9 @@
         <div class="row justify-content-between">
             <div class="col-lg-7 mb-5 mb-lg-0">
                 <div class="imgs-grid">
-                    <div class="grid grid-1"><img src="images/full-pic-1.png" alt="Untree.co"></div>
-                    <div class="grid grid-2"><img src="images/full-pic-1.png" alt="Untree.co"></div>
-                    <div class="grid grid-3"><img src="images/full-pic-1.png" alt="Untree.co"></div>
+                    <div class="grid grid-1"><img src="{{ asset('website/images/full-pic-1.png') }}" alt="Untree.co"></div>
+                    <div class="grid grid-2"><img src="{{ asset('website/images/full-pic-1.png') }}" alt="Untree.co"></div>
+                    <div class="grid grid-3"><img src="{{ asset('website/images/full-pic-1.png') }}" alt="Untree.co"></div>
                 </div>
             </div>
             <div class="col-lg-5 ps-lg-5">
@@ -179,7 +179,7 @@
             <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
                 <div class="product-item-sm d-flex">
                     <div class="thumbnail">
-                        <img src="images/product-1.png" alt="Image" class="img-fluid">
+                        <img src="{{ asset('website/images/product-1.png') }}" alt="Image" class="img-fluid">
                     </div>
                     <div class="pt-3">
                         <h3>Nordic Chair</h3>
@@ -192,7 +192,7 @@
             <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
                 <div class="product-item-sm d-flex">
                     <div class="thumbnail">
-                        <img src="images/product-2.png" alt="Image" class="img-fluid">
+                        <img src="{{ asset('website/images/product-2.png') }}" alt="Image" class="img-fluid">
                     </div>
                     <div class="pt-3">
                         <h3>Kruzo Aero Chair</h3>
@@ -205,7 +205,7 @@
             <div class="col-12 col-md-6 col-lg-4 mb-4 mb-lg-0">
                 <div class="product-item-sm d-flex">
                     <div class="thumbnail">
-                        <img src="images/product-3.png" alt="Image" class="img-fluid">
+                        <img src="{{ asset('website/images/product-3.png') }}" alt="Image" class="img-fluid">
                     </div>
                     <div class="pt-3">
                         <h3>Ergonomic Chair</h3>
@@ -238,31 +238,31 @@
 
                                 <li class="splide__slide">
                                     <div class="review-card">
-                                        <img src="images/review/review (1).jpeg" alt="">
+                                        <img src="{{ asset('website/images/review/review (1).jpeg') }}" alt="">
                                     </div>
                                 </li>
 
                                 <li class="splide__slide">
                                     <div class="review-card">
-                                        <img src="images/review/review (2).jpeg" alt="">
+                                        <img src="{{ asset('website/images/review/review (2).jpeg') }}" alt="">
                                     </div>
                                 </li>
 
                                 <li class="splide__slide">
                                     <div class="review-card">
-                                        <img src="images/review/review (3).jpeg" alt="">
+                                        <img src="{{ asset('website/images/review/review (3).jpeg') }}" alt="">
                                     </div>
                                 </li>
 
                                 <li class="splide__slide">
                                     <div class="review-card">
-                                        <img src="images/review/review (4).jpeg" alt="">
+                                        <img src="{{ asset('website/images/review/review (4).jpeg') }}" alt="">
                                     </div>
                                 </li>
 
                                 <li class="splide__slide">
                                     <div class="review-card">
-                                        <img src="images/review/review (5).jpeg" alt="">
+                                        <img src="{{ asset('website/images/review/review (5).jpeg') }}" alt="">
                                     </div>
                                 </li>
 

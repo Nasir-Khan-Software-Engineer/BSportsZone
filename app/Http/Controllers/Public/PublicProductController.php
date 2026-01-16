@@ -52,7 +52,7 @@ class PublicProductController extends Controller
             ->where('type', 'Product')
             ->firstOrFail();
 
-            $relatedProducts = $this->formatProducts($product->relatedProducts);
+            $relatedProducts = $this->formatProducts($product->relatedProducts->where('is_published', true)->where('type', 'Product'));
   
         // Calculate final price for product
         $priceAfterDiscount = $product->price;

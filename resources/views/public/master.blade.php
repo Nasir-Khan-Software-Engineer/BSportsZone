@@ -78,6 +78,63 @@
 
     @yield('content')
 
+
+    	<!-- Start Testimonial Slider -->
+	<div class="testimonial-section d-none">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-7 mx-auto text-center">
+					<h2 class="section-title">What Our Customers Say 💬</h2>
+				</div>
+			</div>
+
+			<div class="row justify-content-center">
+				<div class="col-lg-12">
+					<div class="review-slider-section">
+						<div id="reviewSplide" class="splide">
+							<div class="splide__track">
+								<ul class="splide__list">
+
+									<li class="splide__slide">
+										<div class="review-card">
+											<img src="{{ asset('website/images/review/review (1).jpeg') }}" alt="">
+										</div>
+									</li>
+
+									<li class="splide__slide">
+										<div class="review-card">
+											<img src="{{ asset('website/images/review/review (2).jpeg') }}" alt="">
+										</div>
+									</li>
+
+									<li class="splide__slide">
+										<div class="review-card">
+											<img src="{{ asset('website/images/review/review (3).jpeg') }}" alt="">
+										</div>
+									</li>
+
+									<li class="splide__slide">
+										<div class="review-card">
+											<img src="{{ asset('website/images/review/review (4).jpeg') }}" alt="">
+										</div>
+									</li>
+
+									<li class="splide__slide">
+										<div class="review-card">
+											<img src="{{ asset('website/images/review/review (5).jpeg') }}" alt="">
+										</div>
+									</li>
+
+								</ul>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- End Testimonial Slider -->
+
     <!-- Start Footer Section -->
     <footer class="footer-section">
         <div class="container relative">
@@ -184,12 +241,56 @@
             Website.Common.updateCopyRightYear();
             Website.AddToCart.setWebsiteCartCount();
 
+
+            $('.add-to-cart-btn').on('click', function() {
+                let selectedProduct = {
+                    id: $(this).data('product-id'),
+                    name: $(this).data('product-name'),
+                    image: $(this).data('product-image'),
+
+                    quantity: 1,
+
+                    variation_id: $(this).data('variation-id'),
+                    variation_tagline: $(this).data('variation-tagline'),
+                    variation_price_after_discount: $(this).data('variation-price-after-discount'),
+                    variation_selling_price: $(this).data('variation-selling-price'),
+                    variation_discount_type: $(this).data('variation-discount-type'),
+                    variation_discount_value: $(this).data('variation-discount-value'),
+                };
+
+                let isAdded = Website.AddToCart.addProductToWebsiteCart(selectedProduct);
+                if(isAdded){
+                    Website.Common.showToastMessage('success', 'The '+selectedProduct.variation_tagline + ' added to cart successfully!');
+                    Website.AddToCart.setWebsiteCartCount();
+                }
+
+            })
+
             // Website.Common.showToastMessage('success', 'Product added to cart!');
             // Website.Common.showToastMessage('error', 'Something went wrong!');
             // Website.Common.showToastMessage('warning', 'Please select a size first!');
 
         });
     </script>
+<!-- 
+    <script>
+		new Splide('#reviewSplide', {
+			type: 'loop',
+			perPage: 6,
+			gap: '5px',
+			arrows: true,
+			pagination: false,
+			drag: true,
+			autoScroll: {
+				speed: 1.2,
+			},
+			breakpoints: {
+				768: { perPage: 5 },
+				480: { perPage: 4 },
+				320: { perPage: 3 }
+			}
+		}).mount(window.splide.Extensions);
+	</script> -->
 
 
     @yield('scripts')

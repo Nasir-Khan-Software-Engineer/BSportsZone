@@ -952,6 +952,41 @@ class ProductController extends Controller
         }
     }
 
+    public function toggleHome($id)
+    {
+        try {
+            $POSID = auth()->user()->POSID;
+            
+            $product = Product::with('variations')
+                ->where('id', $id)
+                ->where('POSID', $POSID)
+                ->where('type', 'Product')
+                ->first();
+            
+            if (!$product) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Product not found.',
+                ], 404);
+            }
+            
+            $product->is_home = !$product->is_home;
+            $product->updated_by = auth()->id();
+            $product->save();
+            
+            return response()->json([
+                'status' => 'success',
+                'message' => $product->is_home ? 'Product marked for home successfully.' : 'Product unmarked from home successfully.',
+                'is_home' => $product->is_home
+            ]);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Something went wrong, please try later.',
+            ], 500);
+        }
+    }
+
     private function formatFileSize($bytes)
     {
         if ($bytes >= 1048576) {

@@ -52,7 +52,7 @@
     <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark fixed-top" arial-label="Furni navigation bar">
 
         <div class="container">
-            <a class="navbar-brand" href="index.html">Furni<span>.</span></a>
+            <a class="navbar-brand" href="{{ route('index') }}">BZportsZone<span>.</span></a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsFurni" aria-controls="navbarsFurni" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -60,18 +60,18 @@
 
             <div class="collapse navbar-collapse" id="navbarsFurni">
                 <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="{{ route('index') }}">Home</a>
+                    <li><a class="nav-link" href="contact.html">Shop</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('index') }}">Portugal</a>
                     </li>
-                    <li><a class="nav-link" href="{{ route('shop') }}">Shop</a></li>
-                    <li><a class="nav-link" href="about.html">About us</a></li>
-                    <li><a class="nav-link" href="services.html">Services</a></li>
-                    <li><a class="nav-link" href="blog.html">Blog</a></li>
-                    <li><a class="nav-link" href="contact.html">Contact us</a></li>
+                    <li><a class="nav-link" href="{{ route('shop') }}">Italy</a></li>
+                    <li><a class="nav-link" href="about.html">Germany</a></li>
+                    <li><a class="nav-link" href="services.html">Football</a></li>
+                    <li><a class="nav-link" href="blog.html">Cricket</a></li>
+                    <li><a class="nav-link" href="contact.html">Club</a></li>
                 </ul>
 
                 <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-                    <li><a class="nav-link" href="#"><img src="{{asset('website/images/user.svg') }}"></a></li>
                     <li class="check-out-btn"><a class="nav-link" href="{{ route('checkout') }}">
                         <img src="{{asset('website/images/cart.svg') }}"></a>
                     </li>
@@ -148,14 +148,13 @@
         <div class="container relative">
 
             <div class="sofa-img">
-                <img src="{{ asset('website/images/sofa.png')}}" alt="Image" class="img-fluid">
+                <img src="http://127.0.0.1:8000/images/1/Product/argentina-back_2026-01-16_17-37-23.png" alt="Image" class="img-fluid">
             </div>
 
             <div class="row g-5 mb-5">
                 <div class="col-lg-4">
-                    <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">Furni<span>.</span></a></div>
-                    <p class="mb-4">Donec facilisis quam ut purus rutrum lobortis. Donec vitae odio quis nisl dapibus malesuada. Nullam ac aliquet velit. Aliquam vulputate velit imperdiet dolor tempor
-                        tristique. Pellentesque habitant</p>
+                    <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">BZportsZone<span>.</span></a></div>
+                    <p class="mb-4 font-roboto-regular">We are committed to delivering premium-quality sports jerseys with reliable service and customer satisfaction at the core. From product quality to post-purchase support, we make sure your shopping experience is smooth, secure, and enjoyable.</p>
 
                     <ul class="list-unstyled custom-social">
                         <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
@@ -170,34 +169,36 @@
                         <div class="col-6 col-sm-6 col-md-3">
                             <ul class="list-unstyled">
                                 <li><a href="#">About us</a></li>
-                                <li><a href="#">Services</a></li>
-                                <li><a href="#">Blog</a></li>
                                 <li><a href="#">Contact us</a></li>
+                                <li><a href="#">Blog</a></li>
+                                <li><a href="#">Return Policy</a></li>
                             </ul>
                         </div>
 
                         <div class="col-6 col-sm-6 col-md-3">
                             <ul class="list-unstyled">
-                                <li><a href="#">Support</a></li>
-                                <li><a href="#">Knowledge base</a></li>
-                                <li><a href="#">Live chat</a></li>
+                                <li><a href="#">Football Jersey</a></li>
+                                <li><a href="#">Cricket Jersey</a></li>
+                                <li><a href="#">Counter Jersey</a></li>
+                                <li><a href="#">Club Jersey</a></li>
                             </ul>
                         </div>
 
                         <div class="col-6 col-sm-6 col-md-3">
                             <ul class="list-unstyled">
-                                <li><a href="#">Jobs</a></li>
-                                <li><a href="#">Our team</a></li>
-                                <li><a href="#">Leadership</a></li>
-                                <li><a href="#">Privacy Policy</a></li>
+                                <li><a href="#">Barcelona Jersey</a></li>
+                                <li><a href="#">Real Madrid Jersey</a></li>
+                                <li><a href="#">Liverpool Jersey</a></li>
+                                <li><a href="#">Arsenal Jersey</a></li>
                             </ul>
                         </div>
 
                         <div class="col-6 col-sm-6 col-md-3">
                             <ul class="list-unstyled">
-                                <li><a href="#">Nordic Chair</a></li>
-                                <li><a href="#">Kruzo Aero</a></li>
-                                <li><a href="#">Ergonomic Chair</a></li>
+                                <li><a href="#">Manchester United Jersey</a></li>
+                                <li><a href="#">Mancity Jersey</a></li>
+                                <li><a href="#">AC Milan Jersey</a></li>
+                                <li><a href="#">PSG Jersey</a></li>
                             </ul>
                         </div>
                     </div>
@@ -209,8 +210,7 @@
                 <div class="row pt-4">
                     <div class="col-lg-6">
                         <p class="mb-2 text-center text-lg-start">Copyright &copy;
-                            <span id="copyright-year"></span>. All Rights Reserved. &mdash; Designed with love by <a href="https://untree.co">Untree.co</a> Distributed By <a
-                                hreff="https://themewagon.com">ThemeWagon</a>
+                            <span id="copyright-year"></span>. All Rights Reserved. &mdash; BSportsZone
                             <!-- License information: https://untree.co/license/ -->
                         </p>
                     </div>

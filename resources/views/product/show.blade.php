@@ -13,6 +13,10 @@
                     <i class="fa-solid {{ $product->is_published ? 'fa-check-circle' : 'fa-times-circle' }}"></i> 
                     {{ $product->is_published ? 'Published' : 'Unpublished' }}
                 </button>
+                <button type="button" class="btn {{ ($product->is_home ?? false) ? 'btn-info' : 'btn-secondary' }} rounded btn-sm toggle-home" data-product-id="{{ $product->id }}" data-is-home="{{ ($product->is_home ?? false) ? '1' : '0' }}">
+                    <i class="fa-solid fa-home"></i> 
+                    {{ ($product->is_home ?? false) ? 'For Home' : 'Mark for Home' }}
+                </button>
                 <a href="{{ route('product.index') }}" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
             </div>
         </div>
@@ -161,7 +165,8 @@
 @push('url-scripts')
 <script>
 var ProductShowUrls = {
-    'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id]) }}"
+    'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id]) }}",
+    'toggleProductHome': "{{ route('product.toggle-home',['product' => $product->id]) }}"
 };
 </script>
 @endpush
@@ -172,7 +177,8 @@ var ProductShowUrls = {
 let productUrls = {
     'getProductPurchases': "{{ route('product.get-purchases', ['product' => $product->id]) }}",
     'showPurchase': "{{ route('stock.purchase.show', ['purchase' => 'purchaseID']) }}",
-    'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id]) }}"
+    'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id]) }}",
+    'toggleProductHome': "{{ route('product.toggle-home',['product' => $product->id]) }}"
 };
 
 $(document).ready(function() {
@@ -199,6 +205,30 @@ $(document).ready(function() {
                 }
             } else {
                 toastr.error(response.message || 'Failed to toggle published status');
+            }
+        });
+    });
+
+    // Toggle home status
+    $(document).on('click', '.toggle-home', function() {
+        let productId = $(this).data('product-id');
+        let $button = $(this);
+        
+        WinPos.Common.postAjaxCall(productUrls.toggleProductHome, JSON.stringify({}), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                // Update button appearance
+                if (response.is_home) {
+                    $button.removeClass('btn-secondary').addClass('btn-info');
+                    $button.html('<i class="fa-solid fa-home"></i> For Home');
+                    $button.attr('data-is-home', '1');
+                } else {
+                    $button.removeClass('btn-info').addClass('btn-secondary');
+                    $button.html('<i class="fa-solid fa-home"></i> Mark for Home');
+                    $button.attr('data-is-home', '0');
+                }
+            } else {
+                toastr.error(response.message || 'Failed to toggle home status');
             }
         });
     });

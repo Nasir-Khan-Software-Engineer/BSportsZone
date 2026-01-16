@@ -228,6 +228,7 @@ Route::middleware(['auth', 'checkSessionAndUserType'])->group(function(){
             Route::put('/{product}', 'update')->name('update');
             Route::put('/{product}/seo', 'updateSeo')->name('update-seo');
             Route::post('/{product}/toggle-published', 'togglePublished')->name('toggle-published');
+            Route::post('/{product}/toggle-home', 'toggleHome')->name('toggle-home');
             Route::delete('/{product}', 'destroy')->name('destroy');
             Route::get('/images/list', 'getProductImagesList')->name('images.list');
             Route::get('/{product}/images', 'getProductImages')->name('images.get');

@@ -302,9 +302,53 @@ a.more {
   color: #2f2f2f;
 }
 
-.product-section {
-  padding: 7rem 0;
+.home-banner{
+  margin-top: 90px;
+  border-radius: 10px;
 }
+.home-banner img{
+  border-radius: 10px;
+}
+
+.main-title{
+    color: #424242;
+    font-size: 22px;
+    font-family: "Delius", cursive;
+    font-weight: 700;
+    font-style: italic;
+}
+
+
+.sub-title{
+    color: #696969;
+    font-size: 14px;
+    font-family: "Delius", cursive;
+    font-weight: 700;
+}
+
+.shop-now-btn{
+    border: 0;
+    background: linear-gradient(135deg, #ee3b18, #2f9805);
+    color: #fff;
+    padding: 10px 50px;
+    border-radius: 15px;
+    transition: all .3s ease-in-out;
+    font-size: 20px;
+    text-decoration: none;
+}
+
+.shop-now-btn:hover {
+    background: linear-gradient(135deg, #2f9805, #ff6a00);
+}
+.main-title-section{
+  height: 95%;
+  display: flex;
+  flex-direction: column;      /* h1 → p → button */
+  justify-content: center;     /* vertical center */
+  align-items: center;         /* horizontal center */
+  text-align: center;
+}
+
 
 .product-item {
   text-align: center;
@@ -444,7 +488,12 @@ a.more {
 .we-help-section {
   padding: 7rem 0;
 }
-
+.we-help-section .imgs-grid {
+  display: -ms-grid;
+  display: grid;
+  grid-template-columns: repeat(27, 1fr);
+  position: relative;
+}
 .we-help-section .imgs-grid:before {
   position: absolute;
   content: "";
@@ -461,13 +510,19 @@ a.more {
 
 .we-help-section .imgs-grid .grid {
   position: relative;
+  
 }
 
 .we-help-section .imgs-grid .grid img {
   border-radius: 20px;
   max-width: 100%;
-}
+  border: 1px solid #d8d8d8;
 
+
+}
+.we-help-section .imgs-grid .grid.grid-1 img{
+  border: 0px solid #d8d8d8;
+}
 .we-help-section .imgs-grid .grid.grid-1 {
   -ms-grid-column: 1;
   -ms-grid-column-span: 18;
@@ -475,6 +530,10 @@ a.more {
   -ms-grid-row: 1;
   -ms-grid-row-span: 27;
   grid-row: 1 / span 27;
+  background-color: #fff;
+  border: 1px solid #d8d8d8;
+  border-radius: 20px;
+  padding: 50px;
 }
 
 .we-help-section .imgs-grid .grid.grid-2 {
@@ -573,7 +632,7 @@ a.more {
 }
 
 .testimonial-section {
-  padding: 3rem 0 7rem 0;
+  padding: 0rem 0 7rem 0;
 }
 
 .testimonial-slider-wrap {
@@ -834,7 +893,7 @@ a.more {
 }
 
 .footer-section .sofa-img img {
-  max-width: 380px;
+  max-width: 300px;
 }
 
 .footer-section .links-wrap {

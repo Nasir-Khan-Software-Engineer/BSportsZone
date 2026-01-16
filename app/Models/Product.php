@@ -29,12 +29,14 @@ class Product extends Model
         'seo_keyword',
         'seo_description',
         'is_published',
+        'is_home',
     ];
 
     protected $casts = [
         'price' => 'double',
         'discount_value' => 'double',
         'is_published' => 'boolean',
+        'is_home' => 'boolean',
     ];
 
     public function brand(): BelongsTo{

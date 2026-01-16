@@ -1140,6 +1140,28 @@ WinPos.Product = (function (Urls){
         });
     };
 
+    var toggleHome = function(productId, buttonElement) {
+        WinPos.Common.postAjaxCall(Urls.toggleProductHome.replace('productID', productId), JSON.stringify({}), function(response) {
+            if (response.status === 'success') {
+                toastr.success(response.message);
+                // Update button appearance
+                if (buttonElement) {
+                    if (response.is_home) {
+                        $(buttonElement).removeClass('btn-secondary').addClass('btn-info');
+                        $(buttonElement).html('<i class="fa-solid fa-home"></i> For Home');
+                        $(buttonElement).attr('data-is-home', '1');
+                    } else {
+                        $(buttonElement).removeClass('btn-info').addClass('btn-secondary');
+                        $(buttonElement).html('<i class="fa-solid fa-home"></i> Mark for Home');
+                        $(buttonElement).attr('data-is-home', '0');
+                    }
+                }
+            } else {
+                toastr.error(response.message || 'Failed to toggle home status');
+            }
+        });
+    };
+
     var updateSeo = function(productId) {
         var formData = WinPos.Common.getFormData('#productSeoForm');
         
@@ -1303,6 +1325,7 @@ WinPos.Product = (function (Urls){
         markProductImageAsDefault: markProductImageAsDefault,
         deleteProductImage: deleteProductImage,
         togglePublished: togglePublished,
+        toggleHome: toggleHome,
         updateSeo: updateSeo,
         updateDefaultDiscountFields: updateDefaultDiscountFields,
         loadRelatedProducts: loadRelatedProducts,

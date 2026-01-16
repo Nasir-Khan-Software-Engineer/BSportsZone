@@ -13,6 +13,10 @@
                     <i class="fa-solid {{ $product->is_published ? 'fa-check-circle' : 'fa-times-circle' }}"></i> 
                     {{ $product->is_published ? 'Published' : 'Unpublished' }}
                 </button>
+                <button type="button" class="btn {{ ($product->is_home ?? false) ? 'btn-info' : 'btn-secondary' }} rounded btn-sm toggle-home" data-product-id="{{ $product->id }}" data-is-home="{{ ($product->is_home ?? false) ? '1' : '0' }}">
+                    <i class="fa-solid fa-home"></i> 
+                    {{ ($product->is_home ?? false) ? 'For Home' : 'Mark for Home' }}
+                </button>
                 <a href="{{ route('product.index') }}" class="btn thm-btn-bg thm-btn-text-color rounded btn-sm"><i class="fa-solid fa-arrow-left"></i> Back</a>
             </div>
         </div>
@@ -671,6 +675,7 @@ let productUrls = {
     'deleteProductImage': "{{ route('product.images.destroy',['product' => $product->id ?? 'productID', 'image' => 'imageID']) }}",
     'updateProductSeo': "{{ route('product.update-seo',['product' => $product->id ?? 'productID']) }}",
     'toggleProductPublished': "{{ route('product.toggle-published',['product' => $product->id ?? 'productID']) }}",
+    'toggleProductHome': "{{ route('product.toggle-home',['product' => $product->id ?? 'productID']) }}",
     'getRelatedProducts': "{{ route('product.related-products.get',['product' => $product->id ?? 'productID']) }}",
     'getAvailableProducts': "{{ route('product.related-products.available',['product' => $product->id ?? 'productID']) }}",
     'addRelatedProduct': "{{ route('product.related-products.add',['product' => $product->id ?? 'productID']) }}",
@@ -840,6 +845,12 @@ $(document).ready(function() {
     $(document).on('click', '.toggle-published', function() {
         let productId = $(this).data('product-id');
         WinPos.Product.togglePublished(productId, $(this));
+    });
+
+    // Toggle home status
+    $(document).on('click', '.toggle-home', function() {
+        let productId = $(this).data('product-id');
+        WinPos.Product.toggleHome(productId, $(this));
     });
 
     // Update SEO

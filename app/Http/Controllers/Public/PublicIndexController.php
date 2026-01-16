@@ -14,8 +14,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use App\Services\Product\IPublicProductService;
+
 class PublicIndexController extends Controller
 {
+
+    public function __construct(IPublicProductService $publicProductService)
+    {
+        $this->publicProductService = $publicProductService;
+    }
+
+
     public function index()
     {
 
@@ -23,7 +32,28 @@ class PublicIndexController extends Controller
 
         // Auth::logout();
               //  Session::flush();
-        return view('public.page.index');
+
+        $homeProducts = Product::where('is_published', true)
+            ->where('type', 'Product')
+            ->where('is_home', true)
+            ->with('variations')
+            ->select([
+                'id',
+                'name',
+                'slug',
+                'price',
+                'image',
+                'discount_type',
+                'discount_value',
+                'seo_keyword',
+                'seo_description',
+                'description'
+            ])->get();
+
+        $homeProducts = $this->publicProductService->formatProducts($homeProducts);
+
+
+        return view('public.page.index', compact('homeProducts'));
     }
 
     public function checkout()

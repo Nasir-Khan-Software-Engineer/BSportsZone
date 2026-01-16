@@ -306,7 +306,7 @@ a.more {
   padding: 7rem 0;
 }
 
-.product-section .product-item {
+.product-item {
   text-align: center;
   display: block;
   position: relative;
@@ -315,24 +315,26 @@ a.more {
   border: 1px solid #d3d3d3;
   border-radius: 10px;
   background-color: #fff;
+  font-family: "Roboto", sans-serif;
 }
-.product-section .product-item a{
+.product-item a{
   text-decoration: none;
 }
 
-.product-section .product-item .add-to-cart-btn{
+.product-item .add-to-cart-btn{
     border: 0;
     background: #268359;
     color: #fff;
     padding: 5px 50px;
     border-radius: 5px;
     transition: all .3s ease-in-out;
+    font-size: 20px;
 }
 
-.product-section .product-item .add-to-cart-btn:hover{
+.product-item .add-to-cart-btn:hover{
     background: #19382d;
 }
-.product-section .product-item .product-thumbnail {
+.product-item .product-thumbnail {
   margin-bottom: 5px;
   position: relative;
   top: 0;
@@ -341,23 +343,23 @@ a.more {
   transition: .3s all ease;
 }
 
-.product-section .product-item h3 {
+.product-item h3 {
   font-weight: 600;
   font-size: 16px;
 }
 
-.product-section .product-item strong {
+.product-item strong {
   font-weight: 800 !important;
   font-size: 18px !important;
 }
 
-.product-section .product-item h3,
-.product-section .product-item strong {
+.product-item h3,
+.product-item strong {
   color: #2f2f2f;
   text-decoration: none;
 }
 
-.product-section .product-item:before {
+.product-item:before {
   bottom: 0;
   left: 0;
   right: 0;
@@ -372,12 +374,12 @@ a.more {
   transition: .3s all ease;
 }
 
-.product-section .product-item:hover .product-thumbnail {
+.product-item:hover .product-thumbnail {
   top: -25px;
 }
 
 
-.product-section .product-item:hover:before {
+.product-item:hover:before {
   height: 70%;
 }
 
@@ -1085,7 +1087,7 @@ textarea {
   color: #575757;
   margin-bottom: 10px;
 }
-.single-product-page .product-info .add-to-cart-btn,
+.single-product-page .product-info .single-add-to-cart-btn,
 .single-product-page .product-info .buy-now-btn{
   border: 0;
   background: #268359;
@@ -1102,12 +1104,72 @@ textarea {
   background: #093320;
 }
 
-.single-product-page .product-info .add-to-cart-btn:hover{
+.single-product-page .product-info .single-add-to-cart-btn:hover{
   background: #19382d;
 }
 
 .single-product-page .product-info .buy-now-btn:hover{
   background: #268359;
+}
+.single-product-page .product-info .product-title{
+  font-family: "Delius", cursive;
+  font-weight: 700;
+  color: #333;
+  font-size: 33px;
+}
+
+
+.single-product-page .product-info .original-price{
+  font-size: 22px;
+  text-decoration: line-through; 
+  color: #999; 
+  margin-right: 8px;
+}
+
+.single-product-page .product-info  .price-display{
+  font-size: 27px;
+  color: #333;
+}
+
+.single-product-page .product-info .product-short-description{
+  margin: 0px;
+  font-size: 16px;
+  color: #6f6f6f;
+  font-family: "Roboto", sans-serif;
+}
+
+.single-product-page .product-description{
+  font-family: "Roboto", sans-serif;
+  color: #585858;
+  font-size: 15px;
+}
+
+.single-product-page .product-description h2{
+  font-family: "Delius", cursive;
+  font-weight: 700;
+  color: #333;
+  font-size: 25px !important;
+}
+.single-product-page .product-description p{
+  margin-bottom: 5px;
+}
+.single-product-page .product-description table{
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.single-product-page .product-description table th{
+  padding: 5px 0px;
+  border: 1px solid #8f8f8f;
+  text-align: center;
+  color: #333;
+}
+
+
+.single-product-page .product-description table tr td{
+  padding: 5px 0px;
+  border: 1px solid #8f8f8f;
+  text-align: center  ;
 }
 
 
@@ -1373,4 +1435,31 @@ textarea {
 .review-card:hover img,
 .product-image-wrap:hover img {
     transform: scale(1.5);
+}
+
+
+
+
+
+.title-italic-bold {
+  font-family: "Delius", cursive;
+  font-weight: 700;
+  font-style: italic;
+}
+
+.title-bold{
+  font-family: "Delius", cursive;
+  font-weight: 700;
+}
+
+.font-delius-regular {
+  font-family: "Delius", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-roboto-regular {
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }

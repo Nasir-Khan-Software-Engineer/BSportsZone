@@ -198,7 +198,6 @@ WinPos.Product = (function (Urls){
 
     var updateProduct = function (productId){
         let formData = WinPos.Common.getFormData("#productEditForm");
-        formData.description = window.editorInstance.getData();
         
         WinPos.Common.putAjaxCallPost(Urls.updateProduct.replace("productID", productId), JSON.stringify(formData), function (response){
             if(response.status === 'success'){
@@ -965,9 +964,9 @@ WinPos.Product = (function (Urls){
                 datalist.empty();
                 productImagesList.forEach(function(image) {
                     var option = $('<option></option>');
-                    option.attr('value', image.name);
+                    option.attr('value', image.file_name);
                     option.attr('data-url', image.url);
-                    option.text(image.name);
+                    option.text(image.file_name);
                     datalist.append(option);
                 });
                 if (callback) callback();
@@ -1033,7 +1032,7 @@ WinPos.Product = (function (Urls){
         }
         
         var image = productImagesList.find(function(img) {
-            return img.name === imageName;
+            return img.file_name === imageName;
         });
         
         if (image) {

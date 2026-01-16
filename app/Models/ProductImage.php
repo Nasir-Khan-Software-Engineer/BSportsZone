@@ -37,7 +37,7 @@ class ProductImage extends Model
 
     public function mediaImage()
     {
-        return $this->hasOne(MediaImage::class, 'name', 'image_name')
+        return $this->hasOne(MediaImage::class, 'file_name', 'image_name')
             ->where('POSID', $this->POSID);
     }
 }

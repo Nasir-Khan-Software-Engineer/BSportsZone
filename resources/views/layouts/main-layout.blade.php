@@ -622,7 +622,7 @@
                 <div class="container-fluid">
 
                     @yield('content')
-
+    
                 </div>
                 <!-- /.container-fluid -->
             </div>
@@ -686,16 +686,8 @@
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.min.js"></script>
 
-    <script type="importmap">
-    {
-    "imports": {
-        "ckeditor5": "{{ asset('ckeditor5/ckeditor5.js') }}",
-        "ckeditor5/": "{{ asset('ckeditor5/') }}"
-    }
-    }
-    </script>
-
-    <script type="module" src="{{ asset('ckeditor-main.js') }}"></script>
+    <link href="https://cdn.jsdelivr.net/npm/summernote/dist/summernote-lite.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/summernote/dist/summernote-lite.js"></script>
 
 
 
@@ -715,6 +707,54 @@
 
 
     $(document).ready(async function() {
+        
+
+
+        $('.summernote').summernote({
+            placeholder: 'Write your content here...',
+            tabsize: 2,
+            height: 300, // editor height in px
+            focus: true, // auto-focus
+            toolbar: [
+                // Font style
+                ['style', ['style']],
+                ['font', ['bold', 'italic', 'underline', 'strikethrough', 'clear']],
+                ['fontname', ['fontname']],
+                ['fontsize', ['fontsize']],
+                
+                // Color & background
+                ['color', ['color']],
+                
+                // Paragraph
+                ['para', ['ul', 'ol', 'paragraph', 'height']],
+                
+                // Insert
+                ['insert', ['link', 'picture', 'video', 'table', 'hr']],
+                
+                // Misc
+                ['view', ['fullscreen', 'codeview', 'help']],
+                
+                // Undo/Redo
+                ['history', ['undo', 'redo']]
+            ],
+            popover: {
+                image: [
+                    ['image', ['resizeFull', 'resizeHalf', 'resizeQuarter', 'resizeNone', 'floatLeft', 'floatRight', 'floatNone', 'removeMedia']],
+                    ['custom', ['imageAttributes']],
+                    ['link', ['linkDialogShow']]
+                ]
+            },
+            callbacks: {
+                onImageUpload: function(files) {
+                    // Optional: custom image upload handler
+                    alert('Image upload is disabled. Use image via URL only.');
+                }
+            }
+        });
+
+
+
+
 
         toastr.options = {
             closeButton: true,

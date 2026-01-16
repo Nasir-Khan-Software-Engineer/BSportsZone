@@ -54,7 +54,7 @@
                 <div class="product-item">
                     <a href="#">
                         <img src="{{ asset('website/images/MeherArt-Product.png') }}" class="img-fluid product-thumbnail">
-                        <h3 class="product-title">Argentina 2026 Jersey Home</h3>
+                        <h3 class="product-title font-roboto-regular">Argentina 2026 Jersey Home</h3>
                         <strong class="product-price">$50.00</strong>
                     </a>
                     <br>

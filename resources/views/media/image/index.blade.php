@@ -21,13 +21,14 @@
                 <thead>
                     <tr>
                         <th class="text-center align-middle" style="width: 5%;" scope="col">ID</th>
-                        <th class="text-center align-middle" style="width: 20%;" scope="col">Name</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Size</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Type</th>
-                        <th class="text-center align-middle" style="width: 15%;" scope="col">Relation</th>
-                        <th class="text-center align-middle" style="width: 15%;" scope="col">Created At</th>
-                        <th class="text-center align-middle" style="width: 15%;" scope="col">Created By</th>
-                        <th class="text-center align-middle" style="width: 10%;" scope="col">Action</th>
+                        <th class="text-center align-middle" style="width: 8%;" scope="col">Image</th>
+                        <th class="text-center align-middle" style="width: 18%;" scope="col">Name</th>
+                        <th class="text-center align-middle" style="width: 8%;" scope="col">Size</th>
+                        <th class="text-center align-middle" style="width: 8%;" scope="col">Type</th>
+                        <th class="text-center align-middle" style="width: 12%;" scope="col">Relation</th>
+                        <th class="text-center align-middle" style="width: 12%;" scope="col">Created At</th>
+                        <th class="text-center align-middle" style="width: 12%;" scope="col">Created By</th>
+                        <th class="text-center align-middle" style="width: 15%;" scope="col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -203,6 +204,35 @@ $(document).ready(function() {
         WinPos.Datatable.selectRow(this);
         let imageID = $(this).data('imageid');
         WinPos.MediaImage.showImage(imageID);
+    });
+
+    // Copy image path to clipboard
+    $(document).on('click', '.copy-path', function() {
+        var path = $(this).data('path');
+        if (path) {
+            // Create a temporary textarea element
+            var tempTextarea = $('<textarea>');
+            $('body').append(tempTextarea);
+            tempTextarea.val(path).select();
+            try {
+                document.execCommand('copy');
+                toastr.success('Image path copied to clipboard!');
+            } catch (err) {
+                // Fallback for browsers that don't support execCommand
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(path).then(function() {
+                        toastr.success('Image path copied to clipboard!');
+                    }).catch(function() {
+                        toastr.error('Failed to copy path to clipboard');
+                    });
+                } else {
+                    toastr.error('Clipboard API not available');
+                }
+            }
+            tempTextarea.remove();
+        } else {
+            toastr.error('No path available');
+        }
     });
 
     // Delete image

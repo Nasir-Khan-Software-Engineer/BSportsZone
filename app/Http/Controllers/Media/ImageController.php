@@ -23,7 +23,7 @@ class ImageController extends Controller
         $query = MediaImage::where('media_images.POSID', $POSID)
             ->with('creator')
             ->where(function($query) use ($searchCriteria) {
-                $query->where('name', 'like', "%{$searchCriteria}%")
+                $query->where('file_name', 'like', "%{$searchCriteria}%")
                       ->orWhere('relation', 'like', "%{$searchCriteria}%")
                       ->orWhere('type', 'like', "%{$searchCriteria}%");
             });
@@ -43,8 +43,8 @@ class ImageController extends Controller
                 ->take($request->input('length'))
                 ->get();
         } elseif ($orderColumn == 1) {
-            // Order by name
-            $images = (clone $query)->orderBy('name', $orderDir)
+            // Order by file_name
+            $images = (clone $query)->orderBy('file_name', $orderDir)
                 ->skip($request->input('start'))
                 ->take($request->input('length'))
                 ->get();
@@ -85,6 +85,8 @@ class ImageController extends Controller
             $image->formattedTime = formatTime($image->created_at);
             $image->formattedSize = $this->formatFileSize($image->size);
             $image->createdBy = $image->creator ? $image->creator->name : 'N/A';
+            $image->imageUrl = asset($image->file_path);
+            $image->fullPath = asset($image->file_path);
             return $image;
         });
 
@@ -147,7 +149,6 @@ class ImageController extends Controller
             // Store in database
             $mediaImage = new MediaImage();
             $mediaImage->POSID = $POSID;
-            $mediaImage->name = $originalName;
             $mediaImage->file_name = $fileName;
             $mediaImage->file_path = "images/{$POSID}/{$relation}/{$fileName}";
             $mediaImage->size = $size;

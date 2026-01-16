@@ -382,9 +382,6 @@
             </div>
 
         </div>
-
-        <textarea class="myCkEditor" name="editor"></textarea>
-        <button id="getData">Get Data</button>
     </div>
 
 </div>
@@ -397,17 +394,10 @@
 
 
 
-
-
 <script>
 $(document).ready(function() {
     // Auto-open attendance modal on dashboard if attendance is pending
     checkAndAutoOpenAttendanceModal();
-
-    $("#getData").click(function() {
-        const data = window.editorInstance.getData();
-        console.log(data);
-    })
     
 });
 
@@ -469,8 +459,6 @@ function checkAndAutoOpenAttendanceModal() {
 function fetchDashboardData(filterValue) {
 
 }
-
-
 
 
 </script>

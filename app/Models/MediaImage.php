@@ -13,7 +13,6 @@ class MediaImage extends Model
 
     protected $fillable = [
         'POSID',
-        'name',
         'file_name',
         'file_path',
         'size',

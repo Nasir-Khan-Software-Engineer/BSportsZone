@@ -12,19 +12,19 @@
             </div>
             <div class="col-12 col-lg-8">
                 <div class="product-info" id="product-info">
-                    <h2 class="heading">{{$product->name}}</h2>
+                    <h1 class="product-title">{{$product->name}}</h1>
                     <div class="price">
                         @if($product->price !== $priceAfterDiscount && $product->discount_type && $product->discount_value)
-                        <span class="original-price" style="text-decoration: line-through; color: #999; margin-right: 8px;">
+                        <span class="original-price">
                             Tk.{{ number_format($product->price, 2) }}
                         </span>
                         @endif
                         <strong class="price-display">Tk.{{ number_format($priceAfterDiscount, 2) }}</strong>
                     </div>
-                    <p class="m-0">{{$product->seo_description}}</p>
+                    <p class="product-short-description">{{$product->seo_description}}</p>
 
                     <div class="variation">
-                        <div><span>Select Yours</span></div>
+                        <div><i>Select Yours</i></div>
                         @foreach($product->variations as $variation)
                             <button class="variation-btn {{ $variation->is_default ? 'active' : '' }}"
                                 data-variation-id="{{ $variation->id }}"
@@ -39,8 +39,8 @@
                         @endforeach
                     </div>
 
-                    <div >
-                        <div><span>Select Quantity</span></div>
+                    <div class="mt-2">
+                        <div><i>Select Quantity</i></div>
                         <div class="input-group mb-3" style="max-width: 150px;">
                             <button class="qty-minus-btn qty-btn" type="button">&minus;</button>
                             <input id="quantityInput" type="text" class="form-control text-center quantity" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
@@ -53,7 +53,7 @@
                         data-product-id="{{$product->id}}"
                         data-product-name="{{$product->name}}"
                         data-product-image="{{$product->image}}"
-                        id="addToCartBtn" class="add-to-cart-btn">Add to Cart</button>
+                        id="addToCartBtn" class="single-add-to-cart-btn">Add to Cart</button>
                         <a href="index.html" class="buy-now-btn mt-1">Cash on Delivery</a>
                     </p>
                 </div>
@@ -66,7 +66,7 @@
             <div class="col-12 mt-1 col-lg-9">
                 <div class="product-details">
                     <div class="row">
-                        <div class="col-12 ">
+                        <div class="col-12 product-description">
                             {!! $product->description !!}
                         </div>
                     </div>
@@ -80,7 +80,7 @@
                 <div class="row justify-content-center">
                     <div class="col-lg-12">
                         <div class="single-product-page-review-slider-section">
-                            <p class="mb-0 text-center">Our Happy Customers Says</p>
+                            <p class="mb-0 text-center">Our Happy Customers Reviews</p>
                             <div id="singleProductPageReviewSplide" class="splide">
                                 <div class="splide__track">
                                     <ul class="splide__list">
@@ -125,7 +125,7 @@
                 <!-- // Related Products Section -->
                 <div class="row">
                     @foreach($relatedProducts as $rproduct)
-                    <div class="col-12 mb-3">
+                    <div class="col-12 mb-3 related-product-section">
                         <div class="product-item px-2">
                             <a title="{{ $rproduct->name }}" href="{{ route('product.single', $rproduct->slug) }}">
                                 <img src="{{ asset('images/1/Product/') }}/{{$rproduct->image}}" alt="{{ $rproduct->name }}" class="img-fluid product-thumbnail">
@@ -139,7 +139,6 @@
                                     <strong>Tk.{{ number_format($rproduct->price_after_discount, 2) }}</strong>
                                 </div>
                             </a>
-                            <br>
                             <button type="button" class="add-to-cart-btn"
                             data-product-id="{{ $rproduct->id }}"
                             data-product-name="{{ $rproduct->name }}"

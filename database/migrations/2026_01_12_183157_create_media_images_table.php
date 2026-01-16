@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('media_images', function (Blueprint $table) {
             $table->id();
             $table->integer('POSID');
-            $table->string('name'); // Original file name
             $table->string('file_name'); // Stored file name with timestamp
             $table->string('file_path'); // Full path to the file
             $table->integer('size'); // File size in bytes

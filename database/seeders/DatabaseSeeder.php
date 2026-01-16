@@ -20,8 +20,7 @@ class DatabaseSeeder extends Seeder
         
         $this->call(UserSeeder::class);
         $this->call(MakeAllUsersAdminSeeder::class);
-        $this->call(AssignAllAdminAccessRightsSeeder::class);
-
+        
         $this->call(POSSettingsSeeder::class);
         $this->call(CustomerSeeder::class);
         $this->call(SupplierSeeder::class);
@@ -29,16 +28,17 @@ class DatabaseSeeder extends Seeder
         $this->call(CategorySeeder::class);
         $this->call(ShopSeeder::class);
         $this->call(UnitSeeder::class);
-
-        $this->call(EmployeeDesignationSeeder::class);
-        $this->call(EmployeeSeeder::class);
-        $this->call(EmployeeReviewSeeder::class);
-
+        
+        //$this->call(EmployeeDesignationSeeder::class);
+        //$this->call(EmployeeSeeder::class);
+        //$this->call(EmployeeReviewSeeder::class);
+        
         $this->call(ServiceSeeder::class);
         //$this->call(ProductWithVariationSeeder::class);
-
+        
         $this->call(EmployeeSmsReportAccessRightSeeder::class);
         //$this->call(PurchaseSeeder::class);
         $this->call(ProductSeeder::class);
+        $this->call(AssignAllAdminAccessRightsSeeder::class);
     }
 }

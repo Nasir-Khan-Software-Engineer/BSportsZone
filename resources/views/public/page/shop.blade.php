@@ -6,18 +6,15 @@
         <div class="row">
             <div class="col-12">
                 <!-- Shop Page Header -->
-                <div class="shop-header text-center py-3">
-                    <h1 class="shop-title">Shop Premium Sports Jerseys</h1>
-                    <p class="shop-description">
+                <div class="shop-header text-center pb-3">
+                    <h1 class="shop-title title-italic-bold">Shop Premium Sports Jerseys</h1>
+                    <p class="shop-description font-roboto-regular">
                         Discover high-quality, stylish jerseys designed for comfort, performance, and everyday wear. <br>
                         Find your perfect fit and represent your team with pride.
                     </p>
                 </div>
-
             </div>
         </div>
-
-
 
 
         <div class="row">
@@ -36,7 +33,6 @@
                             <strong>Tk.{{ number_format($product->price_after_discount, 2) }}</strong>
                         </div>
                     </a>
-                    <br>
                     <button type="button" class="add-to-cart-btn"
                     data-product-id="{{ $product->id }}"
                     data-product-name="{{ $product->name }}"

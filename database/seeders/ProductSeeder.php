@@ -105,10 +105,10 @@ class ProductSeeder extends Seeder
                 continue;
             }
 
-            // Check if MediaImage already exists
+            // Check if MediaImage already exists (check by file_name pattern)
             $existingMediaImage = MediaImage::where('POSID', $POSID)
-                ->where('name', $imageFile)
                 ->where('relation', 'Product')
+                ->where('file_name', 'like', pathinfo($imageFile, PATHINFO_FILENAME) . '_%')
                 ->first();
 
             if ($existingMediaImage) {
@@ -133,7 +133,6 @@ class ProductSeeder extends Seeder
             // Create MediaImage record
             $mediaImage = new MediaImage();
             $mediaImage->POSID = $POSID;
-            $mediaImage->name = $imageFile;
             $mediaImage->file_name = $fileName;
             $mediaImage->file_path = "images/{$POSID}/Product/{$fileName}";
             $mediaImage->size = $fileSize;
@@ -213,7 +212,141 @@ class ProductSeeder extends Seeder
             $seoDescription = "Shop premium quality {$productName} online. Authentic design, comfortable fit, and durable materials. Perfect for fans and players. Available in multiple sizes with 10% discount.";
 
             // Mid-long description
-            $description = "Experience the ultimate in sports apparel with our premium {$productName}. Crafted with meticulous attention to detail, this jersey combines authentic design elements with modern comfort technology. Made from high-quality, breathable fabric that wicks away moisture, keeping you cool and dry during intense matches or casual wear. The jersey features official team colors, embroidered logos, and reinforced stitching for enhanced durability. Whether you're supporting your favorite team from the stands or playing on the field, this jersey offers the perfect blend of style, comfort, and performance. Available in multiple sizes to ensure the perfect fit for every fan and player.";
+            $description = '
+                <h2 class="">2026 Official Team Jersey – Premium Edition</h2>
+
+<p>Step into the spirit of the game with the <strong>2026 Official Team Jersey</strong>. Designed for both athletes and fans, this jersey combines <strong>modern aesthetics</strong>, <strong>premium comfort</strong>, and <strong>team pride</strong>. Whether you’re on the field, in the stands, or showing off your allegiance, this jersey delivers style, functionality, and durability.</p>
+
+<h2>Why Choose This Jersey?</h2>
+<ul>
+    <li><strong>Officially Licensed:</strong> 100% authentic team merchandise with official logos and colors.</li>
+    <li><strong>Premium Fabric:</strong> Lightweight, breathable, and moisture-wicking polyester for all-day comfort.</li>
+    <li><strong>Enhanced Durability:</strong> Reinforced stitching to withstand intensive play and repeated washes.</li>
+    <li><strong>Vibrant Colors:</strong> Long-lasting colors that won’t fade after washing.</li>
+    <li><strong>Performance Fit:</strong> Ergonomic design for ease of movement and optimal comfort.</li>
+</ul>
+
+<h2>Material &amp; Technology</h2>
+<p>This jersey uses <strong>advanced sports fabric technology</strong> to keep you cool and dry. Key features include:</p>
+<ul>
+    <li><strong>Moisture-Wicking Fabric:</strong> Draws sweat away from the skin to keep you dry during intense activity.</li>
+    <li><strong>Breathable Mesh Panels:</strong> Strategically placed for enhanced airflow.</li>
+    <li><strong>Anti-Odor Treatment:</strong> Keeps your jersey fresh longer.</li>
+    <li><strong>Quick-Dry:</strong> Fabric dries fast for convenience after sports or washing.</li>
+</ul>
+
+<h2>Size Guide</h2>
+<p>Please refer to our detailed size chart to find the perfect fit. Measurements are in inches.</p>
+
+<table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Size</th>
+            <th>Chest</th>
+            <th>Waist</th>
+            <th>Length</th>
+            <th>Sleeve</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Small (S)</td>
+            <td>34 - 36</td>
+            <td>28 - 30</td>
+            <td>27</td>
+            <td>24</td>
+        </tr>
+        <tr>
+            <td>Medium (M)</td>
+            <td>38 - 40</td>
+            <td>32 - 34</td>
+            <td>28</td>
+            <td>25</td>
+        </tr>
+        <tr>
+            <td>Large (L)</td>
+            <td>42 - 44</td>
+            <td>36 - 38</td>
+            <td>29</td>
+            <td>26</td>
+        </tr>
+        <tr>
+            <td>Extra Large (XL)</td>
+            <td>46 - 48</td>
+            <td>40 - 42</td>
+            <td>30</td>
+            <td>27</td>
+        </tr>
+        <tr>
+            <td>XXL</td>
+            <td>50 - 52</td>
+            <td>44 - 46</td>
+            <td>31</td>
+            <td>28</td>
+        </tr>
+    </tbody>
+</table>
+
+<h2>How to Measure</h2>
+<ul>
+    <li><strong>Chest:</strong> Measure around the fullest part of your chest.</li>
+    <li><strong>Waist:</strong> Measure around your natural waistline.</li>
+    <li><strong>Length:</strong> Measure from shoulder to hemline.</li>
+    <li><strong>Sleeve:</strong> Measure from shoulder seam to cuff.</li>
+</ul>
+
+<h2>Care Instructions</h2>
+<ul>
+    <li>Machine wash cold with like colors.</li>
+    <li>Do not bleach or iron directly on the logo.</li>
+    <li>Tumble dry low or hang to dry.</li>
+    <li>Do not dry clean.</li>
+</ul>
+
+<h2>Customization Options</h2>
+<p>Make your jersey truly yours! You can add:</p>
+<ul>
+    <li>Player name and number on the back</li>
+    <li>Special patches or badges</li>
+    <li>Limited edition prints (where applicable)</li>
+</ul>
+
+<h2>FAQs</h2>
+<dl>
+    <dt>Q: Is this the official team merchandise?</dt>
+    <dd>A: Yes! This is 100% authentic, licensed merchandise from the official team.</dd>
+
+    <dt>Q: Can I customize my jersey?</dt>
+    <dd>A: Yes, you can add your name and number at checkout.</dd>
+
+    <dt>Q: Does the jersey run true to size?</dt>
+    <dd>A: Yes, please refer to the size chart above for accurate measurements.</dd>
+
+    <dt>Q: Is the jersey suitable for sports activities?</dt>
+    <dd>A: Absolutely! It’s designed with breathable, lightweight fabric perfect for active wear.</dd>
+
+    <dt>Q: How long will it take to ship?</dt>
+    <dd>A: Typically 3-7 business days, depending on your location.</dd>
+
+    <dt>Q: Can I return the jersey if it doesn’t fit?</dt>
+    <dd>A: Yes, we offer a 14-day return policy for unworn items.</dd>
+</dl>
+
+<h2>Customer Reviews</h2>
+<p><em>"High-quality jersey! Fits perfectly and feels amazing on game day." – Samantha R.</em></p>
+<p><em>"The colors are vibrant and the material is breathable. Love it!" – Michael P.</em></p>
+<p><em>"Fast delivery and excellent quality. Will buy more for my family." – Jordan L.</em></p>
+
+<h2>Why Fans Love It</h2>
+<ul>
+    <li>Show your team spirit in style</li>
+    <li>Wearable comfort for games or casual outings</li>
+    <li>Durable, long-lasting, and easy to care for</li>
+</ul>
+
+<p><strong>Order your 2026 Official Team Jersey today and join the winning team in style!</strong></p>
+            
+            ';
 
             // Generate slug from product name
             $slug = $this->generateSlug($productName);
@@ -321,7 +454,7 @@ class ProductSeeder extends Seeder
             // Create or update ProductImage records for all 3 images
             $isFirstDefault = true;
             foreach ($mediaImages as $imageFile => $mediaImage) {
-                $existingProductImage = $existingProductImages->get($mediaImage->name);
+                $existingProductImage = $existingProductImages->get($mediaImage->file_name);
 
                 if ($existingProductImage) {
                     // Update existing product image
@@ -333,7 +466,7 @@ class ProductSeeder extends Seeder
                     $productImage = new ProductImage();
                     $productImage->POSID = $POSID;
                     $productImage->product_id = $product->id;
-                    $productImage->image_name = $mediaImage->name;
+                    $productImage->image_name = $mediaImage->file_name;
                     // Set argentina.png as default (first one)
                     $productImage->is_default = ($isFirstDefault && $imageFile === 'argentina.png');
                     $productImage->created_by = $createdBy;
@@ -347,7 +480,7 @@ class ProductSeeder extends Seeder
 
             // Remove product images that are no longer in the mediaImages list
             $validImageNames = array_map(function($mediaImage) {
-                return $mediaImage->name;
+                return $mediaImage->file_name;
             }, $mediaImages);
             
             ProductImage::where('product_id', $product->id)

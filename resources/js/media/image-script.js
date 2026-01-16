@@ -32,11 +32,24 @@ WinPos.MediaImage = (function (Urls) {
                 {
                     data: null,
                     type: 'string',
+                    orderable: false,
+                    searchable: false,
+                    className: 'text-center align-middle',
+                    render: function (data, type, row) {
+                        if (row.imageUrl) {
+                            return '<img src="' + row.imageUrl + '" style="width: 50px; height: 50px; object-fit: contain; border: 1px solid #ddd; border-radius: 4px;" alt="' + row.file_name + '">';
+                        }
+                        return '-';
+                    }
+                },
+                {
+                    data: null,
+                    type: 'string',
                     orderable: true,
                     searchable: true,
                     className: 'text-center align-middle',
                     render: function (data, type, row) {
-                        return row.name;
+                        return row.file_name;
                     }
                 },
                 {
@@ -95,9 +108,10 @@ WinPos.MediaImage = (function (Urls) {
                     searchable: false,
                     className: 'text-center align-middle',
                     render: function (data, type, row) {
-                        var showBtn = '<button class="btn btn-sm thm-btn-bg thm-btn-text-color show-image" data-imageid="' + row.id + '"><i class="fa-solid fa-eye"></i></button>';
-                        var deleteBtn = '<button class="btn btn-sm thm-btn-bg thm-btn-text-color delete-image" data-imageid="' + row.id + '"><i class="fa-solid fa-trash"></i></button>';
-                        return showBtn + ' ' + deleteBtn;
+                        var showBtn = '<button class="btn btn-sm thm-btn-bg thm-btn-text-color show-image" data-imageid="' + row.id + '" title="Show"><i class="fa-solid fa-eye"></i></button>';
+                        var copyBtn = '<button class="btn btn-sm btn-info copy-path" data-path="' + (row.fullPath || row.imageUrl || '') + '" title="Copy Path"><i class="fa-solid fa-copy"></i></button>';
+                        var deleteBtn = '<button class="btn btn-sm btn-danger delete-image" data-imageid="' + row.id + '" title="Delete"><i class="fa-solid fa-trash"></i></button>';
+                        return showBtn + ' ' + copyBtn + ' ' + deleteBtn;
                     }
                 }
             ]
@@ -172,9 +186,9 @@ WinPos.MediaImage = (function (Urls) {
         WinPos.Common.getAjaxCall(Urls.show.replace('imageID', imageID), function (response) {
             if (response.status === 'success') {
                 var image = response.image;
-                
+                debugger;
                 $('#showImageId').text(image.id);
-                $('#showImageName').text(image.name);
+                $('#showImageName').text(image.file_name);
                 $('#showImageSize').text(image.formattedSize);
                 $('#showImageType').text(image.type ? image.type.toUpperCase() : '-');
                 $('#showImageRelation').text(image.relation);

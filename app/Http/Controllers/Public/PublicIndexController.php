@@ -12,11 +12,17 @@ use App\Models\Variation;
 use App\Models\Accountinfo;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 class PublicIndexController extends Controller
 {
     public function index()
     {
+
+    // logout code 
+
+        // Auth::logout();
+              //  Session::flush();
         return view('public.page.index');
     }
 

@@ -111,7 +111,7 @@
                                 <!-- Description: Full Width -->
                                 <div class="col-12 form-group">
                                     <label for="editProductDescription">Description</label>
-                                    <textarea name="description" id="editProductDescription" class="form-control rounded myCkEditor" cols="30" rows="5" placeholder="Product Description">{!! $product->description ?? '' !!}</textarea>
+                                    <textarea name="description" id="editProductDescription" class="form-control rounded summernote" cols="30" rows="5" placeholder="Product Description">{!! $product->description ?? '' !!}</textarea>
                                 </div>
 
                                 <div class="col-12">
@@ -180,7 +180,7 @@
                                 </div>
                                 <div class="col-12 form-group">
                                     <label for="productSeoDescription">SEO Description</label>
-                                    <textarea name="seo_description" id="productSeoDescription" class="form-control rounded" rows="4" placeholder="Enter SEO description">{{ $product->seo_description ?? '' }}</textarea>
+                                    <textarea maxlength="160" name="seo_description" id="productSeoDescription" class="form-control rounded" rows="4" placeholder="Enter SEO description">{{ $product->seo_description ?? '' }}</textarea>
                                     <small class="form-text text-muted">Enter a brief description for search engines (recommended: 150-160 characters)</small>
                                 </div>
                                 <div class="col-12">
@@ -680,8 +680,6 @@ let productUrls = {
 let productId = {{ $product->id ?? 'null' }};
 
 $(document).ready(function() {
-
-    window.editorInstance.setData('{!! $product->description ?? '' !!}');
 
     // Initialize slug generation
     WinPos.Product.initSlugGeneration();

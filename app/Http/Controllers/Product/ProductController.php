@@ -595,7 +595,7 @@ class ProductController extends Controller
             
             $images->transform(function($image) {
                 $mediaImage = MediaImage::where('POSID', $image->POSID)
-                    ->where('name', $image->image_name)
+                    ->where('file_name', $image->image_name)
                     ->first();
                 
                 $image->image_url = $mediaImage ? asset($mediaImage->file_path) : null;
@@ -624,13 +624,13 @@ class ProductController extends Controller
             
             $images = MediaImage::where('POSID', $POSID)
                 ->where('relation', 'Product')
-                ->orderBy('name', 'asc')
-                ->get(['id', 'name', 'file_path', 'file_name']);
+                ->orderBy('file_name', 'asc')
+                ->get(['id', 'file_path', 'file_name']);
             
             $imageList = $images->map(function($image) {
                 return [
                     'id' => $image->id,
-                    'name' => $image->name,
+                    'name' => $image->file_name,
                     'file_path' => $image->file_path,
                     'file_name' => $image->file_name,
                     'url' => asset($image->file_path)
@@ -671,7 +671,7 @@ class ProductController extends Controller
             
             // Validate image exists in media_images with relation Product
             $mediaImage = MediaImage::where('POSID', $POSID)
-                ->where('name', $request->image_name)
+                ->where('file_name', $request->image_name)
                 ->where('relation', 'Product')
                 ->first();
             
@@ -744,7 +744,7 @@ class ProductController extends Controller
             }
             
             $mediaImage = MediaImage::where('POSID', $POSID)
-                ->where('name', $productImage->image_name)
+                ->where('file_name', $productImage->image_name)
                 ->first();
             
             if ($mediaImage) {
@@ -1076,6 +1076,7 @@ class ProductController extends Controller
             
             $products = Product::where('POSID', $POSID)
                 ->where('type', 'Product')
+                ->where('is_published', 1)
                 ->whereNotIn('id', $relatedProductIds)
                 ->select('id', 'name', 'code')
                 ->orderBy('name', 'asc')

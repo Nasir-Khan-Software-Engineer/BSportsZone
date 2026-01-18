@@ -33,7 +33,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('ckeditor5/ckeditor5.css') }}">
     <style>
     body {
         font-family: 'Rubik', sans-serif !important;

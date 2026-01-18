@@ -1,8 +1,8 @@
 @extends('public.master')
 
 @section('seo')
-    <meta name="description" content="{{ $product->seo_description' }}" />
-    <meta name="keywords" content="{{ $product->seo_keywords' }}" />
+    <meta name="description" content="{{ $product->seo_description }}" />
+    <meta name="keywords" content="{{ $product->seo_keywords }}" />
     <title>Get Your Premium Jersey From Bangladesh Sports Zone.</title>
 @endsection
 

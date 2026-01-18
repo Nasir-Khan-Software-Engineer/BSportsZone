@@ -15,7 +15,7 @@
         <div class="col-12">
             <div class="home-banner">
                 <a href="{{ route('shop') }}">
-                    <img class="img-fluid" src="http://127.0.0.1:8000/images/1/Banner/animated-banner_2026-01-17_01-25-04.gif" alt="">
+                    <img class="img-fluid" src="https://bsportszone.com/images/1/Banner/animated-banner_2026-01-18_17-14-48.gif" alt="bsportszone">
                 </a>
             </div>
         </div>

@@ -55,7 +55,8 @@ export default defineConfig({
                 'resources/js/attendance/attendance-script.js',
                 'resources/js/product/product-script.js',
                 'resources/js/stock/purchase-script.js',
-                'resources/js/stock/return-script.js'
+                'resources/js/stock/return-script.js',
+                'resources/js/media/image-script.js'
             
             ],
             refresh: true,

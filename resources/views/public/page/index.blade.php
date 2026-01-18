@@ -1,5 +1,11 @@
 @extends('public.master')
 
+@section('seo')
+    <meta name="description" content="Premium quality jersey designed for comfort, performance, and true fans." />
+    <meta name="keywords" content="sports jersey, premium jersey, comfort jersey, performance jersey, true fans jersey" />
+    <title>Get Your Premium Jersey From Bangladesh Sports Zone.</title>
+@endsection
+
 @section('content')
 
 <!-- Start Product Section -->
@@ -124,9 +130,9 @@
         <div class="row justify-content-between">
             <div class="col-lg-7 mb-5 mb-lg-0">
                 <div class="imgs-grid">
-                    <div class="grid grid-1"><img src="http://127.0.0.1:8000/images/1/Product/argentina_2026-01-16_17-37-23.png" alt="Untree.co"></div>
-                    <div class="grid grid-2"><img src="http://127.0.0.1:8000/images/1/Product/home-product-2_2026-01-16_23-44-51.png" alt="Untree.co"></div>
-                    <div class="grid grid-3"><img src="http://127.0.0.1:8000/images/1/Product/home-product-3_2026-01-16_23-45-11.png" alt="Untree.co"></div>
+                    <div class="grid grid-1"><img src="http://127.0.0.1:8000/images/1/Product/argentina_2026-01-16_17-37-23.png" alt=""></div>
+                    <div class="grid grid-2"><img src="http://127.0.0.1:8000/images/1/Product/home-product-2_2026-01-16_23-44-51.png" alt=""></div>
+                    <div class="grid grid-3"><img src="http://127.0.0.1:8000/images/1/Product/home-product-3_2026-01-16_23-45-11.png" alt=""></div>
                 </div>
             </div>
             <div class="col-lg-5 ps-lg-5">

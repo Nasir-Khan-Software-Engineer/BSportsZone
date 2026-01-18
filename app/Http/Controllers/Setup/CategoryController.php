@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Services\Category\ICategoryService;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
@@ -28,6 +29,19 @@ class CategoryController extends Controller
         return view("service/category/index", ['categories' => $categories]);
     }
 
+    public function edit(Category $category)
+    {
+        // Verify the category belongs to the user's POS
+        if ($category->POSID !== auth()->user()->POSID) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'category' => $category
+        ]);
+    }
+
     public function store(Request $request)
     {
         try {
@@ -40,11 +54,28 @@ class CategoryController extends Controller
                     Rule::unique('category', 'name') // 👈 specify DB column
                         ->where('POSID', auth()->user()->POSID),
                 ],
+                'slug' => [
+                    'nullable',
+                    'string',
+                    'max:100',
+                    Rule::unique('category', 'slug')
+                        ->where('POSID', auth()->user()->POSID),
+                ],
+                'title' => 'nullable|string|max:255',
+                'keyword' => 'nullable|string',
+                'description' => 'nullable|string',
             ]);
+
+            // Generate slug from name if not provided
+            $slug = $request->slug ?? Str::slug($request->categoryName);
 
             $category             = new Category;
             $category->POSID      = auth()->user()->POSID;
             $category->name       = ucwords($request->categoryName);
+            $category->slug       = $slug;
+            $category->title      = $request->title ?? null;
+            $category->keyword    = $request->keyword ?? null;
+            $category->description = $request->description ?? null;
             $category->icon       = '';
             $category->created_by = auth()->user()->id;
             $category->save();
@@ -92,11 +123,29 @@ class CategoryController extends Controller
                         ->where(fn($query) => $query->where('POSID', auth()->user()->POSID))
                         ->ignore($category->id), // 👈 exclude current row when updating
                 ],
+                'slug' => [
+                    'nullable',
+                    'string',
+                    'max:100',
+                    Rule::unique('category', 'slug')
+                        ->where(fn($query) => $query->where('POSID', auth()->user()->POSID))
+                        ->ignore($category->id),
+                ],
+                'title' => 'nullable|string|max:255',
+                'keyword' => 'nullable|string',
+                'description' => 'nullable|string',
                 'categoryID'   => 'required',
             ]);
 
-            $category->name       = ucwords($request->categoryName);
-            $category->updated_by = auth()->user()->id;
+            // Generate slug from name if not provided
+            $slug = $request->slug ?? Str::slug($request->categoryName);
+
+            $category->name        = ucwords($request->categoryName);
+            $category->slug        = $slug;
+            $category->title       = $request->title ?? null;
+            $category->keyword     = $request->keyword ?? null;
+            $category->description = $request->description ?? null;
+            $category->updated_by  = auth()->user()->id;
             $category->update();
 
             $category->createdBy     = $category->creator->name;

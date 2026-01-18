@@ -4,11 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="author" content="Meher Art">
+    <meta name="author" content="BSportsZone">
     <link rel="shortcut icon" href="favicon.png">
-
-    <meta name="description" content="" />
-    <meta name="keywords" content="bootstrap, bootstrap4" />
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{{ asset('website/css/bootstrap.min.css') }}">
@@ -25,25 +22,17 @@
     <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide-extension-auto-scroll@0.5.3/dist/js/splide-extension-auto-scroll.min.js"></script>
 
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Delius&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
-
-
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Delius&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
     <script>
     var Website = {};
     </script>
 
-
-
-
     @yield('styles')
     @yield('seo')
 
-
-    <title>Meher Art - Enjoys Arabic Calligraphy</title>
 </head>
 
 <body>
@@ -60,20 +49,20 @@
 
             <div class="collapse navbar-collapse" id="navbarsFurni">
                 <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
-                    <li><a class="nav-link" href="contact.html">Shop</a></li>
+                    <li><a class="nav-link" href="{{ route('shop') }}">Shop</a></li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('index') }}">Portugal</a>
+                        <a class="nav-link" href="{{ route('category', 'portugal') }}">Portugal</a>
                     </li>
-                    <li><a class="nav-link" href="{{ route('shop') }}">Italy</a></li>
-                    <li><a class="nav-link" href="about.html">Germany</a></li>
-                    <li><a class="nav-link" href="services.html">Football</a></li>
-                    <li><a class="nav-link" href="blog.html">Cricket</a></li>
-                    <li><a class="nav-link" href="contact.html">Club</a></li>
+                    <li><a class="nav-link" href="{{ route('category', 'italy') }}">Italy</a></li>
+                    <li><a class="nav-link" href="{{ route('category', 'germany') }}">Germany</a></li>
+                    <li><a class="nav-link" href="{{ route('category', 'football') }}">Football</a></li>
+                    <li><a class="nav-link" href="{{ route('category', 'cricket') }}">Cricket</a></li>
+                    <li><a class="nav-link" href="{{ route('category', 'club') }}">Club</a></li>
                 </ul>
 
                 <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
                     <li class="check-out-btn"><a class="nav-link" href="{{ route('checkout') }}">
-                        <img src="{{asset('website/images/cart.svg') }}"></a>
+                            <img src="{{asset('website/images/cart.svg') }}"></a>
                     </li>
                 </ul>
             </div>
@@ -87,61 +76,61 @@
     @yield('content')
 
 
-    	<!-- Start Testimonial Slider -->
-	<div class="testimonial-section d-none">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-7 mx-auto text-center">
-					<h2 class="section-title">What Our Customers Say 💬</h2>
-				</div>
-			</div>
+    <!-- Start Testimonial Slider -->
+    <div class="testimonial-section d-none">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-7 mx-auto text-center">
+                    <h2 class="section-title">What Our Customers Say 💬</h2>
+                </div>
+            </div>
 
-			<div class="row justify-content-center">
-				<div class="col-lg-12">
-					<div class="review-slider-section">
-						<div id="reviewSplide" class="splide">
-							<div class="splide__track">
-								<ul class="splide__list">
+            <div class="row justify-content-center">
+                <div class="col-lg-12">
+                    <div class="review-slider-section">
+                        <div id="reviewSplide" class="splide">
+                            <div class="splide__track">
+                                <ul class="splide__list">
 
-									<li class="splide__slide">
-										<div class="review-card">
-											<img src="{{ asset('website/images/review/review (1).jpeg') }}" alt="">
-										</div>
-									</li>
+                                    <li class="splide__slide">
+                                        <div class="review-card">
+                                            <img src="{{ asset('website/images/review/review (1).jpeg') }}" alt="">
+                                        </div>
+                                    </li>
 
-									<li class="splide__slide">
-										<div class="review-card">
-											<img src="{{ asset('website/images/review/review (2).jpeg') }}" alt="">
-										</div>
-									</li>
+                                    <li class="splide__slide">
+                                        <div class="review-card">
+                                            <img src="{{ asset('website/images/review/review (2).jpeg') }}" alt="">
+                                        </div>
+                                    </li>
 
-									<li class="splide__slide">
-										<div class="review-card">
-											<img src="{{ asset('website/images/review/review (3).jpeg') }}" alt="">
-										</div>
-									</li>
+                                    <li class="splide__slide">
+                                        <div class="review-card">
+                                            <img src="{{ asset('website/images/review/review (3).jpeg') }}" alt="">
+                                        </div>
+                                    </li>
 
-									<li class="splide__slide">
-										<div class="review-card">
-											<img src="{{ asset('website/images/review/review (4).jpeg') }}" alt="">
-										</div>
-									</li>
+                                    <li class="splide__slide">
+                                        <div class="review-card">
+                                            <img src="{{ asset('website/images/review/review (4).jpeg') }}" alt="">
+                                        </div>
+                                    </li>
 
-									<li class="splide__slide">
-										<div class="review-card">
-											<img src="{{ asset('website/images/review/review (5).jpeg') }}" alt="">
-										</div>
-									</li>
+                                    <li class="splide__slide">
+                                        <div class="review-card">
+                                            <img src="{{ asset('website/images/review/review (5).jpeg') }}" alt="">
+                                        </div>
+                                    </li>
 
-								</ul>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- End Testimonial Slider -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Testimonial Slider -->
 
     <!-- Start Footer Section -->
     <footer class="footer-section">
@@ -154,7 +143,8 @@
             <div class="row g-5 mb-5">
                 <div class="col-lg-4">
                     <div class="mb-4 footer-logo-wrap"><a href="#" class="footer-logo">BZportsZone<span>.</span></a></div>
-                    <p class="mb-4 font-roboto-regular">We are committed to delivering premium-quality sports jerseys with reliable service and customer satisfaction at the core. From product quality to post-purchase support, we make sure your shopping experience is smooth, secure, and enjoyable.</p>
+                    <p class="mb-4 font-roboto-regular">We are committed to delivering premium-quality sports jerseys with reliable service and customer satisfaction at the core. From product quality
+                        to post-purchase support, we make sure your shopping experience is smooth, secure, and enjoyable.</p>
 
                     <ul class="list-unstyled custom-social">
                         <li><a href="#"><span class="fa fa-brands fa-facebook-f"></span></a></li>
@@ -177,28 +167,28 @@
 
                         <div class="col-6 col-sm-6 col-md-3">
                             <ul class="list-unstyled">
-                                <li><a href="#">Football Jersey</a></li>
-                                <li><a href="#">Cricket Jersey</a></li>
-                                <li><a href="#">Counter Jersey</a></li>
-                                <li><a href="#">Club Jersey</a></li>
+                                <li><a href="{{ route('category', 'football-jersey') }}">Football Jersey</a></li>
+                                <li><a href="{{ route('category', 'cricket-jersey') }}">Cricket Jersey</a></li>
+                                <li><a href="{{ route('category', 'football-club-jersey') }}">Football Club Jersey</a></li>
+                                <li><a href="{{ route('category', 'cricket-club-jersey') }}">Cricket Club Jersey</a></li>
                             </ul>
                         </div>
 
                         <div class="col-6 col-sm-6 col-md-3">
                             <ul class="list-unstyled">
-                                <li><a href="#">Barcelona Jersey</a></li>
-                                <li><a href="#">Real Madrid Jersey</a></li>
-                                <li><a href="#">Liverpool Jersey</a></li>
-                                <li><a href="#">Arsenal Jersey</a></li>
+                                <li><a href="{{ route('category', 'barcelona-jersey') }}">Barcelona Jersey</a></li>
+                                <li><a href="{{ route('category', 'real-madrid-jersey') }}">Real Madrid Jersey</a></li>
+                                <li><a href="{{ route('category', 'liverpool-jersey') }}">Liverpool Jersey</a></li>
+                                <li><a href="{{ route('category', 'arsenal-jersey') }}">Arsenal Jersey</a></li>
                             </ul>
                         </div>
 
                         <div class="col-6 col-sm-6 col-md-3">
                             <ul class="list-unstyled">
-                                <li><a href="#">Manchester United Jersey</a></li>
-                                <li><a href="#">Mancity Jersey</a></li>
-                                <li><a href="#">AC Milan Jersey</a></li>
-                                <li><a href="#">PSG Jersey</a></li>
+                                <li><a href="{{ route('category', 'manchester-united-jersey') }}">Manchester United Jersey</a></li>
+                                <li><a href="{{ route('category', 'mancity-jersey') }}">Mancity Jersey</a></li>
+                                <li><a href="{{ route('category', 'ac-milan-jersey') }}">AC Milan Jersey</a></li>
+                                <li><a href="{{ route('category', 'psg-jersey') }}">PSG Jersey</a></li>
                             </ul>
                         </div>
                     </div>
@@ -211,7 +201,6 @@
                     <div class="col-lg-6">
                         <p class="mb-2 text-center text-lg-start">Copyright &copy;
                             <span id="copyright-year"></span>. All Rights Reserved. &mdash; BSportsZone
-                            <!-- License information: https://untree.co/license/ -->
                         </p>
                     </div>
 
@@ -236,9 +225,9 @@
     <script src="{{ asset('website/js/custom.js') }}"></script>
 
     <script>
-        var websiteData = {
-            currentYear: new Date().getFullYear()
-        }
+    var websiteData = {
+        currentYear: new Date().getFullYear()
+    }
     </script>
 
     <script src="{{ asset('website/js/common.js') }}"></script>
@@ -246,10 +235,9 @@
 
     <script>
         $(document).ready(function() {
+
             Website.Common.updateCopyRightYear();
             Website.AddToCart.setWebsiteCartCount();
-
-
             $('.add-to-cart-btn').on('click', function() {
                 let selectedProduct = {
                     id: $(this).data('product-id'),
@@ -267,40 +255,14 @@
                 };
 
                 let isAdded = Website.AddToCart.addProductToWebsiteCart(selectedProduct);
-                if(isAdded){
-                    Website.Common.showToastMessage('success', 'The '+selectedProduct.variation_tagline + ' added to cart successfully!');
+                if (isAdded) {
+                    Website.Common.showToastMessage('success', 'The ' + selectedProduct.variation_tagline + ' added to cart successfully!');
                     Website.AddToCart.setWebsiteCartCount();
                 }
-
             })
-
-            // Website.Common.showToastMessage('success', 'Product added to cart!');
-            // Website.Common.showToastMessage('error', 'Something went wrong!');
-            // Website.Common.showToastMessage('warning', 'Please select a size first!');
-
-        });
+            d
+        }); // end jquery
     </script>
-<!-- 
-    <script>
-		new Splide('#reviewSplide', {
-			type: 'loop',
-			perPage: 6,
-			gap: '5px',
-			arrows: true,
-			pagination: false,
-			drag: true,
-			autoScroll: {
-				speed: 1.2,
-			},
-			breakpoints: {
-				768: { perPage: 5 },
-				480: { perPage: 4 },
-				320: { perPage: 3 }
-			}
-		}).mount(window.splide.Extensions);
-	</script> -->
-
-
     @yield('scripts')
 </body>
 

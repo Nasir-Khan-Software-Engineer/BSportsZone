@@ -1,13 +1,44 @@
 @extends('public.master')
 
+@section('seo')
+    <meta name="description" content="{{ $product->seo_description' }}" />
+    <meta name="keywords" content="{{ $product->seo_keywords' }}" />
+    <title>Get Your Premium Jersey From Bangladesh Sports Zone.</title>
+@endsection
 
 @section('content')
-<div class="untree_co-section product-section before-footer-section single-product-page">
+<div class="bsports-zone product-section before-footer-section single-product-page">
     <div class="container">
         <div class="row">
             <div class="col-12 col-lg-4">
                 <div class="product-image">
-                    <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="Image" class="img-fluid">
+                    <!-- <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="Image" class="img-fluid"> -->
+
+                    <div id="singleProductImageSlider" class="splide">
+                        <div class="splide__track">
+                            <ul class="splide__list">
+
+                                <li class="splide__slide">
+                                    <div class="review-card">
+                                        <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="">
+                                    </div>
+                                </li>
+
+                                <li class="splide__slide">
+                                    <div class="review-card">
+                                        <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="">
+                                    </div>
+                                </li>
+
+                                <li class="splide__slide">
+                                    <div class="review-card">
+                                        <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="">
+                                    </div>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-12 col-lg-8">
@@ -26,16 +57,12 @@
                     <div class="variation">
                         <div><i>Select Yours</i></div>
                         @foreach($product->variations as $variation)
-                            <button class="variation-btn {{ $variation->is_default ? 'active' : '' }}"
-                                data-variation-id="{{ $variation->id }}"
-                                data-variation-tagline="{{ $variation->tagline }}"
-                                data-variation-selling-price="{{ $variation->selling_price }}"
-                                data-variation-price-after-discount="{{ $variation->price_after_discount }}"
-                                data-variation-discount-type="{{ $variation->discount_type }}"
-                                data-variation-discount-value="{{ $variation->discount_value }}">
-                                {{ $variation->tagline }}
-                                <i class="fa-solid fa-check"></i>
-                            </button>
+                        <button class="variation-btn {{ $variation->is_default ? 'active' : '' }}" data-variation-id="{{ $variation->id }}" data-variation-tagline="{{ $variation->tagline }}"
+                            data-variation-selling-price="{{ $variation->selling_price }}" data-variation-price-after-discount="{{ $variation->price_after_discount }}"
+                            data-variation-discount-type="{{ $variation->discount_type }}" data-variation-discount-value="{{ $variation->discount_value }}">
+                            {{ $variation->tagline }}
+                            <i class="fa-solid fa-check"></i>
+                        </button>
                         @endforeach
                     </div>
 
@@ -43,17 +70,15 @@
                         <div><i>Select Quantity</i></div>
                         <div class="input-group mb-3" style="max-width: 150px;">
                             <button class="qty-minus-btn qty-btn" type="button">&minus;</button>
-                            <input id="quantityInput" type="text" class="form-control text-center quantity" value="1" placeholder="" aria-label="Example text with button addon" aria-describedby="button-addon1">
+                            <input id="quantityInput" type="text" class="form-control text-center quantity" value="1" placeholder="" aria-label="Example text with button addon"
+                                aria-describedby="button-addon1">
                             <button class="qty-plus-btn qty-btn" type="button">&plus;</button>
                         </div>
                     </div>
 
                     <p>
-                        <button
-                        data-product-id="{{$product->id}}"
-                        data-product-name="{{$product->name}}"
-                        data-product-image="{{$product->image}}"
-                        id="addToCartBtn" class="single-add-to-cart-btn">Add to Cart</button>
+                        <button data-product-id="{{$product->id}}" data-product-name="{{$product->name}}" data-product-image="{{$product->image}}" id="addToCartBtn" class="single-add-to-cart-btn">Add
+                            to Cart</button>
                         <a href="index.html" class="buy-now-btn mt-1">Cash on Delivery</a>
                     </p>
                 </div>
@@ -75,7 +100,7 @@
             <div class="col-12 col-lg-3 mt-1">
 
                 <!-- // review Section -->
-                
+
 
                 <div class="row justify-content-center">
                     <div class="col-lg-12">
@@ -139,20 +164,12 @@
                                     <strong>Tk.{{ number_format($rproduct->price_after_discount, 2) }}</strong>
                                 </div>
                             </a>
-                            <button type="button" class="add-to-cart-btn"
-                            data-product-id="{{ $rproduct->id }}"
-                            data-product-name="{{ $rproduct->name }}"
-                            data-product-image="{{ $rproduct->image }}"
-                            data-product-quantity="1"
-
-                            data-variation-id="{{ $rproduct->default_variation_id }}"
-                            data-variation-price-after-discount="{{ $rproduct->default_variation_price_after_discount }}"
-                            data-variation-selling-price="{{ $rproduct->default_variation_selling_price }}"
-                            data-variation-discount-type="{{ $rproduct->default_variation_discount_type }}"
-                            data-variation-discount-value="{{ $rproduct->default_variation_discount_value }}"
-                            data-variation-tagline="{{ $rproduct->default_variation_tagline }}"
-
-                            >Add to Cart</button>
+                            <button type="button" class="add-to-cart-btn" data-product-id="{{ $rproduct->id }}" data-product-name="{{ $rproduct->name }}" data-product-image="{{ $rproduct->image }}"
+                                data-product-quantity="1" data-variation-id="{{ $rproduct->default_variation_id }}"
+                                data-variation-price-after-discount="{{ $rproduct->default_variation_price_after_discount }}"
+                                data-variation-selling-price="{{ $rproduct->default_variation_selling_price }}" data-variation-discount-type="{{ $rproduct->default_variation_discount_type }}"
+                                data-variation-discount-value="{{ $rproduct->default_variation_discount_value }}" data-variation-tagline="{{ $rproduct->default_variation_tagline }}">Add to
+                                Cart</button>
                         </div>
                     </div>
                     @endforeach
@@ -164,34 +181,57 @@
 @endsection
 
 @section('scripts')
-    <script>
-        var websiteData = {};
+<script>
+var websiteData = {};
 
-        document.querySelectorAll('.faq-question').forEach(question => {
-			question.addEventListener('click', () => {
-				const item = question.parentElement;
-				item.classList.toggle('active');
-			});
-		});
+document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+        const item = question.parentElement;
+        item.classList.toggle('active');
+    });
+});
 
-        new Splide('#singleProductPageReviewSplide', {
-			type: 'loop',
-			perPage: 2,
-			gap: '1px',
-			arrows: false,
-			pagination: true,
-			drag: true,
-            grab: true,
-			autoScroll: {
-				speed: 0.5,
-			},
-			breakpoints: {
-				768: { perPage: 1 },
-				480: { perPage: 1 },
-				320: { perPage: 1 }
-			}
-		}).mount(window.splide.Extensions);
-    </script>
+    new Splide('#singleProductPageReviewSplide', {
+        type: 'loop',
+        perPage: 2,
+        gap: '1px',
+        arrows: false,
+        pagination: true,
+        drag: true,
+        grab: true,
+        autoScroll: {
+            speed: 0.5,
+        },
+        breakpoints: {
+            768: {
+                perPage: 1
+            },
+            480: {
+                perPage: 1
+            },
+            320: {
+                perPage: 1
+            }
+        }
+    }).mount(window.splide.Extensions);
 
-    <script src="{{ asset('website/js/single-product-script.js') }}"></script>
+
+    new Splide('#singleProductImageSlider', {
+        type: 'slide',
+        perPage: 1,
+        gap: '1px',
+        arrows: true,
+        pagination: true,
+        drag: true,
+        grab: true,
+        breakpoints: {
+            768: { perPage: 1 },
+            480: { perPage: 1 },
+            320: { perPage: 1 }
+        }
+    }).mount();
+
+</script>
+
+<script src="{{ asset('website/js/single-product-script.js') }}"></script>
 @endsection

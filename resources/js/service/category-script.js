@@ -1,4 +1,30 @@
 WinPos.Category = (function(Urls){
+    // Auto-generate slug from category name
+    var generateSlug = function(name) {
+        return name.toLowerCase()
+            .trim()
+            .replace(/[^\w\s-]/g, '')
+            .replace(/[\s_-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    };
+
+    // Update slug when name changes (if slug is empty)
+    var setupSlugAutoGeneration = function() {
+        $('#createCategoryForm #categoryName').on('input', function() {
+            let slugField = $('#createCategoryForm #categorySlug');
+            if (!slugField.val() || slugField.data('auto-generated')) {
+                let slug = generateSlug($(this).val());
+                slugField.val(slug);
+                slugField.data('auto-generated', true);
+            }
+        });
+
+        // Mark slug as manually edited if user types in it
+        $('#createCategoryForm #categorySlug').on('input', function() {
+            $(this).data('auto-generated', false);
+        });
+    };
+
     var validateCategory = function (formData, type, callback){
 
         let category = $('#createCategoryForm #categoryName').val().trim();
@@ -29,6 +55,23 @@ WinPos.Category = (function(Urls){
 
             update(formData, id, callback);
         }
+    }
+
+    var loadCategoryForEdit = function(categoryId, callback) {
+        WinPos.Common.getAjaxCall(Urls.editCategory.replace('categoryid', categoryId), function(response) {
+            if(response.status === 'success') {
+                let cat = response.category;
+                $('#createCategoryForm #categoryName').val(cat.name || '');
+                $('#createCategoryForm #categorySlug').val(cat.slug || '').data('auto-generated', false);
+                $('#createCategoryForm #categoryTitle').val(cat.title || '');
+                $('#createCategoryForm #categoryKeyword').val(cat.keyword || '');
+                $('#createCategoryForm #categoryDescription').val(cat.description || '');
+                $('#createCategoryForm #categoryID').val(cat.id);
+                if(callback) callback();
+            } else {
+                toastr.error('Failed to load category data');
+            }
+        });
     }
 
     var save = function (formData, callback){
@@ -90,6 +133,8 @@ WinPos.Category = (function(Urls){
 
     return {
         saveCategory: validateCategory,
-        deleteCategory: deleteCategory
+        deleteCategory: deleteCategory,
+        loadCategoryForEdit: loadCategoryForEdit,
+        setupSlugAutoGeneration: setupSlugAutoGeneration
     }
 })(CategoryUrls);

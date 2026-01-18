@@ -13,6 +13,10 @@ class Category extends Model
     protected $fillable = [
         'POSID',
         'name',
+        'slug',
+        'title',
+        'keyword',
+        'description',
         'logo',
         'created_by',
         'updated_by',

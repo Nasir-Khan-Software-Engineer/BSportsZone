@@ -105,10 +105,17 @@ $(document).ready(function() {
         $("#categoryName").focus();
     })
 
+    // Setup slug auto-generation
+    WinPos.Category.setupSlugAutoGeneration();
+
     $("#createCategoryBtn").on('click', function() {
         $("#createCategoryModalLabel").html("Create New Category")
         $("#saveUpdateCategory").attr('data-type', 'create').html('<i class="fa-solid fa-floppy-disk"></i> Create');
         $("#categoryName").val("");
+        $("#categorySlug").val("").data('auto-generated', false);
+        $("#categoryTitle").val("");
+        $("#categoryKeyword").val("");
+        $("#categoryDescription").val("");
         $("#categoryID").val("");
         $("[name='_method']").val("POST");
 
@@ -117,14 +124,16 @@ $(document).ready(function() {
 
     $('#categoryTable').on("click", ".edit-category", function() {
         WinPos.Datatable.selectRow(this);
+        let categoryId = $(this).attr('data-id');
 
-        $("#createCategoryModalLabel").text("Update Category | Category ID: " + $(this).attr('data-id'))
-        $("#categoryName").val($(this).attr('data-name'));
-        $("#categoryID").val($(this).attr('data-id'));
+        $("#createCategoryModalLabel").text("Update Category | Category ID: " + categoryId)
         $("#saveUpdateCategory").attr('data-type', 'update').html('<i class="fa-solid fa-floppy-disk"></i> Update');
-
-        $("#createCategoryModal").modal('show');
         $("[name='_method']").val("PUT");
+
+        // Load category data via AJAX
+        WinPos.Category.loadCategoryForEdit(categoryId, function() {
+            $("#createCategoryModal").modal('show');
+        });
     });
 
     $("#saveUpdateCategory").on('click', function(event) {

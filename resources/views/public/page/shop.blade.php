@@ -1,7 +1,14 @@
 @extends('public.master')
 
+@section('seo')
+    <meta name="description" content="Discover high-quality, stylish jerseys designed for comfort, performance, and everyday wear. <br>
+                        Find your perfect fit and represent your team with pride." />
+    <meta name="keywords" content="sports jersey, premium jersey, comfort jersey, performance jersey, true fans jersey" />
+    <title>Shop Premium Sports Jerseys</title>
+@endsection
+
 @section('content')
-<div class="untree_co-section product-section before-footer-section">
+<div class="bsports-zone product-section before-footer-section">
     <div class="container">
         <div class="row">
             <div class="col-12">
@@ -15,7 +22,6 @@
                 </div>
             </div>
         </div>
-
 
         <div class="row">
             @forelse($products as $product)

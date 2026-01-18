@@ -1,8 +1,13 @@
 @extends('public.master')
 
+@section('seo')
+    <meta name="description" content="Premium quality jersey designed for comfort, performance, and true fans." />
+    <meta name="keywords" content="sports jersey, premium jersey, comfort jersey, performance jersey, true fans jersey" />
+    <title>Get Your Premium Jersey From Bangladesh Sports Zone.</title>
+@endsection
 
 @section('content')
-<div class="untree_co-section">
+<div class="bsports-zone">
     <div class="container pb-5">
 
         <div class="row">

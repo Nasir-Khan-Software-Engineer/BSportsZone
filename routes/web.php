@@ -43,9 +43,11 @@ use App\Http\Controllers\HelpPortal\LoyaltyHelpController;
 
 use App\Http\Controllers\Public\PublicProductController;
 use App\Http\Controllers\Public\PublicIndexController;
+use App\Http\Controllers\Public\PublicCategoryController;
 
 Route::get('/', [PublicIndexController::class, 'index'])->name('index');
 Route::get('/shop/{page?}', [PublicProductController::class, 'index'])->name('shop')->where('page', '[0-9]+');
+Route::get('/category/{slug}/{page?}', [PublicCategoryController::class, 'index'])->name('category')->where('page', '[0-9]+');
 Route::get('/checkout', [PublicIndexController::class, 'checkout'])->name('checkout');
 Route::post('/place-order', [PublicIndexController::class, 'placeOrder'])->name('placeOrder');
 Route::get('/order/thanks/{order}', [PublicIndexController::class, 'thanks'])->name('order.thanks');

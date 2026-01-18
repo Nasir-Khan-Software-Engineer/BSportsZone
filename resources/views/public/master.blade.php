@@ -36,7 +36,9 @@
 </head>
 
 <body>
-
+    <li class="check-out-btn"><a class="nav-link" href="{{ route('checkout') }}">
+        <img src="{{asset('website/images/cart.svg') }}"></a>
+    </li>
     <!-- Start Header/Navigation -->
     <nav class="custom-navbar navbar navbar navbar-expand-md navbar-dark bg-dark fixed-top" arial-label="Furni navigation bar">
 
@@ -60,11 +62,9 @@
                     <li><a class="nav-link" href="{{ route('category', 'club') }}">Club</a></li>
                 </ul>
 
-                <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
-                    <li class="check-out-btn"><a class="nav-link" href="{{ route('checkout') }}">
-                            <img src="{{asset('website/images/cart.svg') }}"></a>
-                    </li>
-                </ul>
+                
+                    
+                
             </div>
         </div>
 

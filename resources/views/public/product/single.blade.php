@@ -190,13 +190,13 @@ document.querySelectorAll('.faq-question').forEach(question => {
         },
         breakpoints: {
             768: {
-                perPage: 1
+                perPage: 2
             },
             480: {
-                perPage: 1
+                perPage: 2
             },
             320: {
-                perPage: 1
+                perPage: 2
             }
         }
     }).mount(window.splide.Extensions);

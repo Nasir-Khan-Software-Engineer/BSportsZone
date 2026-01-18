@@ -12,30 +12,16 @@
         <div class="row">
             <div class="col-12 col-lg-4">
                 <div class="product-image">
-                    <!-- <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="Image" class="img-fluid"> -->
-
                     <div id="singleProductImageSlider" class="splide">
                         <div class="splide__track">
                             <ul class="splide__list">
-
+                                @foreach($product->images as $image)
                                 <li class="splide__slide">
                                     <div class="review-card">
-                                        <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="">
+                                        <img src="{{ asset('images/1/Product/') }}/{{$image->image_name}}" alt="{{$product->name}}">
                                     </div>
                                 </li>
-
-                                <li class="splide__slide">
-                                    <div class="review-card">
-                                        <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="">
-                                    </div>
-                                </li>
-
-                                <li class="splide__slide">
-                                    <div class="review-card">
-                                        <img src="{{ asset('images/1/Product/') }}/argentina.png" alt="">
-                                    </div>
-                                </li>
-
+                                @endforeach
                             </ul>
                         </div>
                     </div>

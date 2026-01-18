@@ -52,7 +52,7 @@ class PublicProductController extends Controller
 
     public function product($slug)
     {
-        $product = Product::with('images', 'variations', 'relatedProducts')
+        $product = Product::with('images', 'variations', 'relatedProducts', 'images')
             ->where('slug', $slug)
             ->where('is_published', true)
             ->where('type', 'Product')

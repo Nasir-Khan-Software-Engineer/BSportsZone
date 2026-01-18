@@ -137,7 +137,7 @@
         <div class="container relative">
 
             <div class="sofa-img">
-                <img src="http://127.0.0.1:8000/images/1/Product/argentina-back_2026-01-16_17-37-23.png" alt="Image" class="img-fluid">
+                <img src="https://bsportszone.com/images/1/Product/argentina-back_2026-01-18_16-56-20.png" alt="Image" class="img-fluid">
             </div>
 
             <div class="row g-5 mb-5">
